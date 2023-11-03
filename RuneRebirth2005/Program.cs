@@ -11,6 +11,7 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
+    Server server = new Server();
     Log.Information("Application Starting");
     ServerEngine serverEngine = new ServerEngine();
     serverEngine.Run();
