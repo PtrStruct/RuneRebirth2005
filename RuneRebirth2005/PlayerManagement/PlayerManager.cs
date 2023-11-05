@@ -2,6 +2,7 @@
 using RuneRebirth2005.ClientManagement;
 using RuneRebirth2005.Entities;
 using RuneRebirth2005.Network;
+using RuneRebirth2005.Network.Outgoing;
 using Serilog;
 
 namespace RuneRebirth2005.PlayerManagement;
@@ -24,10 +25,10 @@ public static class PlayerManager
     public static void DisconnectClient(Client client)
     {
         if (client.Index != -1)
-            Server.Players[client.Index] = null;
+            Server.Players[client.Index] = new Player();
 
         client.Socket.Close();
-        Log.Information($"Client {client.Index} disconnected.");
+        Log.Warning($"Client {client.Index} disconnected.");
     }
 
     public static void AssignAvailablePlayerSlot(Player player)
@@ -48,6 +49,17 @@ public static class PlayerManager
     public static void RegisterPlayer(Player player)
     {
         Server.Players[player.Index] = player;
-        Log.Information($"+ [{player.Index}] has been registered!");
+        Log.Information($"Client with ID: [{player.Index}] has been registered!");
+    }
+
+    public static void Login(Player player)
+    {
+        player.IsUpdateRequired = true;
+        player.DidTeleportOrSpawn = true;
+        player.Flags |= PlayerUpdateFlags.Appearance;
+
+        new RegionLoadPacket(player).Add();
+        // new PlayerUpdatePacket(player).Add();
+        new SendPlayerStatus(player).Add();
     }
 }

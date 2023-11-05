@@ -1,4 +1,6 @@
 ﻿using RuneRebirth2005.Entities;
+using RuneRebirth2005.Network;
+using RuneRebirth2005.Network.Outgoing;
 
 namespace RuneRebirth2005;
 

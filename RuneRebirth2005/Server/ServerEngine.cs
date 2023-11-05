@@ -1,12 +1,13 @@
 ﻿using System.Diagnostics;
 using RuneRebirth2005.Network;
+using RuneRebirth2005.Network.Outgoing;
+using Serilog;
 
 namespace RuneRebirth2005;
 
 public class ServerEngine
 {
     private bool _isRunning;
-
 
     public void Run()
     {
@@ -47,12 +48,44 @@ public class ServerEngine
 
     private void WarnAboutDeficit(TimeSpan sleepTime, double elapsedMilliseconds)
     {
-        Console.WriteLine(
-            $"Server can't keep up!\nElapsed: {elapsedMilliseconds} ms\nDeficit: {-sleepTime.TotalMilliseconds} ms");
+        Log.Warning(
+            $"Server can't keep up!\nElapsed: {elapsedMilliseconds} ms\nDeficit: {-sleepTime.TotalMilliseconds} ms.");
     }
 
     private void Tick()
     {
         ConnectionHandler.AcceptClients();
+
+        /* Fetch Incoming Data */
+        Log.Information("Fetching data from clients..");
+        foreach (var player in Server.Players)
+        {
+            if (player.Index == -1) continue;
+            for (int i = 0; i < 50; i++)
+                player.PacketHandler.RetrievePacket();
+        }
+
+        /* Process Incoming Data */
+        Log.Information("Processing fetched data..");
+        foreach (var player in Server.Players)
+        {
+            if (player.Index == -1) continue;
+            player.PacketStore.ProcessPackets();
+            new PlayerUpdatePacket(player).Add();
+        }
+
+        /* Send buffered data */
+        Log.Information("Flushing the buffered data!");
+        foreach (var player in Server.Players)
+        {
+            if (player.Index == -1) continue;
+            player.FlushBufferedData();
+        }
+        
+        foreach (var player in Server.Players)
+        {
+            if (player.Index == -1) continue;
+            player.Reset();
+        }
     }
 }
