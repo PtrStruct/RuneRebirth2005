@@ -2,13 +2,13 @@
 
 namespace RuneRebirth2005.Network.Outgoing;
 
-public class SendPlayerMessage
+public class SendPlayerMessagePacket
 {
     private readonly Player _player;
     private readonly int _x;
     private readonly int _y;
 
-    public SendPlayerMessage(Player player)
+    public SendPlayerMessagePacket(Player player)
     {
         _player = player;
         _x = player.Location.CenterChunkX;

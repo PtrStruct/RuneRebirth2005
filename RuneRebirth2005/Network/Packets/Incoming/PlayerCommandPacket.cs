@@ -28,10 +28,15 @@ public class PlayerCommandPacket : IPacket
         {
             case "pos":
                 foreach (var message in _player.Location.ToStringParts())
-                {
-                    new SendPlayerMessage(_player).Add(message);
-                }
-
+                    new SendPlayerMessagePacket(_player).Add(message);
+                break;
+            case "hair":
+                var style = int.Parse(_commandArgs[1]);
+                var color = int.Parse(_commandArgs[2]);
+                _player.Appearance.Hair = style;
+                _player.Colors.Hair = color;
+                _player.IsUpdateRequired = true;
+                _player.Flags |= PlayerUpdateFlags.Appearance;
                 break;
         }
     }

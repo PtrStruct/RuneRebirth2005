@@ -104,17 +104,15 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
         // writer.WriteBits(1, 0);
 
-        // if (updateRequired)
-        // {
-        //     writer.WriteBits(1, 1);
-        //     writer.WriteBits(2, 0);
-        //     // AppendStand(writer);
-        //     player.IsUpdateRequired = false;
-        // }
-        // else
-        // {
-        writer.WriteBits(1, 0);
-        // }
+        if (player.IsUpdateRequired)
+        {
+            writer.WriteBits(1, 1);
+            writer.WriteBits(2, 0);
+        }
+        else
+        {
+            writer.WriteBits(1, 0);
+        }
     }
 
     private void RemovePlayer(Player other)
@@ -188,7 +186,8 @@ public class PlayerUpdatePacket(Player currentPlayer)
             return;
         }
 
-        if (currentPlayer.DidTeleportOrSpawn)
+
+        if (currentPlayer.DidTeleportOrSpawn || currentPlayer.IsUpdateRequired)
         {
             AppendTeleportOrSpawn();
         }
