@@ -24,8 +24,7 @@ public static class ConnectionHandler
                 continue;
 
             var tcpClient = tcpListener.AcceptTcpClient();
-            Log.Information(
-                $"+ Incoming Connection From: {((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString()}");
+            Log.Information($"Incoming Connection From: {((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString()}");
             try
             {
                 var player = PlayerManager.InitializeClient(tcpClient);
@@ -36,10 +35,16 @@ public static class ConnectionHandler
                     return;
                 }
 
-                if (player.LoginHandler.Login())
+                if (player.LoginHandler.Handshake())
                 {
                     PlayerManager.AssignAvailablePlayerSlot(player);
+                    
+                    int count = Server.Players.Where(x => x?.Index != -1).Count();
+                    player.Location.X = 3200 + count;
+                    player.Location.Y = 3200;
+                    
                     PlayerManager.RegisterPlayer(player);
+                    PlayerManager.Login(player);
                 }
                 else
                 {

@@ -5,7 +5,7 @@ namespace RuneRebirth2005.Network;
 
 public class LoginHandler(Client client)
 {
-    public bool Login()
+    public bool Handshake()
     {
         var serverSessionKey = SessionEncryption.GenerateServerSessionKey();
 
@@ -19,7 +19,7 @@ public class LoginHandler(Client client)
 
         client.Writer.WriteByte(0); //responseCode 0 - Exchanges session keys, player name, password, etc. 
         client.Writer.WriteQWord(serverSessionKey);
-        client.DirectFlushStream(); /* Send */
+        client.FlushBufferedData(); /* Send */
 
         client.FillStream(2);
         var connectionStatus = client.Reader.ReadUnsignedByte();
@@ -49,23 +49,21 @@ public class LoginHandler(Client client)
         client.Writer.packetEncryption = client.OutEncryption;
 
         var UID = client.Reader.ReadDWord();
-        var Username = client.Reader.ReadString();
-        client.Username = Username;
+        client.Username = client.Reader.ReadString();
         client.Password = client.Reader.ReadString();
 
-
-        if (Server.Players.Any(player => string.Equals(player?.Username, Username, StringComparison.CurrentCultureIgnoreCase)))
+        if (Server.Players.Any(player => string.Equals(player?.Username, client.Username, StringComparison.CurrentCultureIgnoreCase)))
         {
-            Log.Information($"{Username} tried logging in even though they're already logged in.");
+            Log.Information($"{client.Username} tried logging in even though they're already logged in.");
             client.Writer.WriteByte(5);
-            client.DirectFlushStream();
+            client.FlushBufferedData();
             return false;
         }
 
         client.Writer.WriteByte(2); /* Secondary response code 2 = Login | 5 = Already logged in etc. */
         client.Writer.WriteByte(2);
         client.Writer.WriteByte(0);
-        client.DirectFlushStream();
+        client.FlushBufferedData();
 
         return true;
     }

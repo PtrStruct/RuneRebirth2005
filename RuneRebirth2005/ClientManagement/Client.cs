@@ -1,5 +1,7 @@
 ﻿using System.Net.Sockets;
+using RuneRebirth2005.Entities;
 using RuneRebirth2005.Network;
+using Serilog;
 
 namespace RuneRebirth2005.ClientManagement;
 
@@ -20,10 +22,11 @@ public class Client
     public LoginHandler LoginHandler { get; set; }
     public string Username { get; set; }
     public string Password { get; set; }
+    public List<Player> LocalPlayers { get; set; } = new();
 
     public void Disconnect(string reason)
     {
-        Server.Players[Index] = null;
+        Server.Players[Index] = new Player();
         Socket.Close();
         Console.WriteLine($"Client {Index} disconnected. Reason: {reason}");
     }
@@ -45,14 +48,14 @@ public class Client
         }
     }
 
-    public void DirectFlushStream()
+    public void FlushBufferedData()
     {
         try
         {
             NetworkStream.Write(Writer.Buffer, 0, Writer.CurrentOffset);
-            Console.WriteLine($"Flushing {Writer.CurrentOffset} bytes of data.");
-            Writer.CurrentOffset = 0;
             NetworkStream.Flush();
+            Log.Information($"Flushed {Writer.CurrentOffset} bytes of data.");
+            Writer.CurrentOffset = 0;
         }
         catch (IOException ex)
         {
