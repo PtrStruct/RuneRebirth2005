@@ -188,7 +188,8 @@ public class PlayerUpdatePacket(Player currentPlayer)
             return;
         }
 
-        if (currentPlayer.DidTeleportOrSpawn)
+
+        if (currentPlayer.DidTeleportOrSpawn || currentPlayer.IsUpdateRequired)
         {
             AppendTeleportOrSpawn();
         }

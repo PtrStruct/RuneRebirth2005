@@ -3,17 +3,15 @@ using RuneRebirth2005.Entities;
 namespace RuneRebirth2005.Network.Outgoing;
 
 
-public class SendPlayerStatus
+public class SendPlayerStatusPackets
 {
     private readonly Player _player;
     private readonly int _x;
     private readonly int _y;
 
-    public SendPlayerStatus(Player player)
+    public SendPlayerStatusPackets(Player player)
     {
         _player = player;
-        _x = player.Location.CenterChunkX;
-        _y = player.Location.CenterChunkY;
     }
 
     public void Add()

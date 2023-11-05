@@ -59,7 +59,20 @@ public static class PlayerManager
         player.Flags |= PlayerUpdateFlags.Appearance;
 
         new RegionLoadPacket(player).Add();
-        // new PlayerUpdatePacket(player).Add();
-        new SendPlayerStatus(player).Add();
+        new SendPlayerStatusPackets(player).Add();
+        new SetSidebarInterfacePacket(player).Add(0, 2423);
+        new SetSidebarInterfacePacket(player).Add(1, 3917);
+        new SetSidebarInterfacePacket(player).Add(2, 638);
+        new SetSidebarInterfacePacket(player).Add(3, 3213);
+        new SetSidebarInterfacePacket(player).Add(4, 1644);
+        new SetSidebarInterfacePacket(player).Add(5, 5608);
+        new SetSidebarInterfacePacket(player).Add(6, 1151);
+        new SetSidebarInterfacePacket(player).Add(8, 5065);
+        new SetSidebarInterfacePacket(player).Add(9, 5715);
+        new SetSidebarInterfacePacket(player).Add(10, 2449);
+        new SetSidebarInterfacePacket(player).Add(11, 4445);
+        new SetSidebarInterfacePacket(player).Add(12, 147);
+        new SetSidebarInterfacePacket(player).Add(13, 6299);
+        
     }
 }
