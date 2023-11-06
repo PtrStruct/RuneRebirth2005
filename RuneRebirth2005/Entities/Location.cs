@@ -36,7 +36,9 @@ public class Location
     public int BuildAreaStartY { get; set; }
     public int PositionRelativeToOffsetChunkX => X - OffsetChunkX * 8;
     public int PositionRelativeToOffsetChunkY => Y - OffsetChunkY * 8;
-    public bool IsOutside => X < 16 || X >= 88 || Y < 16 || Y >= 88;
+
+    public bool IsOutside => PositionRelativeToOffsetChunkX < 16 || PositionRelativeToOffsetChunkX >= 88 ||
+                             PositionRelativeToOffsetChunkY < 16 || PositionRelativeToOffsetChunkY >= 88;
 
     public Location(int x, int y)
     {
@@ -93,7 +95,7 @@ public class Location
             $"PositionRelativeToOffsetChunkX: {PositionRelativeToOffsetChunkX} PositionRelativeToOffsetChunkY: {PositionRelativeToOffsetChunkY}",
             $"IsOutside: {IsOutside}"
         };
-    
+
         return messageParts;
     }
 }
