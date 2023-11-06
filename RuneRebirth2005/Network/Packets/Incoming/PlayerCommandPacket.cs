@@ -39,10 +39,9 @@ public class PlayerCommandPacket : IPacket
                 _player.Flags |= PlayerUpdateFlags.Appearance;
                 break;
             case "level":
-                // Parse provided skill ID and level
                 var skillId = int.Parse(_commandArgs[1]);
                 var level = int.Parse(_commandArgs[2]);
-    	
+
                 // Check if the provided skill id is valid
                 if (skillId >= 0 && skillId < Enum.GetNames(typeof(PlayerSkills.Skill)).Length)
                 {
@@ -50,10 +49,13 @@ public class PlayerCommandPacket : IPacket
                     _player.SavePlayer();
                 }
                 else
-                {
-                    // Output an error message or handle the invalid input as you see fit
                     new SendPlayerMessagePacket(_player).Add("Invalid skill ID provided");
-                }
+
+                break;
+
+            case "logout":
+                _player.SavePlayer();
+                new LogoutPacket(_player).Add();
                 break;
         }
     }

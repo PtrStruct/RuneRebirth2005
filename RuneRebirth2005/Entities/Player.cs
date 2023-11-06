@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using RuneRebirth2005.ClientManagement;
 using RuneRebirth2005.Network;
+using Serilog;
 
 namespace RuneRebirth2005.Entities;
 
@@ -54,6 +55,7 @@ public class Player : Client, IEntity
         // Save the file to the directory
         using FileStream createStream = File.Create(filePath);
         JsonSerializer.Serialize(createStream, Data, new JsonSerializerOptions() { WriteIndented = true });
+        Log.Information($"Saving player data for: {Username}.");
     }
 
     public void LoadPlayer()
@@ -63,5 +65,6 @@ public class Player : Client, IEntity
         
         using FileStream openStream = File.OpenRead(filePath);
         Data = JsonSerializer.Deserialize<PlayerData>(openStream);
+        Log.Information($"Loaded player data for: {Username}.");
     }
 }
