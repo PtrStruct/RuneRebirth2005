@@ -11,8 +11,8 @@ public class RegionLoadPacket
     public RegionLoadPacket(Player player)
     {
         _player = player;
-        _x = player.Location.CenterChunkX;
-        _y = player.Location.CenterChunkY;
+        _x = player.Data.Location.CenterChunkX;
+        _y = player.Data.Location.CenterChunkY;
     }
 
     public void Add()

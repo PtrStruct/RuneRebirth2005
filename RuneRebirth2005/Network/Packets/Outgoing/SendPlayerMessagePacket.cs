@@ -11,8 +11,6 @@ public class SendPlayerMessagePacket
     public SendPlayerMessagePacket(Player player)
     {
         _player = player;
-        _x = player.Location.CenterChunkX;
-        _y = player.Location.CenterChunkY;
     }
 
     public void Add(string msg)

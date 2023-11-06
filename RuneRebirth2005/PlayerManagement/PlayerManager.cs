@@ -58,12 +58,14 @@ public static class PlayerManager
         player.DidTeleportOrSpawn = true;
         player.Flags |= PlayerUpdateFlags.Appearance;
 
+        // player.LoadPlayer();
+        
         new RegionLoadPacket(player).Add();
         new SendPlayerStatusPackets(player).Add();
         new SetSidebarInterfacePacket(player).Add(0, 2423);
         new SetSidebarInterfacePacket(player).Add(1, 3917);
         new SetSidebarInterfacePacket(player).Add(2, 638);
-        new SetSidebarInterfacePacket(player).Add(3, 3213);
+        new SetSidebarInterfacePacket(player).Add(3, 3213); /* Inventory */
         new SetSidebarInterfacePacket(player).Add(4, 1644);
         new SetSidebarInterfacePacket(player).Add(5, 5608);
         new SetSidebarInterfacePacket(player).Add(6, 1151);
@@ -73,6 +75,11 @@ public static class PlayerManager
         new SetSidebarInterfacePacket(player).Add(11, 4445);
         new SetSidebarInterfacePacket(player).Add(12, 147);
         new SetSidebarInterfacePacket(player).Add(13, 6299);
+        
+        new SetSidebarInterfacePacket(player).Add(0, 5855);
+        new TextToInterfacePacket(player).Add("Unarmed", 5857);
+        
+        player.LoadPlayer();
         
     }
 }
