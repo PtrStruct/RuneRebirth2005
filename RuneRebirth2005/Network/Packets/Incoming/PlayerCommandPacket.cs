@@ -27,16 +27,33 @@ public class PlayerCommandPacket : IPacket
         switch (command)
         {
             case "pos":
-                foreach (var message in _player.Location.ToStringParts())
+                foreach (var message in _player.Data.Location.ToStringParts())
                     new SendPlayerMessagePacket(_player).Add(message);
                 break;
             case "hair":
                 var style = int.Parse(_commandArgs[1]);
                 var color = int.Parse(_commandArgs[2]);
-                _player.Appearance.Hair = style;
-                _player.Colors.Hair = color;
+                _player.Data.Appearance.Hair = style;
+                _player.Data.Colors.Hair = color;
                 _player.IsUpdateRequired = true;
                 _player.Flags |= PlayerUpdateFlags.Appearance;
+                break;
+            case "level":
+                // Parse provided skill ID and level
+                var skillId = int.Parse(_commandArgs[1]);
+                var level = int.Parse(_commandArgs[2]);
+    	
+                // Check if the provided skill id is valid
+                if (skillId >= 0 && skillId < Enum.GetNames(typeof(PlayerSkills.Skill)).Length)
+                {
+                    _player.Data.PlayerSkills.Levels[skillId] = level;
+                    _player.SavePlayer();
+                }
+                else
+                {
+                    // Output an error message or handle the invalid input as you see fit
+                    new SendPlayerMessagePacket(_player).Add("Invalid skill ID provided");
+                }
                 break;
         }
     }

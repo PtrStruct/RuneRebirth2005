@@ -11,10 +11,10 @@ public class SetSidebarInterfacePacket
         _player = player;
     }
 
-    public void Add(int _form, int _menuId)
+    public void Add(int _tabId, int _displayId)
     {
         _player.Writer.CreateFrame(ServerOpCodes.SIDEBAR_INTF_ASSIGN);
-        _player.Writer.WriteWord(_menuId); /* Tab */
-        _player.Writer.WriteByteA(_form); /* Icon */
+        _player.Writer.WriteWord(_displayId); /* What to display inside that tab */
+        _player.Writer.WriteByteA(_tabId); /* Which tab */
     }
 }

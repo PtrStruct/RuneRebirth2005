@@ -43,7 +43,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
         {
             if (player.Index == -1 || player.Index == currentPlayer.Index) continue;
 
-            if (!currentPlayer.LocalPlayers.Contains(player) && player.Location.IsWithinArea(currentPlayer.Location))
+            if (!currentPlayer.LocalPlayers.Contains(player) && player.Data.Location.IsWithinArea(currentPlayer.Data.Location))
             {
                 currentPlayer.LocalPlayers.Add(player);
                 AddLocalPlayer(currentPlayer.Writer, currentPlayer, player);
@@ -61,7 +61,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
         foreach (var other in currentPlayer.LocalPlayers.ToList())
         {
-            if (other.Location.IsWithinArea(currentPlayer.Location) && !other.DidTeleportOrSpawn)
+            if (other.Data.Location.IsWithinArea(currentPlayer.Data.Location) && !other.DidTeleportOrSpawn)
             {
                 UpdateLocalPlayerMovement(other, currentPlayer.Writer);
 
@@ -147,8 +147,8 @@ public class PlayerUpdatePacket(Player currentPlayer)
     private void AppendAppearance(Player player, RSStream playerFlagUpdateBlock)
     {
         var updateBlockBuffer = new RSStream(new byte[128]);
-        updateBlockBuffer.WriteByte(player.Gender);
-        updateBlockBuffer.WriteByte(player.HeadIcon); // Skull Icon
+        updateBlockBuffer.WriteByte(player.Data.Gender);
+        updateBlockBuffer.WriteByte(player.Data.HeadIcon); // Skull Icon
 
         WriteHelmet(updateBlockBuffer, player);
         WriteCape(updateBlockBuffer, player);
@@ -167,8 +167,8 @@ public class PlayerUpdatePacket(Player currentPlayer)
         WriteMovementAnimations(updateBlockBuffer);
 
         updateBlockBuffer.WriteQWord(player.Username.ToLong());
-        updateBlockBuffer.WriteByte(player.CombatLevel);
-        updateBlockBuffer.WriteWord(player.TotalLevel);
+        updateBlockBuffer.WriteByte(player.Data.CombatLevel);
+        updateBlockBuffer.WriteWord(player.Data.TotalLevel);
 
         playerFlagUpdateBlock.WriteByteC(updateBlockBuffer.CurrentOffset);
         playerFlagUpdateBlock.WriteBytes(updateBlockBuffer.Buffer, updateBlockBuffer.CurrentOffset, 0);
@@ -213,8 +213,8 @@ public class PlayerUpdatePacket(Player currentPlayer)
         currentPlayer.Writer.WriteBits(1, 1); // set to true, if discarding walking queue (after teleport e.g.)
         currentPlayer.Writer.WriteBits(1,
             currentPlayer.IsUpdateRequired ? 1 : 0); // UpdateRequired aka does come with UpdateFlags
-        currentPlayer.Writer.WriteBits(7, currentPlayer.Location.PositionRelativeToOffsetChunkY); // y-position
-        currentPlayer.Writer.WriteBits(7, currentPlayer.Location.PositionRelativeToOffsetChunkX); // x-position
+        currentPlayer.Writer.WriteBits(7, currentPlayer.Data.Location.PositionRelativeToOffsetChunkY); // y-position
+        currentPlayer.Writer.WriteBits(7, currentPlayer.Data.Location.PositionRelativeToOffsetChunkX); // x-position
         currentPlayer.DidTeleportOrSpawn = false;
     }
 
@@ -230,15 +230,15 @@ public class PlayerUpdatePacket(Player currentPlayer)
         writer.WriteBits(1, 1); /* Observed */
         writer.WriteBits(1, 1); /* Teleported */
 
-        var delta = Location.Delta(player.Location, other.Location);
+        var delta = Location.Delta(player.Data.Location, other.Data.Location);
         writer.WriteBits(5, delta.Y);
         writer.WriteBits(5, delta.X);
-        Log.Warning($"Adding: {other.Index} For {player.Index} DY: {other.Location.Y} - DX: {other.Location.X}");
+        Log.Warning($"Adding: {other.Index} For {player.Index} DY: {other.Data.Location.Y} - DX: {other.Data.Location.X}");
     }
 
     private void WriteBeard(RSStream stream, Player client)
     {
-        var beard = client.Appearance.Beard;
+        var beard = client.Data.Appearance.Beard;
 
         if (beard <= 0)
             stream.WriteByte(0);
@@ -248,8 +248,8 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteFeet(RSStream stream, Player client)
     {
-        var itemId = client.Equipment.Boots;
-        var feetId = client.Appearance.Feet;
+        var itemId = client.Data.Equipment.Boots;
+        var feetId = client.Data.Appearance.Feet;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -258,8 +258,8 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteHands(RSStream stream, Player client)
     {
-        var itemId = client.Equipment.Gloves;
-        var handsId = client.Appearance.Hands;
+        var itemId = client.Data.Equipment.Gloves;
+        var handsId = client.Data.Appearance.Hands;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -268,11 +268,11 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteHair(RSStream stream, Player client)
     {
-        var isFullHelmOrMask = GameConstants.IsFullHelm(client.Equipment.Helmet) ||
-                               GameConstants.IsFullMask(client.Equipment.Helmet);
+        var isFullHelmOrMask = GameConstants.IsFullHelm(client.Data.Equipment.Helmet) ||
+                               GameConstants.IsFullMask(client.Data.Equipment.Helmet);
         if (!isFullHelmOrMask)
         {
-            var hair = client.Appearance.Hair;
+            var hair = client.Data.Appearance.Hair;
             stream.WriteWord(0x100 + hair);
         }
         else
@@ -281,8 +281,8 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteLegs(RSStream stream, Player client)
     {
-        var itemId = client.Equipment.Legs;
-        var legsId = client.Appearance.Legs;
+        var itemId = client.Data.Equipment.Legs;
+        var legsId = client.Data.Appearance.Legs;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -291,7 +291,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteShield(RSStream stream, Player client)
     {
-        var itemId = client.Equipment.Shield;
+        var itemId = client.Data.Equipment.Shield;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -300,8 +300,8 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteBody(RSStream stream, Player client)
     {
-        var itemId = client.Equipment.Body;
-        var torsoId = client.Appearance.Torso;
+        var itemId = client.Data.Equipment.Body;
+        var torsoId = client.Data.Appearance.Torso;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -310,7 +310,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteWeapon(RSStream stream, Player client)
     {
-        var itemId = client.Equipment.Weapon;
+        var itemId = client.Data.Equipment.Weapon;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -319,7 +319,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteAmulet(RSStream stream, Player client)
     {
-        var itemId = client.Equipment.Amulet;
+        var itemId = client.Data.Equipment.Amulet;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -328,7 +328,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteCape(RSStream stream, Player client)
     {
-        var itemId = client.Equipment.Cape;
+        var itemId = client.Data.Equipment.Cape;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -337,7 +337,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteHelmet(RSStream stream, Player client)
     {
-        var itemId = client.Equipment.Helmet;
+        var itemId = client.Data.Equipment.Helmet;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -346,10 +346,10 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteArms(RSStream stream, Player client)
     {
-        var isFullBody = GameConstants.IsFullBody(client.Equipment.Body);
+        var isFullBody = GameConstants.IsFullBody(client.Data.Equipment.Body);
         if (!isFullBody)
         {
-            var arms = client.Appearance.Arms;
+            var arms = client.Data.Appearance.Arms;
             stream.WriteWord(0x100 + arms);
         }
         else
@@ -360,13 +360,13 @@ public class PlayerUpdatePacket(Player currentPlayer)
     {
         for (int i = 0; i < 5; i++)
         {
-            stream.WriteByte(client.Colors.GetColors()[i]);
+            stream.WriteByte(client.Data.Colors.GetColors()[i]);
         }
     }
 
     private void WriteMovementAnimations(RSStream stream)
     {
-        foreach (var animation in currentPlayer.MovementAnimations.GetAnimations())
+        foreach (var animation in currentPlayer.Data.MovementAnimations.GetAnimations())
             stream.WriteWord(animation);
     }
 }
