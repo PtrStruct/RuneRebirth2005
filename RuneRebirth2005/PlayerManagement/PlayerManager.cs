@@ -57,12 +57,14 @@ public static class PlayerManager
         player.IsUpdateRequired = true;
         player.DidTeleportOrSpawn = true;
         player.Flags |= PlayerUpdateFlags.Appearance;
+        player.LoadPlayer();
 
-        // player.LoadPlayer();
-        
         new RegionLoadPacket(player).Add();
         new SendPlayerStatusPackets(player).Add();
-        new SetSidebarInterfacePacket(player).Add(0, 2423);
+
+        new SetSidebarInterfacePacket(player).Add(0, 5855);
+        new TextToInterfacePacket(player).Add("Unarmed", 5857);
+
         new SetSidebarInterfacePacket(player).Add(1, 3917);
         new SetSidebarInterfacePacket(player).Add(2, 638);
         new SetSidebarInterfacePacket(player).Add(3, 3213); /* Inventory */
@@ -75,11 +77,13 @@ public static class PlayerManager
         new SetSidebarInterfacePacket(player).Add(11, 4445);
         new SetSidebarInterfacePacket(player).Add(12, 147);
         new SetSidebarInterfacePacket(player).Add(13, 6299);
-        
-        new SetSidebarInterfacePacket(player).Add(0, 5855);
-        new TextToInterfacePacket(player).Add("Unarmed", 5857);
-        
-        player.LoadPlayer();
-        
+
+        foreach (SkillEnum skill in Enum.GetValues(typeof(SkillEnum)))
+        {
+            int experience = player.Data.PlayerSkills.Experience[(int)skill]; // Replace with method to get experience for skill
+            int level = player.Data.PlayerSkills.Levels[(int)skill];
+
+            new SetSkillLevelPacket(player).Add(skill, experience, level);
+        }
     }
 }
