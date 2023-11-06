@@ -80,7 +80,7 @@ public static class PlayerManager
 
         foreach (SkillEnum skill in Enum.GetValues(typeof(SkillEnum)))
         {
-            int experience = player.Data.PlayerSkills.Experience[(int)skill]; // Replace with method to get experience for skill
+            int experience = player.Data.PlayerSkills.Experience[(int)skill];
             int level = player.Data.PlayerSkills.Levels[(int)skill];
 
             new SetSkillLevelPacket(player).Add(skill, experience, level);
