@@ -40,8 +40,8 @@ public static class ConnectionHandler
                     PlayerManager.AssignAvailablePlayerSlot(player);
                     
                     int count = Server.Players.Where(x => x?.Index != -1).Count();
-                    player.Location.X = 3200 + count;
-                    player.Location.Y = 3200;
+                    player.Data.Location.X = 3200 + count;
+                    player.Data.Location.Y = 3200;
                     
                     PlayerManager.RegisterPlayer(player);
                     PlayerManager.Login(player);
