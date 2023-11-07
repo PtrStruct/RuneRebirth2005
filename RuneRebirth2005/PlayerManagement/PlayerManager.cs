@@ -18,7 +18,7 @@ public static class PlayerManager
             Reader = new RSStream(new byte[ServerConfig.BUFFER_SIZE]),
             Writer = new RSStream(new byte[ServerConfig.BUFFER_SIZE])
         };
-
+        Log.Information($"Initialized new Player");
         return player;
     }
 

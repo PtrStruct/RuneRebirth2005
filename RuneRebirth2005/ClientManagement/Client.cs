@@ -28,15 +28,24 @@ public class Client
     {
         Server.Players[Index] = new Player();
         Socket.Close();
-        Console.WriteLine($"Client {Index} disconnected. Reason: {reason}");
+        Log.Information($"Client {Index} disconnected. Reason: {reason}");
     }
 
     public void FillStream(int count)
     {
+        if (!NetworkStream.CanRead)
+        {
+            return;
+        }
         try
         {
             Reader.CurrentOffset = 0;
-            NetworkStream.Read(Reader.Buffer, 0, count);
+            var bytes = NetworkStream.Read(Reader.Buffer, 0, count);
+
+            if (bytes < count)
+            {
+                throw new IOException("we couldn't read enough bytes");
+            }
         }
         catch (IOException ex)
         {
@@ -50,6 +59,10 @@ public class Client
 
     public void FlushBufferedData()
     {
+        if (!NetworkStream.CanWrite)
+        {
+            return;
+        }
         try
         {
             NetworkStream.Write(Writer.Buffer, 0, Writer.CurrentOffset);

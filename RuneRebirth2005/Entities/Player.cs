@@ -62,9 +62,16 @@ public class Player : Client, IEntity
     {
         var directoryPath = "Data/Characters";
         var filePath = $"{directoryPath}/{Username}.json";
-        
-        using FileStream openStream = File.OpenRead(filePath);
-        Data = JsonSerializer.Deserialize<PlayerData>(openStream);
-        Log.Information($"Loaded player data for: {Username}.");
+
+        if (File.Exists(filePath))
+        {
+            using FileStream openStream = File.OpenRead(filePath);
+            Data = JsonSerializer.Deserialize<PlayerData>(openStream);
+            Log.Information($"Loaded player data for: {Username}.");
+        }
+        else
+        {
+            SavePlayer();
+        }
     }
 }
