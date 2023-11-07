@@ -3,67 +3,74 @@ using Serilog;
 
 namespace RuneRebirth2005.Network;
 
-public class LoginHandler(Client client)
+public class LoginHandler
 {
+    private readonly Client _client;
+
+    public LoginHandler(Client client)
+    {
+        _client = client;
+    }
+    
     public bool Handshake()
     {
         var serverSessionKey = SessionEncryption.GenerateServerSessionKey();
 
-        client.FillStream(2);
-        var connectionType = client.Reader.ReadUnsignedByte();
+        _client.FillStream(2);
+        var connectionType = _client.Reader.ReadUnsignedByte();
         Log.Information($"ConnectionType: {connectionType}");
-        var userHash = client.Reader.ReadUnsignedByte();
+        var userHash = _client.Reader.ReadUnsignedByte();
 
         for (var i = 0; i < 8; i++)
-            client.Writer.WriteByte(0);
+            _client.Writer.WriteByte(0);
 
-        client.Writer.WriteByte(0); //responseCode 0 - Exchanges session keys, player name, password, etc. 
-        client.Writer.WriteQWord(serverSessionKey);
-        client.FlushBufferedData(); /* Send */
+        _client.Writer.WriteByte(0); //responseCode 0 - Exchanges session keys, player name, password, etc. 
+        _client.Writer.WriteQWord(serverSessionKey);
+        _client.FlushBufferedData(); /* Send */
 
-        client.FillStream(2);
-        var connectionStatus = client.Reader.ReadUnsignedByte();
-        var loginPacketSize = client.Reader.ReadUnsignedByte();
-        client.FillStream(loginPacketSize);
+        _client.FillStream(2);
+        var connectionStatus = _client.Reader.ReadUnsignedByte();
+        var loginPacketSize = _client.Reader.ReadUnsignedByte();
+        _client.FillStream(loginPacketSize);
 
         var loginEncryptPacketSize = loginPacketSize - (36 + 1 + 1 + 2);
-        var magicNumber = client.Reader.ReadUnsignedByte();
-        var revision = client.Reader.ReadSignedWord();
-        var clientVersion = client.Reader.ReadUnsignedByte();
+        var magicNumber = _client.Reader.ReadUnsignedByte();
+        var revision = _client.Reader.ReadSignedWord();
+        var clientVersion = _client.Reader.ReadUnsignedByte();
 
         var crcValues = new int[9];
         for (var i = 0; i < crcValues.Length; i++)
-            crcValues[i] = client.Reader.ReadDWord();
+            crcValues[i] = _client.Reader.ReadDWord();
 
-        var size2 = client.Reader.ReadUnsignedByte();
-        var magicNumber2 = client.Reader.ReadUnsignedByte();
+        var size2 = _client.Reader.ReadUnsignedByte();
+        var magicNumber2 = _client.Reader.ReadUnsignedByte();
 
         var ISAACSeed = new int[4];
         for (var i = 0; i < ISAACSeed.Length; i++)
-            ISAACSeed[i] = client.Reader.ReadDWord();
-        client.InEncryption = new SessionEncryption(ISAACSeed);
+            ISAACSeed[i] = _client.Reader.ReadDWord();
+        _client.InEncryption = new SessionEncryption(ISAACSeed);
 
         for (var i = 0; i < ISAACSeed.Length; i++)
             ISAACSeed[i] += 50;
-        client.OutEncryption = new SessionEncryption(ISAACSeed);
-        client.Writer.packetEncryption = client.OutEncryption;
+        _client.OutEncryption = new SessionEncryption(ISAACSeed);
+        _client.Writer.packetEncryption = _client.OutEncryption;
 
-        var UID = client.Reader.ReadDWord();
-        client.Username = client.Reader.ReadString();
-        client.Password = client.Reader.ReadString();
+        var UID = _client.Reader.ReadDWord();
+        _client.Data.Username = _client.Reader.ReadString();
+        _client.Data.Password = _client.Reader.ReadString();
 
-        if (Server.Players.Any(player => string.Equals(player?.Username, client.Username, StringComparison.CurrentCultureIgnoreCase)))
+        if (Server.Players.Any(player => string.Equals(player?.Data.Username, _client.Data.Username, StringComparison.CurrentCultureIgnoreCase)))
         {
-            Log.Information($"{client.Username} tried logging in even though they're already logged in.");
-            client.Writer.WriteByte(5);
-            client.FlushBufferedData();
+            Log.Information($"{_client.Data.Username} tried logging in even though they're already logged in.");
+            _client.Writer.WriteByte(5);
+            _client.FlushBufferedData();
             return false;
         }
 
-        client.Writer.WriteByte(2); /* Secondary response code 2 = Login | 5 = Already logged in etc. */
-        client.Writer.WriteByte(2);
-        client.Writer.WriteByte(0);
-        client.FlushBufferedData();
+        _client.Writer.WriteByte(2); /* Secondary response code 2 = Login | 5 = Already logged in etc. */
+        _client.Writer.WriteByte(2);
+        _client.Writer.WriteByte(0);
+        _client.FlushBufferedData();
 
         return true;
     }

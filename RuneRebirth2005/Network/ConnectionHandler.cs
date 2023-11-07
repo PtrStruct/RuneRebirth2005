@@ -24,7 +24,7 @@ public static class ConnectionHandler
                 continue;
 
             var tcpClient = tcpListener.AcceptTcpClient();
-            Log.Information($"Incoming Connection From: {((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString()}");
+            Log.Information($"Incoming Connection From: {((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address}");
             try
             {
                 var player = PlayerManager.InitializeClient(tcpClient);

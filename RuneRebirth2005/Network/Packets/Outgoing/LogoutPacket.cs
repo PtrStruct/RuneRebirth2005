@@ -15,6 +15,6 @@ public class LogoutPacket
     public void Add()
     {
         _player.Writer.CreateFrame(ServerOpCodes.DISCONNECT);
-        Log.Information($"{_player.Username} has logged out.");
+        Log.Information($"{_player.Data.Username} has logged out.");
     }
 }
