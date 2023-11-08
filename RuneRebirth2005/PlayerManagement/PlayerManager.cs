@@ -78,6 +78,9 @@ public static class PlayerManager
         new SetSidebarInterfacePacket(player).Add(12, 147);
         new SetSidebarInterfacePacket(player).Add(13, 6299);
 
+        new SetPlayerOptionsPacket(player).Add(4, false, "Trade with");
+        new SetPlayerOptionsPacket(player).Add(5, false, "Follow");
+
         foreach (SkillEnum skill in Enum.GetValues(typeof(SkillEnum)))
         {
             int experience = player.Data.PlayerSkills.Experience[(int)skill];
