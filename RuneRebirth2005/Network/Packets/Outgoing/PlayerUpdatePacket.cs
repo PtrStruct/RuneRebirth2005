@@ -255,7 +255,7 @@ public class PlayerUpdatePacket
 
     private void WriteFeet(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Boots;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Boots).ItemId;
         var feetId = client.Data.Appearance.Feet;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
@@ -265,7 +265,7 @@ public class PlayerUpdatePacket
 
     private void WriteHands(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Gloves;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Gloves).ItemId;
         var handsId = client.Data.Appearance.Hands;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
@@ -275,8 +275,8 @@ public class PlayerUpdatePacket
 
     private void WriteHair(RSStream stream, Player client)
     {
-        var isFullHelmOrMask = GameConstants.IsFullHelm(client.Data.Equipment.Helmet) ||
-                               GameConstants.IsFullMask(client.Data.Equipment.Helmet);
+        var isFullHelmOrMask = GameConstants.IsFullHelm(client.Data.Equipment.GetItem(EquipmentSlot.Helmet).ItemId) ||
+                               GameConstants.IsFullMask(client.Data.Equipment.GetItem(EquipmentSlot.Helmet).ItemId);
         if (!isFullHelmOrMask)
         {
             var hair = client.Data.Appearance.Hair;
@@ -288,7 +288,7 @@ public class PlayerUpdatePacket
 
     private void WriteLegs(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Legs;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Legs).ItemId;
         var legsId = client.Data.Appearance.Legs;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
@@ -298,7 +298,7 @@ public class PlayerUpdatePacket
 
     private void WriteShield(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Shield;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Shield).ItemId;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -307,7 +307,7 @@ public class PlayerUpdatePacket
 
     private void WriteBody(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Body;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Chest).ItemId;
         var torsoId = client.Data.Appearance.Torso;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
@@ -317,7 +317,7 @@ public class PlayerUpdatePacket
 
     private void WriteWeapon(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Weapon;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Weapon).ItemId;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -326,7 +326,7 @@ public class PlayerUpdatePacket
 
     private void WriteAmulet(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Amulet;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Amulet).ItemId;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -335,7 +335,7 @@ public class PlayerUpdatePacket
 
     private void WriteCape(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Cape;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Cape).ItemId;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -344,7 +344,7 @@ public class PlayerUpdatePacket
 
     private void WriteHelmet(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Helmet;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Helmet).ItemId;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -353,7 +353,7 @@ public class PlayerUpdatePacket
 
     private void WriteArms(RSStream stream, Player client)
     {
-        var isFullBody = GameConstants.IsFullBody(client.Data.Equipment.Body);
+        var isFullBody = GameConstants.IsFullBody(client.Data.Equipment.GetItem(EquipmentSlot.Chest).ItemId);
         if (!isFullBody)
         {
             var arms = client.Data.Appearance.Arms;

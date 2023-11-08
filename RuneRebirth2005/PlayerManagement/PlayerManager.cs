@@ -81,12 +81,16 @@ public static class PlayerManager
         new SetPlayerOptionsPacket(player).Add(4, false, "Trade with");
         new SetPlayerOptionsPacket(player).Add(5, false, "Follow");
 
+        foreach (EquipmentSlot equipment in Enum.GetValues(typeof(EquipmentSlot)))
+        {
+            var item = player.Data.Equipment.GetItem(equipment);
+            new UpdateSlotPacket(player).Add(equipment, item.ItemId, item.Quantity);
+        }
+
         foreach (SkillEnum skill in Enum.GetValues(typeof(SkillEnum)))
         {
-            int experience = player.Data.PlayerSkills.Experience[(int)skill];
-            int level = player.Data.PlayerSkills.Levels[(int)skill];
-
-            new SetSkillLevelPacket(player).Add(skill, experience, level);
+            var theSkill = player.Data.PlayerSkills.GetSkill(skill);
+            new SetSkillLevelPacket(player).Add(skill, theSkill.Experience, theSkill.Level);
         }
     }
 }

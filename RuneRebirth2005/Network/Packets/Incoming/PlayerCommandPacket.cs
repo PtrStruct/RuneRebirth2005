@@ -45,7 +45,22 @@ public class PlayerCommandPacket : IPacket
                 // Check if the provided skill id is valid
                 if (skillId >= 0 && skillId < Enum.GetNames(typeof(SkillEnum)).Length)
                 {
-                    _player.Data.PlayerSkills.Levels[skillId] = level;
+                    _player.Data.PlayerSkills.SetSkill((SkillEnum)skillId, level);
+                    _player.SavePlayer();
+                }
+                else
+                    new SendPlayerMessagePacket(_player).Add("Invalid skill ID provided");
+
+                break;
+
+            case "boost":
+                skillId = int.Parse(_commandArgs[1]);
+                level = int.Parse(_commandArgs[2]);
+
+                // Check if the provided skill id is valid
+                if (skillId >= 0 && skillId < Enum.GetNames(typeof(SkillEnum)).Length)
+                {
+                    _player.Data.PlayerSkills.BoostSkill((SkillEnum)skillId, level);
                     _player.SavePlayer();
                 }
                 else

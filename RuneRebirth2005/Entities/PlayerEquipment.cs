@@ -1,32 +1,61 @@
 using System.Reflection;
+using Serilog;
 
 namespace RuneRebirth2005.Entities;
 
 public class PlayerEquipment
 {
-    public int Helmet { get; set; } = -1;
-    public int Amulet { get; set; } = -1;
-    public int Cape { get; set; } = -1;
-    public int Weapon { get; set; } = -1;
-    public int Body { get; set; } = -1;
-    public int Shield { get; set; } = -1;
-    public int Gloves { get; set; } = -1;
-    public int Legs { get; set; } = -1;
-    public int Boots { get; set; } = -1;
+    public Dictionary<EquipmentSlot, EquipmentItem> EquipmentSlots { get; set; }
 
-    public IEnumerable<int> GetEquipment()
+    public PlayerEquipment()
     {
-        return new List<int>
+        EquipmentSlots = new Dictionary<EquipmentSlot, EquipmentItem>()
         {
-            Helmet,
-            Amulet,
-            Cape,
-            Weapon,
-            Body,
-            Shield,
-            Gloves,
-            Legs,
-            Boots
+            { EquipmentSlot.Helmet, new EquipmentItem { ItemId = -1, Quantity = 0 } },
+            { EquipmentSlot.Cape, new EquipmentItem { ItemId = -1, Quantity = 0 } },
+            { EquipmentSlot.Amulet, new EquipmentItem { ItemId = -1, Quantity = 0 } },
+            { EquipmentSlot.Weapon, new EquipmentItem { ItemId = -1, Quantity = 0 } },
+            { EquipmentSlot.Chest, new EquipmentItem { ItemId = -1, Quantity = 0 } },
+            { EquipmentSlot.Shield, new EquipmentItem { ItemId = -1, Quantity = 0 } },
+            { EquipmentSlot.Legs, new EquipmentItem { ItemId = -1, Quantity = 0 } },
+            { EquipmentSlot.Gloves, new EquipmentItem { ItemId = -1, Quantity = 0 } },
+            { EquipmentSlot.Boots, new EquipmentItem { ItemId = -1, Quantity = 0 } },
+            { EquipmentSlot.Ring, new EquipmentItem { ItemId = -1, Quantity = 0 } },
+            { EquipmentSlot.Ammo, new EquipmentItem { ItemId = -1, Quantity = 0 } }
         };
     }
+
+    public EquipmentItem GetItem(EquipmentSlot slot)
+    {
+        return EquipmentSlots.TryGetValue(slot, out var item) ? item : new EquipmentItem { ItemId = -1, Quantity = 0 };
+    }
+
+    public void SetItem(EquipmentSlot slot, EquipmentItem item)
+    {
+        if (EquipmentSlots.ContainsKey(slot))
+        {
+            EquipmentSlots[slot] = item;
+        }
+    }
+}
+
+public class EquipmentItem
+{
+    public int ItemId { get; set; }
+    public int Quantity { get; set; }
+}
+
+public enum EquipmentSlot
+{
+    Helmet = 0,
+    Cape = 1,
+    Amulet = 2,
+    Weapon = 3,
+    Chest = 4,
+    Shield = 5,
+    Legs = 7,
+    Gloves = 9,
+    Boots = 10,
+    Ring = 12,
+    Ammo = 13
 }
