@@ -2,7 +2,7 @@ namespace RuneRebirth2005;
 
 public class GameConstants
 {
-    private static bool IsItemInArray(int itemID, int[] array)
+    public static bool IsItemInArray(int itemID, int[] array)
     {
         return Array.IndexOf(array, itemID) > -1;
     }

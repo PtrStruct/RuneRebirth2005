@@ -57,7 +57,7 @@ public class ServerEngine
         ConnectionHandler.AcceptClients();
 
         /* Fetch Incoming Data */
-        Log.Information("Fetching data from clients..");
+        // Log.Information("Fetching data from clients..");
         foreach (var player in Server.Players)
         {
             if (player.Index == -1) continue;
@@ -66,7 +66,7 @@ public class ServerEngine
         }
 
         /* Process Incoming Data */
-        Log.Information("Processing fetched data..");
+        // Log.Information("Processing fetched data..");
         foreach (var player in Server.Players)
         {
             if (player.Index == -1) continue;
@@ -75,7 +75,7 @@ public class ServerEngine
         }
 
         /* Send buffered data */
-        Log.Information("Flushing the buffered data!");
+        // Log.Information("Flushing the buffered data!");
         foreach (var player in Server.Players)
         {
             if (player.Index == -1) continue;

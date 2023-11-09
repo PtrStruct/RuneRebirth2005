@@ -13,6 +13,7 @@ public class Client
     }
 
     public int Index { get; set; } = -1;
+    public PlayerData Data { get; set; } = new();
     public RSStream Reader { get; set; }
     public RSStream Writer { get; set; }
     public TcpClient Socket { get; set; }
@@ -20,8 +21,7 @@ public class Client
     public SessionEncryption InEncryption { get; set; }
     public SessionEncryption OutEncryption { get; set; }
     public LoginHandler LoginHandler { get; set; }
-    public string Username { get; set; }
-    public string Password { get; set; }
+
     public List<Player> LocalPlayers { get; set; } = new();
 
     public void Disconnect(string reason)
@@ -67,7 +67,7 @@ public class Client
         {
             NetworkStream.Write(Writer.Buffer, 0, Writer.CurrentOffset);
             NetworkStream.Flush();
-            Log.Information($"Flushed {Writer.CurrentOffset} bytes of data.");
+            //Log.Information($"Flushed {Writer.CurrentOffset} bytes of data.");
             Writer.CurrentOffset = 0;
         }
         catch (IOException ex)
@@ -78,5 +78,22 @@ public class Client
         {
             Disconnect("The socket was unexpectedly closed. Exception message: " + e.Message);
         }
+    }
+    
+    public class PlayerData
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public int Gender { get; set; }
+        public int HeadIcon { get; set; }
+        public int CombatLevel { get; set; }
+        public int TotalLevel { get; set; }
+        public PlayerColors Colors { get; set; } = new();
+        public PlayerEquipment Equipment { get; set; } = new();
+        public PlayerSkills PlayerSkills { get; set; } = new();
+        public PlayerAppearance Appearance { get; set; } = new();
+        public MovementAnimations MovementAnimations { get; set; } = new();
+        public Location Location { get; set; } = new(3200, 3200);
+        public PlayerBonuses Bonuses { get; set; } = new();
     }
 }

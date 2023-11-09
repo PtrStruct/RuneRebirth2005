@@ -1,6 +1,7 @@
 ﻿using System.Net.Sockets;
 using RuneRebirth2005.ClientManagement;
 using RuneRebirth2005.Entities;
+using RuneRebirth2005.Helpers;
 using RuneRebirth2005.Network;
 using RuneRebirth2005.Network.Outgoing;
 using Serilog;
@@ -29,6 +30,14 @@ public static class PlayerManager
 
         client.Socket.Close();
         Log.Warning($"Client {client.Index} disconnected.");
+    }
+
+    public static void SilentDisconnectClient(Client client)
+    {
+        if (client.Index != -1)
+            Server.Players[client.Index] = new Player();
+
+        client.Socket.Close();
     }
 
     public static void AssignAvailablePlayerSlot(Player player)
@@ -78,12 +87,30 @@ public static class PlayerManager
         new SetSidebarInterfacePacket(player).Add(12, 147);
         new SetSidebarInterfacePacket(player).Add(13, 6299);
 
+        new SetPlayerOptionsPacket(player).Add(4, false, "Trade with");
+        new SetPlayerOptionsPacket(player).Add(5, false, "Follow");
+
+        for (int i = 0; i < BonusHelper.BonusMap.Count; i++)
+        {
+            var bonus = BonusHelper.BonusMap[i];
+
+            int bonusValue = player.Data.Bonuses.GetBonus(bonus.Index);
+            string sign = bonusValue > 0 ? "+" : "";
+            new TextToInterfacePacket(player).Add($"{bonus.Name}: {sign}{bonusValue}", BonusHelper.BonusMap[i].FrameId);
+        }
+
+        foreach (EquipmentSlot equipment in Enum.GetValues(typeof(EquipmentSlot)))
+        {
+            var item = player.Data.Equipment.GetItem(equipment);
+            new UpdateSlotPacket(player).Add(equipment, item.ItemId, item.Quantity);
+        }
+
+        BonusManager.RefreshBonus(player);
+
         foreach (SkillEnum skill in Enum.GetValues(typeof(SkillEnum)))
         {
-            int experience = player.Data.PlayerSkills.Experience[(int)skill];
-            int level = player.Data.PlayerSkills.Levels[(int)skill];
-
-            new SetSkillLevelPacket(player).Add(skill, experience, level);
+            var theSkill = player.Data.PlayerSkills.GetSkill(skill);
+            new SetSkillLevelPacket(player).Add(skill, theSkill.Experience, theSkill.Level);
         }
     }
 }

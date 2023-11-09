@@ -19,6 +19,18 @@ public class PacketHandler(Player player)
     private int _packetLength = -1;
     public void RetrievePacket()
     {
+        if (!_player.NetworkStream.DataAvailable)
+            return;
+
+        FillStream(1);
+
+        if (_opCode == -1)
+            UpdatePacketOpCode();
+
+        if (_opCode != 0)
+        {
+            Log.Information($"Received opcode {_opCode}.");
+        }
 
         if (_state == State.READ_OPCODE)
         {
@@ -80,7 +92,6 @@ public class PacketHandler(Player player)
     {
         return player.InEncryption.GetNextKey();
     }
-
 }
 
 public class PacketParameters

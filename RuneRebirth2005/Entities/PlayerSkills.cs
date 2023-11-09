@@ -1,23 +1,83 @@
-﻿namespace RuneRebirth2005.Entities;
+﻿using Serilog;
+
+namespace RuneRebirth2005.Entities;
 
 public class PlayerSkills
 {
-    public int[] Levels { get; set; }
-    public int[] Experience { get; set; }
+    public Dictionary<SkillEnum, Skill> Skills { get; set; }
+
     public PlayerSkills()
     {
-        int totalSkills = Enum.GetNames(typeof(SkillEnum)).Length;
-        Levels = new int[totalSkills];
-        Experience = new int[totalSkills];
-        
-        for (int i = 0; i < totalSkills; i++)
+        if (Skills == null)
         {
-            Levels[i] = 1;
-            Experience[i] = 0; // Initial experience can be set to 0, can be modified according to your game rules.
+            Skills = new Dictionary<SkillEnum, Skill>();
+            foreach (SkillEnum skillEnum in Enum.GetValues(typeof(SkillEnum)))
+            {
+                Skills[skillEnum] = new Skill { Level = 1, Experience = 0 };
+            }
+
+            Skills[SkillEnum.Hitpoints].Level = 10;
+            Skills[SkillEnum.Hitpoints].Experience = 1154;
         }
-        
-        Levels[(int)SkillEnum.Hitpoints] = 10;
-        Experience[(int)SkillEnum.Hitpoints] = 1154;
+    }
+
+    public Skill GetSkill(SkillEnum skill)
+    {
+        return Skills.TryGetValue(skill, out var skillValue)
+            ? skillValue
+            : null;
+    }
+
+    public void SetSkill(SkillEnum skillType, int level)
+    {
+        if (Skills.ContainsKey(skillType))
+        {
+            Skills[skillType].Level = level;
+        }
+        else
+        {
+            Log.Warning($"Skill {skillType} does not exist.");
+        }
+    }
+
+    public void BoostSkill(SkillEnum skillType, int level)
+    {
+        if (Skills.ContainsKey(skillType))
+            Skills[skillType].Level = level;
+        else
+            Log.Warning($"Skill {skillType} does not exist.");
+    }
+}
+
+public class Skill
+{
+    private int level;
+    public int Level
+    {
+        get { return level; }
+        set
+        {
+            level = value;
+            Experience = GetXPForLevel(value);
+        }
+    }
+
+    public int Experience { get; set; }
+
+    private int GetXPForLevel(int level)
+    {
+        double points = 0;
+        int output = 0;
+
+        for (int lvl = 1; lvl <= level; lvl++)
+        {
+            points += (int)Math.Floor(lvl + 300.0 * Math.Pow(2.0, lvl / 7.0));
+            if (lvl >= level)
+                return output;
+            output = (int)Math.Floor(points / 4);
+        }
+
+        return 0;
     }
 }
 

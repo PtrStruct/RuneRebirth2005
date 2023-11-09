@@ -45,7 +45,7 @@ public class Location
         X = x;
         Y = y;
         ForceUpdate();
-        Log.Warning($"RegionId {RegionId} - ChunkX: {CenterChunkX} - ChunkY: {CenterChunkY}");
+        // Log.Warning($"RegionId {RegionId} - ChunkX: {CenterChunkX} - ChunkY: {CenterChunkY}");
     }
 
     private void Update()

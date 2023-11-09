@@ -4,8 +4,15 @@ using Serilog;
 
 namespace RuneRebirth2005.Network.Outgoing;
 
-public class PlayerUpdatePacket(Player currentPlayer)
+public class PlayerUpdatePacket
 {
+    private readonly Player _currentPlayer;
+
+    public PlayerUpdatePacket(Player currentPlayer)
+    {
+        _currentPlayer = currentPlayer;
+    }
+    
     public RSStream PlayerFlagUpdateBlock { get; set; }
 
     public void Add()
@@ -13,14 +20,14 @@ public class PlayerUpdatePacket(Player currentPlayer)
         PlayerFlagUpdateBlock = new RSStream(new byte[5000]);
         UpdateCurrentPlayerMovement();
 
-        if (currentPlayer.IsUpdateRequired)
-            UpdatePlayerState(currentPlayer, PlayerFlagUpdateBlock);
+        if (_currentPlayer.IsUpdateRequired)
+            UpdatePlayerState(_currentPlayer, PlayerFlagUpdateBlock);
 
         UpdateLocalPlayers();
         AddPlayersToLocalList();
 
         Finalize(PlayerFlagUpdateBlock);
-        currentPlayer.Writer.EndFrameVarSizeWord();
+        _currentPlayer.Writer.EndFrameVarSizeWord();
     }
 
 
@@ -28,12 +35,12 @@ public class PlayerUpdatePacket(Player currentPlayer)
     {
         if (PlayerFlagUpdateBlock.CurrentOffset > 0)
         {
-            currentPlayer.Writer.FinishBitAccess();
-            currentPlayer.Writer.WriteBytes(PlayerFlagUpdateBlock.Buffer, PlayerFlagUpdateBlock.CurrentOffset, 0);
+            _currentPlayer.Writer.FinishBitAccess();
+            _currentPlayer.Writer.WriteBytes(PlayerFlagUpdateBlock.Buffer, PlayerFlagUpdateBlock.CurrentOffset, 0);
         }
         else
         {
-            currentPlayer.Writer.FinishBitAccess();
+            _currentPlayer.Writer.FinishBitAccess();
         }
     }
 
@@ -41,29 +48,29 @@ public class PlayerUpdatePacket(Player currentPlayer)
     {
         foreach (var player in Server.Players)
         {
-            if (player.Index == -1 || player.Index == currentPlayer.Index) continue;
+            if (player.Index == -1 || player.Index == _currentPlayer.Index) continue;
 
-            if (!currentPlayer.LocalPlayers.Contains(player) && player.Data.Location.IsWithinArea(currentPlayer.Data.Location))
+            if (!_currentPlayer.LocalPlayers.Contains(player) && player.Data.Location.IsWithinArea(_currentPlayer.Data.Location))
             {
-                currentPlayer.LocalPlayers.Add(player);
-                AddLocalPlayer(currentPlayer.Writer, currentPlayer, player);
+                _currentPlayer.LocalPlayers.Add(player);
+                AddLocalPlayer(_currentPlayer.Writer, _currentPlayer, player);
                 UpdatePlayerState(player, PlayerFlagUpdateBlock);
             }
         }
 
         /* Finished adding local players */
-        currentPlayer.Writer.WriteBits(11, 2047);
+        _currentPlayer.Writer.WriteBits(11, 2047);
     }
 
     private void UpdateLocalPlayers()
     {
-        currentPlayer.Writer.WriteBits(8, currentPlayer.LocalPlayers.Count); // number of players to add
+        _currentPlayer.Writer.WriteBits(8, _currentPlayer.LocalPlayers.Count); // number of players to add
 
-        foreach (var other in currentPlayer.LocalPlayers.ToList())
+        foreach (var other in _currentPlayer.LocalPlayers.ToList())
         {
-            if (other.Data.Location.IsWithinArea(currentPlayer.Data.Location) && !other.DidTeleportOrSpawn)
+            if (other.Data.Location.IsWithinArea(_currentPlayer.Data.Location) && !other.DidTeleportOrSpawn)
             {
-                UpdateLocalPlayerMovement(other, currentPlayer.Writer);
+                UpdateLocalPlayerMovement(other, _currentPlayer.Writer);
 
                 if (other.IsUpdateRequired)
                     UpdatePlayerState(other, PlayerFlagUpdateBlock);
@@ -117,8 +124,8 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void RemovePlayer(Player other)
     {
-        currentPlayer.Writer.WriteBits(1, 0);
-        currentPlayer.LocalPlayers.Remove(other);
+        _currentPlayer.Writer.WriteBits(1, 0);
+        _currentPlayer.LocalPlayers.Remove(other);
     }
 
     private void UpdatePlayerState(Player player, RSStream playerFlagUpdateBlock)
@@ -146,10 +153,10 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void AppendAppearance(Player player, RSStream playerFlagUpdateBlock)
     {
-        var updateBlockBuffer = new RSStream(new byte[128]);
+        var updateBlockBuffer = new RSStream(new byte[256]);
         updateBlockBuffer.WriteByte(player.Data.Gender);
         updateBlockBuffer.WriteByte(player.Data.HeadIcon); // Skull Icon
-
+        
         WriteHelmet(updateBlockBuffer, player);
         WriteCape(updateBlockBuffer, player);
         WriteAmulet(updateBlockBuffer, player);
@@ -158,15 +165,16 @@ public class PlayerUpdatePacket(Player currentPlayer)
         WriteShield(updateBlockBuffer, player);
         WriteArms(updateBlockBuffer, player);
         WriteLegs(updateBlockBuffer, player);
+
         WriteHair(updateBlockBuffer, player);
         WriteHands(updateBlockBuffer, player);
         WriteFeet(updateBlockBuffer, player);
         WriteBeard(updateBlockBuffer, player);
-
+        
         WritePlayerColors(updateBlockBuffer, player);
         WriteMovementAnimations(updateBlockBuffer);
 
-        updateBlockBuffer.WriteQWord(player.Username.ToLong());
+        updateBlockBuffer.WriteQWord(player.Data.Username.ToLong());
         updateBlockBuffer.WriteByte(player.Data.CombatLevel);
         updateBlockBuffer.WriteWord(player.Data.TotalLevel);
 
@@ -176,18 +184,18 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     void UpdateCurrentPlayerMovement()
     {
-        currentPlayer.Writer.CreateFrameVarSizeWord(ServerOpCodes.PLAYER_UPDATE);
-        currentPlayer.Writer.InitBitAccess();
+        _currentPlayer.Writer.CreateFrameVarSizeWord(ServerOpCodes.PLAYER_UPDATE);
+        _currentPlayer.Writer.InitBitAccess();
 
         /* Idle */
-        if (!currentPlayer.IsUpdateRequired && !currentPlayer.DidTeleportOrSpawn)
+        if (!_currentPlayer.IsUpdateRequired && !_currentPlayer.DidTeleportOrSpawn)
         {
             AppendIdleStand();
             return;
         }
 
 
-        if (currentPlayer.DidTeleportOrSpawn || currentPlayer.IsUpdateRequired)
+        if (_currentPlayer.DidTeleportOrSpawn || _currentPlayer.IsUpdateRequired)
         {
             AppendTeleportOrSpawn();
         }
@@ -205,22 +213,22 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void AppendTeleportOrSpawn()
     {
-        currentPlayer.Writer.WriteBits(1, 1); // set to true if updating thisPlayer
-        currentPlayer.Writer.WriteBits(2, 3); // updateType - 3=jump to pos
+        _currentPlayer.Writer.WriteBits(1, 1); // set to true if updating thisPlayer
+        _currentPlayer.Writer.WriteBits(2, 3); // updateType - 3=jump to pos
 
         // the following applies to type 3 only
-        currentPlayer.Writer.WriteBits(2, 0); // height level (0-3)
-        currentPlayer.Writer.WriteBits(1, 1); // set to true, if discarding walking queue (after teleport e.g.)
-        currentPlayer.Writer.WriteBits(1,
-            currentPlayer.IsUpdateRequired ? 1 : 0); // UpdateRequired aka does come with UpdateFlags
-        currentPlayer.Writer.WriteBits(7, currentPlayer.Data.Location.PositionRelativeToOffsetChunkY); // y-position
-        currentPlayer.Writer.WriteBits(7, currentPlayer.Data.Location.PositionRelativeToOffsetChunkX); // x-position
-        currentPlayer.DidTeleportOrSpawn = false;
+        _currentPlayer.Writer.WriteBits(2, 0); // height level (0-3)
+        _currentPlayer.Writer.WriteBits(1, 1); // set to true, if discarding walking queue (after teleport e.g.)
+        _currentPlayer.Writer.WriteBits(1,
+            _currentPlayer.IsUpdateRequired ? 1 : 0); // UpdateRequired aka does come with UpdateFlags
+        _currentPlayer.Writer.WriteBits(7, _currentPlayer.Data.Location.PositionRelativeToOffsetChunkY); // y-position
+        _currentPlayer.Writer.WriteBits(7, _currentPlayer.Data.Location.PositionRelativeToOffsetChunkX); // x-position
+        _currentPlayer.DidTeleportOrSpawn = false;
     }
 
     private void AppendIdleStand()
     {
-        currentPlayer.Writer.WriteBits(1, 0);
+        _currentPlayer.Writer.WriteBits(1, 0);
     }
 
 
@@ -240,15 +248,16 @@ public class PlayerUpdatePacket(Player currentPlayer)
     {
         var beard = client.Data.Appearance.Beard;
 
-        if (beard <= 0)
-            stream.WriteByte(0);
-        else
+        if (beard != 1 && GameConstants.IsFullHelm(client.Data.Equipment.GetItem(EquipmentSlot.Helmet).ItemId) ||
+            GameConstants.IsFullMask(client.Data.Equipment.GetItem(EquipmentSlot.Helmet).ItemId))
             stream.WriteWord(0x100 + beard);
+        else
+            stream.WriteByte(0);
     }
 
     private void WriteFeet(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Boots;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Boots).ItemId;
         var feetId = client.Data.Appearance.Feet;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
@@ -258,7 +267,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteHands(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Gloves;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Gloves).ItemId;
         var handsId = client.Data.Appearance.Hands;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
@@ -268,8 +277,8 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteHair(RSStream stream, Player client)
     {
-        var isFullHelmOrMask = GameConstants.IsFullHelm(client.Data.Equipment.Helmet) ||
-                               GameConstants.IsFullMask(client.Data.Equipment.Helmet);
+        var isFullHelmOrMask = GameConstants.IsFullHelm(client.Data.Equipment.GetItem(EquipmentSlot.Helmet).ItemId) ||
+                               GameConstants.IsFullMask(client.Data.Equipment.GetItem(EquipmentSlot.Helmet).ItemId);
         if (!isFullHelmOrMask)
         {
             var hair = client.Data.Appearance.Hair;
@@ -281,7 +290,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteLegs(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Legs;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Legs).ItemId;
         var legsId = client.Data.Appearance.Legs;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
@@ -291,7 +300,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteShield(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Shield;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Shield).ItemId;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -300,7 +309,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteBody(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Body;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Chest).ItemId;
         var torsoId = client.Data.Appearance.Torso;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
@@ -310,7 +319,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteWeapon(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Weapon;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Weapon).ItemId;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -319,7 +328,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteAmulet(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Amulet;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Amulet).ItemId;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -328,7 +337,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteCape(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Cape;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Cape).ItemId;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -337,7 +346,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteHelmet(RSStream stream, Player client)
     {
-        var itemId = client.Data.Equipment.Helmet;
+        var itemId = client.Data.Equipment.GetItem(EquipmentSlot.Helmet).ItemId;
         if (itemId > -1)
             stream.WriteWord(0x200 + itemId);
         else
@@ -346,7 +355,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteArms(RSStream stream, Player client)
     {
-        var isFullBody = GameConstants.IsFullBody(client.Data.Equipment.Body);
+        var isFullBody = GameConstants.IsFullBody(client.Data.Equipment.GetItem(EquipmentSlot.Chest).ItemId);
         if (!isFullBody)
         {
             var arms = client.Data.Appearance.Arms;
@@ -366,7 +375,7 @@ public class PlayerUpdatePacket(Player currentPlayer)
 
     private void WriteMovementAnimations(RSStream stream)
     {
-        foreach (var animation in currentPlayer.Data.MovementAnimations.GetAnimations())
+        foreach (var animation in _currentPlayer.Data.MovementAnimations.GetAnimations())
             stream.WriteWord(animation);
     }
 }

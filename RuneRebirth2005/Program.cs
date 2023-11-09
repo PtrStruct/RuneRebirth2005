@@ -1,4 +1,5 @@
 ﻿using RuneRebirth2005;
+using RuneRebirth2005.Helpers;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -21,8 +22,10 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    Server server = new Server();
-    Log.Information("Application Starting");
+    Server.InitializePlayers();
+    BonusDefinitionLoader.Load();
+    
+    
     ServerEngine serverEngine = new ServerEngine();
     serverEngine.Run();
 }
