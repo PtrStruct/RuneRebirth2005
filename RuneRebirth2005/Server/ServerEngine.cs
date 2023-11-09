@@ -67,10 +67,15 @@ public class ServerEngine
 
         /* Process Incoming Data */
         // Log.Information("Processing fetched data..");
+
+        foreach (var player in Server.Players)
+        {
+            player.PacketStore.ProcessPackets();
+        }
+        
         foreach (var player in Server.Players)
         {
             if (player.Index == -1) continue;
-            player.PacketStore.ProcessPackets();
             new PlayerUpdatePacket(player).Add();
         }
 
@@ -79,7 +84,7 @@ public class ServerEngine
         foreach (var player in Server.Players)
         {
             if (player.Index == -1) continue;
-            Log.Information($"Going to flush data to: {player.Username}");
+            //Log.Information($"Going to flush data to: {player.Data.Username}");
             player.FlushBufferedData();
         }
         
