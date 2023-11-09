@@ -79,6 +79,7 @@ public class ServerEngine
         foreach (var player in Server.Players)
         {
             if (player.Index == -1) continue;
+            Log.Information($"Going to flush data to: {player.Username}");
             player.FlushBufferedData();
         }
         
