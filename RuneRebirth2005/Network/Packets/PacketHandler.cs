@@ -3,9 +3,15 @@ using Serilog;
 
 namespace RuneRebirth2005.Network;
 
-public class PacketHandler(Player player)
+public class PacketHandler
 {
+    private readonly Player _player;
 
+    public PacketHandler(Player player)
+    {
+        _player = player;
+    }
+    
     private enum State
     {
         READ_OPCODE = 0,
@@ -19,27 +25,15 @@ public class PacketHandler(Player player)
     private int _packetLength = -1;
     public void RetrievePacket()
     {
-        if (!_player.NetworkStream.DataAvailable)
-            return;
-
-        FillStream(1);
-
-        if (_opCode == -1)
-            UpdatePacketOpCode();
-
-        if (_opCode != 0)
-        {
-            Log.Information($"Received opcode {_opCode}.");
-        }
 
         if (_state == State.READ_OPCODE)
         {
-            if (player.Socket.Available == 0)
+            if (_player.Socket.Available == 0)
             {
                 return;
             }
 
-            player.FillStream(1);
+            _player.FillStream(1);
             
             _opCode = (byte)(GetReader().ReadUnsignedByte() - GetInEncryptionKey());
             _packetLength = GameConstants.INCOMING_SIZES[_opCode];
@@ -56,12 +50,12 @@ public class PacketHandler(Player player)
 
         if (_state == State.READ_VAR_SIZE)
         {
-            if (player.Socket.Available == 0)
+            if (_player.Socket.Available == 0)
             {
                 return;
             }
 
-            player.FillStream(1);
+            _player.FillStream(1);
 
             _packetLength = GetReader().ReadUnsignedByte();
             _state = State.READ_PAYLOAD;
@@ -69,29 +63,30 @@ public class PacketHandler(Player player)
 
         if (_state != State.READ_PAYLOAD) return;
         
-        if (_packetLength > player.Socket.Available)
+        if (_packetLength > _player.Socket.Available)
         {
             return;
         }
-        player.FillStream(_packetLength);
+        _player.FillStream(_packetLength);
         Log.Information($"[{_opCode}] Packet Received - Length: {_packetLength}");
 
         var packet = PacketFactory.CreateClientPacket(_opCode,
-            new PacketParameters { OpCode = _opCode, Length = _packetLength, Player = player });
+            new PacketParameters { OpCode = _opCode, Length = _packetLength, Player = _player });
             
-        player.PacketStore.AddPacket(_opCode, packet);
+        _player.PacketStore.AddPacket(_opCode, packet);
         _state = State.READ_OPCODE;
     }
 
     private RSStream GetReader()
     {
-        return player.Reader;
+        return _player.Reader;
     }
 
     private int GetInEncryptionKey()
     {
-        return player.InEncryption.GetNextKey();
+        return _player.InEncryption.GetNextKey();
     }
+
 }
 
 public class PacketParameters

@@ -19,7 +19,6 @@ public static class PlayerManager
             Reader = new RSStream(new byte[ServerConfig.BUFFER_SIZE]),
             Writer = new RSStream(new byte[ServerConfig.BUFFER_SIZE])
         };
-        Log.Information($"Initialized new Player");
         return player;
     }
 
@@ -42,10 +41,10 @@ public static class PlayerManager
 
     public static void AssignAvailablePlayerSlot(Player player)
     {
-        for (var i = 1; i < Server.Players.Length; i++)
+        for (var i = 0; i < Server.Players.Length; i++)
             if (Server.Players[i].Index == -1)
             {
-                player.Index = i;
+                player.Index = i + 1;
                 Log.Information($"Incoming connection has been assigned index: {player.Index}!");
                 return;
             }
@@ -57,7 +56,7 @@ public static class PlayerManager
 
     public static void RegisterPlayer(Player player)
     {
-        Server.Players[player.Index] = player;
+        Server.Players[player.Index - 1] = player;
         Log.Information($"Client with ID: [{player.Index}] has been registered!");
     }
 
