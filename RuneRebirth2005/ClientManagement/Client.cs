@@ -54,7 +54,7 @@ public class Client
         {
             NetworkStream.Write(Writer.Buffer, 0, Writer.CurrentOffset);
             NetworkStream.Flush();
-            Log.Information($"Flushed {Writer.CurrentOffset} bytes of data.");
+            //Log.Information($"Flushed {Writer.CurrentOffset} bytes of data.");
             Writer.CurrentOffset = 0;
         }
         catch (IOException ex)
@@ -79,10 +79,8 @@ public class Client
         public PlayerEquipment Equipment { get; set; } = new();
         public PlayerSkills PlayerSkills { get; set; } = new();
         public PlayerAppearance Appearance { get; set; } = new();
-        public PlayerAppearance PlayerAppearance { get; set; } = new();
         public MovementAnimations MovementAnimations { get; set; } = new();
         public Location Location { get; set; } = new(3200, 3200);
+        public PlayerBonuses Bonuses { get; set; } = new();
     }
-    
 }
-

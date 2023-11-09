@@ -153,10 +153,10 @@ public class PlayerUpdatePacket
 
     private void AppendAppearance(Player player, RSStream playerFlagUpdateBlock)
     {
-        var updateBlockBuffer = new RSStream(new byte[128]);
+        var updateBlockBuffer = new RSStream(new byte[256]);
         updateBlockBuffer.WriteByte(player.Data.Gender);
         updateBlockBuffer.WriteByte(player.Data.HeadIcon); // Skull Icon
-
+        
         WriteHelmet(updateBlockBuffer, player);
         WriteCape(updateBlockBuffer, player);
         WriteAmulet(updateBlockBuffer, player);
@@ -165,11 +165,12 @@ public class PlayerUpdatePacket
         WriteShield(updateBlockBuffer, player);
         WriteArms(updateBlockBuffer, player);
         WriteLegs(updateBlockBuffer, player);
+
         WriteHair(updateBlockBuffer, player);
         WriteHands(updateBlockBuffer, player);
         WriteFeet(updateBlockBuffer, player);
         WriteBeard(updateBlockBuffer, player);
-
+        
         WritePlayerColors(updateBlockBuffer, player);
         WriteMovementAnimations(updateBlockBuffer);
 
@@ -247,10 +248,11 @@ public class PlayerUpdatePacket
     {
         var beard = client.Data.Appearance.Beard;
 
-        if (beard <= 0)
-            stream.WriteByte(0);
-        else
+        if (beard != 1 && GameConstants.IsFullHelm(client.Data.Equipment.GetItem(EquipmentSlot.Helmet).ItemId) ||
+            GameConstants.IsFullMask(client.Data.Equipment.GetItem(EquipmentSlot.Helmet).ItemId))
             stream.WriteWord(0x100 + beard);
+        else
+            stream.WriteByte(0);
     }
 
     private void WriteFeet(RSStream stream, Player client)

@@ -24,7 +24,10 @@ public class PacketHandler
         if (_opCode == -1)
             UpdatePacketOpCode();
 
-        Log.Information($"Received opcode {_opCode}.");
+        if (_opCode != 0)
+        {
+            Log.Information($"Received opcode {_opCode}.");
+        }
 
         if (_packetLength == -1)
         {
@@ -83,7 +86,6 @@ public class PacketHandler
     {
         _player.FillStream(i);
     }
-
 }
 
 public class PacketParameters

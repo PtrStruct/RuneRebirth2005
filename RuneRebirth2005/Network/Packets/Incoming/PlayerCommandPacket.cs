@@ -1,5 +1,6 @@
 ﻿using RuneRebirth2005.Entities;
 using RuneRebirth2005.Network.Outgoing;
+using RuneRebirth2005.PlayerManagement;
 using Serilog;
 
 namespace RuneRebirth2005.Network.Incoming;
@@ -53,21 +54,14 @@ public class PlayerCommandPacket : IPacket
 
                 break;
 
-            case "boost":
-                skillId = int.Parse(_commandArgs[1]);
-                level = int.Parse(_commandArgs[2]);
-
-                // Check if the provided skill id is valid
-                if (skillId >= 0 && skillId < Enum.GetNames(typeof(SkillEnum)).Length)
-                {
-                    _player.Data.PlayerSkills.BoostSkill((SkillEnum)skillId, level);
-                    _player.SavePlayer();
-                }
-                else
-                    new SendPlayerMessagePacket(_player).Add("Invalid skill ID provided");
-
+            case "equip":
+                var itemId = int.Parse(_commandArgs[1]);
+                _player.Data.Equipment.EquipItem(itemId);
+                _player.IsUpdateRequired = true;
+                BonusManager.RefreshBonus(_player);
+                _player.SavePlayer();
                 break;
-
+            
             case "logout":
                 _player.SavePlayer();
                 new LogoutPacket(_player).Add();
