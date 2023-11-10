@@ -1,6 +1,7 @@
 ﻿using System.Net.Sockets;
 using RuneRebirth2005.Entities;
 using RuneRebirth2005.Network;
+using RuneRebirth2005.NPCManagement;
 using Serilog;
 
 namespace RuneRebirth2005.ClientManagement;
@@ -23,6 +24,7 @@ public class Client
     public LoginHandler LoginHandler { get; set; }
 
     public List<Player> LocalPlayers { get; set; } = new();
+    public List<NPC> LocalNPCs { get; set; } = new();
 
     public void Disconnect(string reason)
     {

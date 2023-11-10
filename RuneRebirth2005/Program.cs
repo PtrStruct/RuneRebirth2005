@@ -1,5 +1,6 @@
 ﻿using RuneRebirth2005;
 using RuneRebirth2005.Helpers;
+using RuneRebirth2005.NPCManagement;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -24,6 +25,7 @@ try
 {
     Server.InitializePlayers();
     BonusDefinitionLoader.Load();
+    NPCManager.Load();
     
     
     ServerEngine serverEngine = new ServerEngine();
