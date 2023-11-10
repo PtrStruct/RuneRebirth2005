@@ -17,6 +17,8 @@ public static class PacketFactory
                 return new FirstOptionClickPacket(parameters);
             case 103:
                 return new PlayerCommandPacket(parameters);
+            case 72:
+                return new AttackNPCPacket(parameters);
             default:
                 Log.Error($"No packet class implementation for opcode {opcode}.");
                 break;
@@ -25,3 +27,4 @@ public static class PacketFactory
         return null;
     }
 }
+

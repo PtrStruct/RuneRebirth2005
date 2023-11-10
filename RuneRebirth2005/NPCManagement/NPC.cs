@@ -17,10 +17,13 @@ public class NPC : IEntity
     public int Size { get; set; } = -1;
     public int CombatLevel { get; set; } = 1;
     public int Health { get; set; } = 25;
-    public int AnimationId { get; set; } = -1;
     public bool CanWalk { get; set; }
     public Face Face { get; set; }
     public bool Alive { get; set; } = true;
+    public int AnimationId { get; set; } = -1;
+    public int AttackAnimation { get; set; } = -1;
+    public int BlockAnimation { get; set; } = -1;
+    public int FallAnimation { get; set; } = -1;
 }
 
 [Flags]

@@ -10,29 +10,37 @@ public class NPCManager
 
     public NPCManager()
     {
-        
     }
 
     public static void Load()
     {
-        // WorldNPCs.Add(new NPC
-        // {
-        //     Index = 0,
-        //     Location = new Location(3198, 3200),
-        //     ModelId = 1769,
-        //     Alive = true,
-        //     IsUpdateRequired = true
-        // });
-        //
-        // WorldNPCs.Add(new NPC
-        // {
-        //     Index = 1,
-        //     Location = new Location(3197, 3200),
-        //     ModelId = 1769,
-        //     Alive = true,
-        //     IsUpdateRequired = true
-        // });
-        
+        WorldNPCs.Add(new NPC
+        {
+            Index = 0,
+            Location = new Location(3193, 3200),
+            ModelId = 50,
+            Alive = true,
+            IsUpdateRequired = true
+        });
+
+        WorldNPCs.Add(new NPC
+        {
+            Index = 1,
+            Location = new Location(3199, 3200),
+            ModelId = 1769,
+            Alive = true,
+            IsUpdateRequired = true
+        });
+
+        WorldNPCs.Add(new NPC
+        {
+            Index = 2,
+            Location = new Location(3201, 3200),
+            ModelId = 1769,
+            Alive = true,
+            IsUpdateRequired = true
+        });
+
         var npcDefs = File.ReadAllText("../../../Data/NPCDefinitions.json");
         var npcSpawns = File.ReadAllText("../../../Data/NPCSpawns.json");
         
@@ -40,7 +48,7 @@ public class NPCManager
         var NPCs = JsonConvert.DeserializeObject<List<NPCSpawn>>(npcSpawns).OrderBy(o => o.Id).ToList();
         
         
-        for (int i = 0; i < NPCs.Count; i++)
+        for (int i = 3; i < NPCs.Count; i++)
         {
             var npc = NPCs[i];
             LoadNewNPC(npc, i);
@@ -67,7 +75,10 @@ public class NPCManager
             Location = new Location(npcSpawn.X, npcSpawn.Y),
             CanWalk = npcSpawn.Walk == 1,
             Size = npcDef.Size,
-            NeedsPlacement = true,
+            AttackAnimation = npcDef.AttackAnim,
+            BlockAnimation = npcDef.DefenceAnim,
+            FallAnimation = npcDef.DeathAnim,
+            Alive = true,
             Health = npcDef.Hitpoints == 0 ? 1 : npcDef.Hitpoints
         };
 

@@ -67,6 +67,8 @@ public static class PlayerManager
         player.Flags |= PlayerUpdateFlags.Appearance;
         player.LoadPlayer();
 
+        player.CalculateCombatLevel();
+        
         new RegionLoadPacket(player).Add();
         new SendPlayerStatusPackets(player).Add();
 

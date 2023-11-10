@@ -42,9 +42,9 @@ public static class ConnectionHandler
                 {
                     PlayerManager.AssignAvailablePlayerSlot(player);
 
-                    int count = Server.Players.Where(x => x?.Index != -1).Count();
-                    player.Data.Location.X = 3200 + count;
-                    player.Data.Location.Y = 3200;
+                    // int count = Server.Players.Where(x => x?.Index != -1).Count();
+                    // player.Data.Location.X = 3200 + count;
+                    // player.Data.Location.Y = 3200;
 
                     PlayerManager.RegisterPlayer(player);
                     PlayerManager.Login(player);

@@ -5,23 +5,23 @@ namespace RuneRebirth2005.NPCManagement;
 
 public class NPCUpdater
 {
-     // public static void GenerateMovement()
-     // {
-     //     foreach (var npc in Server.NPCs)
-     //     {
-     //         if (npc == null)
-     //             continue;
-     //
-     //         var shouldMove = new Random().Next(0, 3) == 0;
-     //         var dir = MovementHelper.DirectionFromDelta(1, 1);
-     //         if (shouldMove && npc.CanWalk)
-     //         {
-     //             npc.Location.Move(1,1);
-     //             if (dir != -1)
-     //                 npc.MovementHandler.PrimaryDirection = dir;
-     //         }
-     //     }
-     // }
+    // public static void GenerateMovement()
+    // {
+    //     foreach (var npc in Server.NPCs)
+    //     {
+    //         if (npc == null)
+    //             continue;
+    //
+    //         var shouldMove = new Random().Next(0, 3) == 0;
+    //         var dir = MovementHelper.DirectionFromDelta(1, 1);
+    //         if (shouldMove && npc.CanWalk)
+    //         {
+    //             npc.Location.Move(1,1);
+    //             if (dir != -1)
+    //                 npc.MovementHandler.PrimaryDirection = dir;
+    //         }
+    //     }
+    // }
 
     public static void Update()
     {
@@ -43,12 +43,13 @@ public class NPCUpdater
                     continue;
                 }
 
-                if (NPCManager.WorldNPCs[npc.Index] != null && player.Data.Location.IsWithinArea(npc.Location) && npc.Alive)
+                if (NPCManager.WorldNPCs[npc.Index] != null && player.Data.Location.IsWithinArea(npc.Location) &&
+                    npc.Alive)
                 {
                     UpdateMovement(npc, player.Writer);
 
                     if (npc.IsUpdateRequired)
-                        AppendUpdates(npc, updateBlock);
+                        UpdateNPCState(npc, updateBlock);
                 }
                 else
                 {
@@ -65,7 +66,7 @@ public class NPCUpdater
                     break;
 
                 if (npc == null) continue;
-                
+
                 if (player.LocalNPCs.Contains(npc))
                     continue;
 
@@ -81,9 +82,9 @@ public class NPCUpdater
                     player.LocalNPCs.Add(npc);
                     npc.Flags |= NPCUpdateFlags.Face;
                     npc.IsUpdateRequired = true;
-                    
+
                     AddNPC(player, npc, player.Writer);
-                    AppendUpdates(npc, updateBlock);
+                    UpdateNPCState(npc, updateBlock);
                     npc.NeedsPlacement = false;
                 }
                 else
@@ -107,8 +108,6 @@ public class NPCUpdater
             player.Writer.EndFrameVarSizeWord();
             //client.FlushBufferedData();
         }
-
-        
     }
 
     public static void Reset()
@@ -132,11 +131,11 @@ public class NPCUpdater
             //npc.MovementHandler.SecondaryDirection = -1;
         }
     }
-    
 
-    private static void AppendUpdates(NPC npc, RSStream updateBlock)
+
+    private static void UpdateNPCState(NPC npc, RSStream updateBlock)
     {
-        var mask = NPCUpdateFlags.None;
+        var mask = npc.Flags;
 
         // if (npc.Flags.HasFlag(NPCUpdateFlags.Animation))
         // {
@@ -158,19 +157,19 @@ public class NPCUpdater
         //     mask |= NPCUpdateFlags.InteractingEntity;
         // }
 
-        if (npc.Flags.HasFlag(NPCUpdateFlags.Face))
-        {
-            mask |= NPCUpdateFlags.Face;
-        }
+        //if (npc.Flags.HasFlag(NPCUpdateFlags.Face))
+        //{
+        //    mask |= NPCUpdateFlags.Face;
+        //}
 
         updateBlock.WriteByte((byte)mask);
 
-        // if ((mask & NPCUpdateFlags.Animation) != 0)
-        // {
-        //     updateBlock.WriteWordBigEndian(npc.AnimationId); //866 //1365 wc
-        //     updateBlock.WriteByte(0); //delay
-        // }
-        //
+        if ((mask & NPCUpdateFlags.Animation) != 0)
+        {
+            updateBlock.WriteWordBigEndian(npc.AnimationId);
+            updateBlock.WriteByte(0); //delay
+        }
+
         // if ((mask & NPCUpdateFlags.Graphics) != 0)
         // {
         //     updateBlock.WriteWordBigEndian(npc.GraphicsId);
@@ -209,49 +208,48 @@ public class NPCUpdater
         playerWriter.WriteBits(1, npc.IsUpdateRequired ? 1 : 0);
     }
 
-     private static void UpdateMovement(NPC npc, RSStream writer)
-     {
-         
-         if (npc.NeedsPlacement)
-         {
-             writer.WriteBits(1, 1);
-             writer.WriteBits(2, 0);
-             npc.NeedsPlacement = false;
-         }
-         else
-         {
-             writer.WriteBits(1, 0);
-         }
-         
-         // if (npc.MovementHandler.SecondaryDirection == -1)
-         // {
-         //     if (npc.MovementHandler.PrimaryDirection == -1)
-         //     {
-         //         if (npc.IsUpdateRequired)
-         //         {
-         //             writer.WriteBits(1, 1);
-         //             writer.WriteBits(2, 0);
-         //         }
-         //         else
-         //         {
-         //             writer.WriteBits(1, 0);
-         //         }
-         //     }
-         //     else
-         //     {
-         //         writer.WriteBits(1, 1);
-         //         writer.WriteBits(2, 1);
-         //         writer.WriteBits(3, npc.MovementHandler.PrimaryDirection);
-         //         writer.WriteBits(1, npc.IsUpdateRequired ? 1 : 0);
-         //     }
-         // }
-         // else
-         // {
-         //     writer.WriteBits(1, 1);
-         //     writer.WriteBits(2, 2);
-         //     writer.WriteBits(3, npc.MovementHandler.PrimaryDirection);
-         //     writer.WriteBits(3, npc.MovementHandler.SecondaryDirection);
-         //     writer.WriteBits(1, npc.IsUpdateRequired ? 1 : 0);
-         // }
-     }
+    private static void UpdateMovement(NPC npc, RSStream writer)
+    {
+        if (npc.NeedsPlacement || npc.IsUpdateRequired)
+        {
+            writer.WriteBits(1, 1);
+            writer.WriteBits(2, 0);
+            npc.NeedsPlacement = false;
+        }
+        else
+        {
+            writer.WriteBits(1, 0);
+        }
+
+        // if (npc.MovementHandler.SecondaryDirection == -1)
+        // {
+        //     if (npc.MovementHandler.PrimaryDirection == -1)
+        //     {
+        //         if (npc.IsUpdateRequired)
+        //         {
+        //             writer.WriteBits(1, 1);
+        //             writer.WriteBits(2, 0);
+        //         }
+        //         else
+        //         {
+        //             writer.WriteBits(1, 0);
+        //         }
+        //     }
+        //     else
+        //     {
+        //         writer.WriteBits(1, 1);
+        //         writer.WriteBits(2, 1);
+        //         writer.WriteBits(3, npc.MovementHandler.PrimaryDirection);
+        //         writer.WriteBits(1, npc.IsUpdateRequired ? 1 : 0);
+        //     }
+        // }
+        // else
+        // {
+        //     writer.WriteBits(1, 1);
+        //     writer.WriteBits(2, 2);
+        //     writer.WriteBits(3, npc.MovementHandler.PrimaryDirection);
+        //     writer.WriteBits(3, npc.MovementHandler.SecondaryDirection);
+        //     writer.WriteBits(1, npc.IsUpdateRequired ? 1 : 0);
+        // }
+    }
 }

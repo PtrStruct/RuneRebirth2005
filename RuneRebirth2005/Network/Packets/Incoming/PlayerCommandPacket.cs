@@ -1,5 +1,6 @@
 ﻿using RuneRebirth2005.Entities;
 using RuneRebirth2005.Network.Outgoing;
+using RuneRebirth2005.NPCManagement;
 using RuneRebirth2005.PlayerManagement;
 using Serilog;
 
@@ -60,6 +61,25 @@ public class PlayerCommandPacket : IPacket
                 _player.IsUpdateRequired = true;
                 BonusManager.RefreshBonus(_player);
                 _player.SavePlayer();
+                break;
+            
+            
+            case "kill":
+                var npcIndex = int.Parse(_commandArgs[1]);
+                var npc = NPCManager.WorldNPCs[npcIndex];
+                npc.AnimationId = npc.FallAnimation;
+                npc.Flags |= NPCUpdateFlags.Animation;
+                npc.IsUpdateRequired = true;
+                // npc.Alive = false;
+                break;
+            
+            case "unkill":
+                npcIndex = int.Parse(_commandArgs[1]);
+                npc = NPCManager.WorldNPCs[npcIndex];
+                npc.Alive = true;
+                npc.AnimationId = -1;
+                npc.Flags |= NPCUpdateFlags.Animation;
+                npc.IsUpdateRequired = true;
                 break;
             
             case "logout":

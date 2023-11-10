@@ -145,10 +145,15 @@ public class PlayerUpdatePacket
         //if ((mask & PlayerUpdateFlags.Graphics) != 0) AppendGraphics(player, updatetempBlock);
         // if ((mask & PlayerUpdateFlags.Animation) != 0) AppendAnimation(player, updatetempBlock, player.AnimationId);
         // if ((mask & PlayerUpdateFlags.InteractingEntity) != 0) AppendInteractingEntity(player, updatetempBlock);
-        //if ((mask & PlayerUpdateFlags.InteractingEntity) != 0) AppendNPCInteract(player, updatetempBlock);
+        if ((mask & PlayerUpdateFlags.InteractingEntity) != 0) AppendNPCInteract(player, playerFlagUpdateBlock);
         if ((mask & PlayerUpdateFlags.Appearance) != 0) AppendAppearance(player, playerFlagUpdateBlock);
         //if ((mask & PlayerUpdateFlags.FaceDirection) != 0) AppendFaceDirection(player, updatetempBlock);
         // if ((mask & PlayerUpdateFlags.SingleHit) != 0) AppendSingleHit(player, updatetempBlock);
+    }
+
+    private void AppendNPCInteract(Player player, RSStream updatetempBlock)
+    {
+        updatetempBlock.WriteWordBigEndian(player.InteractingEntityId);
     }
 
     private void AppendAppearance(Player player, RSStream playerFlagUpdateBlock)

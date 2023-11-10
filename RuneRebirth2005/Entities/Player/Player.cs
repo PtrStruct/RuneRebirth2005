@@ -12,6 +12,8 @@ public class Player : Client, IEntity
     public bool DidTeleportOrSpawn { get; set; }
     public bool IsUpdateRequired { get; set; }
     public PlayerUpdateFlags Flags { get; set; } = PlayerUpdateFlags.None;
+    public int InteractingEntityId { get; set; } = -1;
+    public IEntity CombatFocus { get; set; }
 
     public Player()
     {
@@ -26,7 +28,6 @@ public class Player : Client, IEntity
         DidTeleportOrSpawn = false;
     }
 
-    
 
     public void SavePlayer()
     {
@@ -50,9 +51,36 @@ public class Player : Client, IEntity
 
         if (!File.Exists(filePath))
             SavePlayer();
-        
+
         using FileStream openStream = File.OpenRead(filePath);
         Data = JsonSerializer.Deserialize<PlayerData>(openStream);
         Log.Information($"Loaded player data for: {Data.Username}.");
+    }
+
+    public void CalculateCombatLevel()
+    {
+        PlayerSkills skills = new PlayerSkills();
+
+        int mag = Skill.GetLevelForXP(skills.GetSkill(SkillEnum.Magic).Experience);
+        int ran = Skill.GetLevelForXP(skills.GetSkill(SkillEnum.Ranged).Experience);
+        int att = Skill.GetLevelForXP(skills.GetSkill(SkillEnum.Attack).Experience);
+        int str = Skill.GetLevelForXP(skills.GetSkill(SkillEnum.Strength).Experience);
+        int def = Skill.GetLevelForXP(skills.GetSkill(SkillEnum.Defence).Experience);
+        int hp = Skill.GetLevelForXP(skills.GetSkill(SkillEnum.Hitpoints).Experience);
+        int pray = Skill.GetLevelForXP(skills.GetSkill(SkillEnum.Prayer).Experience);
+
+        if (ran > att + str)
+        {
+            Data.CombatLevel = (int)Math.Floor((def * 0.25) + (hp * 0.25) + (pray * 0.125) + (ran * 0.4875));
+        }
+        else if (mag > att + str)
+        {
+            Data.CombatLevel = (int)Math.Floor((def * 0.25) + (hp * 0.25) + (pray * 0.125) + (mag * 0.4875));
+        }
+        else
+        {
+            Data.CombatLevel =
+                (int)Math.Floor((def * 0.25) + (hp * 0.25) + (pray * 0.125) + (att * 0.325) + (str * 0.325));
+        }
     }
 }

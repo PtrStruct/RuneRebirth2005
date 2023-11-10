@@ -79,6 +79,23 @@ public class Skill
 
         return 0;
     }
+    
+    public static int GetLevelForXP(double exp){
+        double points = 0;
+        int output = 0;
+        if (exp > 13034430)
+            return 99;
+
+        for (int lvl = 1; lvl <= 99; lvl++) {
+            points += Math.Floor(lvl + 300.0 * Math.Pow(2.0, lvl / 7.0));
+            output = (int) Math.Floor(points / 4);
+            if (output >= (int) exp) {
+                return lvl;
+            }
+        }
+        return 0;
+    }
+    
 }
 
 public enum SkillEnum
