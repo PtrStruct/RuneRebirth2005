@@ -1,10 +1,14 @@
 ﻿using RuneRebirth2005.Entities;
+using RuneRebirth2005.Entities.Combat;
 
 namespace RuneRebirth2005.NPCManagement;
 
 public class NPC : IEntity
 {
     public int Index { get; set; }
+    public IEntity CombatFocus { get; set; }
+    public Weapon Weapon { get; set; }
+    public DamageInformation RecentDamageInformation { get; set; } = new();
     public string Name { get; set; }
     public int ModelId { get; set; }
     public Location SpawnLocation { get; set; }
@@ -20,11 +24,27 @@ public class NPC : IEntity
     public bool CanWalk { get; set; }
     public Face Face { get; set; }
     public bool Alive { get; set; } = true;
-    public int AnimationId { get; set; } = -1;
+    public int CurrentAnimation { get; set; } = -1;
     public int AttackAnimation { get; set; } = -1;
     public int BlockAnimation { get; set; } = -1;
     public int FallAnimation { get; set; } = -1;
+
+    public int InteractingEntityId { get; set; } = -1;
+    
+    public MeleeCombat MeleeCombat { get; set; }
+
+    public NPC()
+    {
+        Weapon = new Weapon
+        {
+            Speed = 5
+        };
+
+        MeleeCombat = new MeleeCombat(this);
+    }
+    
 }
+
 
 [Flags]
 public enum NPCUpdateFlags

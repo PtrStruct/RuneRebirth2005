@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using RuneRebirth2005.Entities.Combat;
 using RuneRebirth2005.Network;
 using RuneRebirth2005.Network.Outgoing;
 using RuneRebirth2005.NPCManagement;
@@ -57,7 +58,7 @@ public class ServerEngine
     {
         ConnectionHandler.AcceptClients();
 
-        
+
         /* Fetch Incoming Data */
         // Log.Information("Fetching data from clients..");
         foreach (var player in Server.Players)
@@ -66,23 +67,26 @@ public class ServerEngine
             for (int i = 0; i < 50; i++)
                 player.PacketHandler.RetrievePacket();
         }
-        
+
         /* Process Incoming Data */
         // Log.Information("Processing fetched data..");
-
         foreach (var player in Server.Players)
         {
             player.PacketStore.ProcessPackets();
         }
-        
+
+        /* Combat */
+        CombatManager.Invoke();
+
+        /* Package Player Update */
         foreach (var player in Server.Players)
         {
             if (player.Index == -1) continue;
             new PlayerUpdatePacket(player).Add();
         }
-        
+
         NPCUpdater.Update();
-        
+
         /* Send buffered data */
         // Log.Information("Flushing the buffered data!");
         foreach (var player in Server.Players)
@@ -91,9 +95,9 @@ public class ServerEngine
             //Log.Information($"Going to flush data to: {player.Data.Username}");
             player.FlushBufferedData();
         }
-        
+
         NPCUpdater.Reset();
-        
+
         foreach (var player in Server.Players)
         {
             if (player.Index == -1) continue;

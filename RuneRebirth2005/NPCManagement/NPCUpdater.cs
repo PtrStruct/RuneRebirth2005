@@ -47,7 +47,7 @@ public class NPCUpdater
                     npc.Alive)
                 {
                     UpdateMovement(npc, player.Writer);
-
+                    
                     if (npc.IsUpdateRequired)
                         UpdateNPCState(npc, updateBlock);
                 }
@@ -80,11 +80,13 @@ public class NPCUpdater
                 {
                     // Console.WriteLine($"Added: {npc.ModelId}.");
                     player.LocalNPCs.Add(npc);
-                    npc.Flags |= NPCUpdateFlags.Face;
-                    npc.IsUpdateRequired = true;
+                    // npc.Flags |= NPCUpdateFlags.Face;
+                    // npc.IsUpdateRequired = true;
 
                     AddNPC(player, npc, player.Writer);
-                    UpdateNPCState(npc, updateBlock);
+                    if (npc.IsUpdateRequired)
+                        UpdateNPCState(npc, updateBlock);
+
                     npc.NeedsPlacement = false;
                 }
                 else
@@ -114,11 +116,14 @@ public class NPCUpdater
     {
         foreach (var npc in NPCManager.WorldNPCs)
         {
-            if (npc == null) continue;
+            if (npc == null || npc.Index == -1) continue;
 
             npc.Flags = NPCUpdateFlags.None;
             npc.IsUpdateRequired = false;
             npc.NeedsPlacement = false;
+            npc.CurrentAnimation = -1;
+            npc.RecentDamageInformation.HasBeenHit = false;
+            npc.MeleeCombat.PerformedHit = false;
             //npc.AnimationUpdateRequired = false;
             //npc.GraphicsUpdateRequired = false;
             //npc.SingleHitUpdateRequired = false;
@@ -166,7 +171,7 @@ public class NPCUpdater
 
         if ((mask & NPCUpdateFlags.Animation) != 0)
         {
-            updateBlock.WriteWordBigEndian(npc.AnimationId);
+            updateBlock.WriteWordBigEndian(npc.CurrentAnimation);
             updateBlock.WriteByte(0); //delay
         }
 
@@ -184,11 +189,11 @@ public class NPCUpdater
         //     updateBlock.WriteByte(npc.MaxHealth); //maxHealth
         // }
         //
-        // if ((mask & NPCUpdateFlags.InteractingEntity) != 0)
-        // {
-        //     var id = npc.InteractingEntityId;
-        //     updateBlock.WriteWord(id);
-        // }
+         if ((mask & NPCUpdateFlags.InteractingEntity) != 0)
+         {
+             var id = npc.InteractingEntityId;
+             updateBlock.WriteWord(id);
+         }
 
         if ((mask & NPCUpdateFlags.Face) != 0)
         {

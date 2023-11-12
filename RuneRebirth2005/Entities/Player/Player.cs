@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using RuneRebirth2005.ClientManagement;
+using RuneRebirth2005.Entities.Combat;
 using RuneRebirth2005.Network;
 using Serilog;
 
@@ -14,11 +15,24 @@ public class Player : Client, IEntity
     public PlayerUpdateFlags Flags { get; set; } = PlayerUpdateFlags.None;
     public int InteractingEntityId { get; set; } = -1;
     public IEntity CombatFocus { get; set; }
+    public Weapon Weapon { get; set; }
+    public DamageInformation RecentDamageInformation { get; set; } = new();
+    public MeleeCombat MeleeCombat { get; set; }
+    public int CurrentAnimation { get; set; } = -1;
+    public int AttackAnimation { get; set; } = 422;
+    public int BlockAnimation { get; set; } = 404;
+    public int FallAnimation { get; set; } = -1;
 
     public Player()
     {
         Index = -1;
         PacketHandler = new PacketHandler(this);
+        Weapon = new Weapon
+        {
+            Speed = 4
+        };
+
+        MeleeCombat = new MeleeCombat(this);
     }
 
     public void Reset()
@@ -26,6 +40,9 @@ public class Player : Client, IEntity
         Flags |= PlayerUpdateFlags.None;
         IsUpdateRequired = false;
         DidTeleportOrSpawn = false;
+        RecentDamageInformation.HasBeenHit = false;
+        MeleeCombat.PerformedHit = false;
+        CurrentAnimation = -1;
     }
 
 
