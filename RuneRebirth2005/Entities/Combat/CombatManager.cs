@@ -26,4 +26,5 @@ public class CombatManager
             player.MeleeCombat.DecideCombatAnimation();
         }
     }
+    
 }

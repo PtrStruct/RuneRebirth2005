@@ -17,6 +17,13 @@ public class ServerEngine
 
         ConnectionHandler.Initialize();
 
+        DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+        {
+            RemainingTicks = 2,
+            Task = () => { Console.WriteLine("Woo0"); }
+        });
+
+
         while (_isRunning)
         {
             var stopwatch = StartStopwatch();
@@ -56,8 +63,10 @@ public class ServerEngine
 
     private void Tick()
     {
+        
         ConnectionHandler.AcceptClients();
 
+        DelayedTaskHandler.Tick();
 
         /* Fetch Incoming Data */
         // Log.Information("Fetching data from clients..");
@@ -78,6 +87,8 @@ public class ServerEngine
         /* Combat */
         CombatManager.Invoke();
 
+        
+        
         /* Package Player Update */
         foreach (var player in Server.Players)
         {
@@ -86,6 +97,7 @@ public class ServerEngine
         }
 
         NPCUpdater.Update();
+
 
         /* Send buffered data */
         // Log.Information("Flushing the buffered data!");

@@ -26,20 +26,31 @@ public class MeleeCombat
         {
             if (_currentEntity.CombatFocus != null)
             {
+                _currentEntity.InCombat = true;
+
                 if (_currentEntity is Player player)
                 {
                     player.CombatFocus.RecentDamageInformation.HasBeenHit = true;
                     player.CombatFocus.RecentDamageInformation.HitBy = _currentEntity;
                     player.CombatFocus.RecentDamageInformation.Amount = 1;
-                    PerformedHit = true;
 
                     player.Flags |= PlayerUpdateFlags.InteractingEntity;
                     player.InteractingEntityId = _currentEntity.CombatFocus.Index;
 
-
-                    if (player.CombatFocus.CombatFocus == null)
+                    /* If we've hit the target and it's not in combat */
+                    if (!player.CombatFocus.InCombat)
                     {
-                        player.CombatFocus.CombatFocus = _currentEntity;
+                        DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+                        {
+                            RemainingTicks = 1,
+                            Task = () =>
+                            {
+                                if (player.CombatFocus.CombatFocus == null)
+                                {
+                                    player.CombatFocus.CombatFocus = _currentEntity;
+                                }
+                            }
+                        });
                     }
                 }
                 else if (_currentEntity is NPC npc)
@@ -53,6 +64,7 @@ public class MeleeCombat
                     npc.InteractingEntityId = _currentEntity.CombatFocus.Index + 32768;
                 }
 
+                PerformedHit = true;
                 CurrentTick = 0;
             }
         }
@@ -83,13 +95,11 @@ public class MeleeCombat
     {
         if (!PerformedHit && entity.RecentDamageInformation.HasBeenHit)
         {
-            if (_currentEntity.CombatFocus != null)
-                entity.CurrentAnimation = entity.BlockAnimation;
+            entity.CurrentAnimation = entity.BlockAnimation;
         }
         else if (PerformedHit)
         {
-            if (_currentEntity.CombatFocus != null)
-                entity.CurrentAnimation = entity.AttackAnimation;
+            entity.CurrentAnimation = entity.AttackAnimation;
         }
     }
 }

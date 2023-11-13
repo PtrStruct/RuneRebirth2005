@@ -16,6 +16,7 @@ public class NPC : IEntity
     public Location Location { get; set; }
     public int HeadIcon { get; set; }
     public bool IsUpdateRequired { get; set; }
+    public bool InCombat { get; set; }
     public bool NeedsPlacement { get; set; } = true;
     public NPCUpdateFlags Flags { get; set; }
     public int Size { get; set; } = -1;

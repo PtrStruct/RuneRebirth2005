@@ -12,6 +12,7 @@ public class Player : Client, IEntity
     public PacketStore PacketStore { get; set; } = new();
     public bool DidTeleportOrSpawn { get; set; }
     public bool IsUpdateRequired { get; set; }
+    public bool InCombat { get; set; }
     public PlayerUpdateFlags Flags { get; set; } = PlayerUpdateFlags.None;
     public int InteractingEntityId { get; set; } = -1;
     public IEntity CombatFocus { get; set; }
