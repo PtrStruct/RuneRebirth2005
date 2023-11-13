@@ -13,7 +13,6 @@ public interface IEntity
     public int BlockAnimation { get; set; }
     public int FallAnimation { get; set; }
     public bool IsUpdateRequired { get; set; }
-
     public MeleeCombat MeleeCombat { get; set; }
     
 

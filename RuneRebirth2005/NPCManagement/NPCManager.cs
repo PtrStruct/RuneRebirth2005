@@ -79,7 +79,9 @@ public class NPCManager
             BlockAnimation = npcDef.DefenceAnim,
             FallAnimation = npcDef.DeathAnim,
             Alive = true,
-            Health = npcDef.Hitpoints == 0 ? 1 : npcDef.Hitpoints
+            Health = npcDef.Hitpoints == 0 ? 1 : npcDef.Hitpoints,
+            CurrentHealth = npcDef.Hitpoints == 0 ? 1 : npcDef.Hitpoints
+            
         };
 
         SetFaceBasedOnWalk(npc, npcSpawn.Walk);

@@ -181,14 +181,14 @@ public class NPCUpdater
         //     updateBlock.WriteDWord(4);
         // }
         //
-        // if ((mask & NPCUpdateFlags.SingleHit) != 0)
-        // {
-        //     updateBlock.WriteByteA((byte)npc.CombatHandler.CombatMethod.DamageInfo.Amount); //hitDamage
-        //     updateBlock.WriteByteC((byte)npc.CombatHandler.CombatMethod.DamageInfo.Type); //hitType
-        //     updateBlock.WriteByteA(npc.Health); //currentHealth
-        //     updateBlock.WriteByte(npc.MaxHealth); //maxHealth
-        // }
-        //
+         if ((mask & NPCUpdateFlags.SingleHit) != 0)
+         {
+             updateBlock.WriteByteA((byte)npc.RecentDamageInformation.Amount); //hitDamage
+             updateBlock.WriteByteC((byte)npc.RecentDamageInformation.DamageType); //hitType
+             updateBlock.WriteByteA(npc.CurrentHealth); //currentHealth
+             updateBlock.WriteByte(npc.Health); //maxHealth
+         }
+
          if ((mask & NPCUpdateFlags.InteractingEntity) != 0)
          {
              var id = npc.InteractingEntityId;

@@ -21,7 +21,8 @@ public class NPC : IEntity
     public NPCUpdateFlags Flags { get; set; }
     public int Size { get; set; } = -1;
     public int CombatLevel { get; set; } = 1;
-    public int Health { get; set; } = 25;
+    public int Health { get; set; }
+    public int CurrentHealth { get; set; }
     public bool CanWalk { get; set; }
     public Face Face { get; set; }
     public bool Alive { get; set; } = true;
