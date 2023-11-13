@@ -30,9 +30,36 @@ public class MeleeCombat
 
                 if (_currentEntity is Player player)
                 {
+                    int damage = 1;
                     player.CombatFocus.RecentDamageInformation.HasBeenHit = true;
                     player.CombatFocus.RecentDamageInformation.HitBy = _currentEntity;
-                    player.CombatFocus.RecentDamageInformation.Amount = 1;
+                    player.CombatFocus.RecentDamageInformation.Amount = damage;
+                    player.CombatFocus.RecentDamageInformation.DamageType =
+                        damage > 0 ? DamageType.Damage : DamageType.Block;
+
+
+                    // if (player.CombatFocus is Player playerTarget)
+                    // {
+                    //     playerTarget.Flags |= PlayerUpdateFlags.SingleHit;
+                    //     playerTarget.Data.CurrentHealth -= damage;
+                    // }
+                    // else if (player.CombatFocus is NPC NPCTarget)
+                    // {
+                    //     NPCTarget.Flags |= NPCUpdateFlags.SingleHit;
+                    //     NPCTarget.CurrentHealth -= damage;
+                    // }
+                    //
+                    if (player.CombatFocus is Player playerTarget)
+                    {
+                        playerTarget.Flags |= PlayerUpdateFlags.SingleHit;
+                        playerTarget.Data.CurrentHealth -= damage;
+                    }
+                    else if (player.CombatFocus is NPC NPCTarget)
+                    {
+                        NPCTarget.Flags |= NPCUpdateFlags.SingleHit;
+                        NPCTarget.CurrentHealth -= damage;
+                    }
+
 
                     player.Flags |= PlayerUpdateFlags.InteractingEntity;
                     player.InteractingEntityId = _currentEntity.CombatFocus.Index;
@@ -55,12 +82,28 @@ public class MeleeCombat
                 }
                 else if (_currentEntity is NPC npc)
                 {
+                    int damage = 1;
                     npc.CombatFocus.RecentDamageInformation.HasBeenHit = true;
                     npc.CombatFocus.RecentDamageInformation.HitBy = _currentEntity;
                     npc.CombatFocus.RecentDamageInformation.Amount = 1;
+                    npc.CombatFocus.RecentDamageInformation.DamageType =
+                        damage > 0 ? DamageType.Damage : DamageType.Block;
+
                     PerformedHit = true;
 
+                    if (npc.CombatFocus is Player playerTarget)
+                    {
+                        playerTarget.Flags |= PlayerUpdateFlags.SingleHit;
+                        playerTarget.Data.CurrentHealth -= damage;
+                    }
+                    else if (npc.CombatFocus is NPC NPCTarget)
+                    {
+                        NPCTarget.Flags |= NPCUpdateFlags.SingleHit;
+                        NPCTarget.CurrentHealth -= damage;
+                    }
+
                     npc.Flags |= NPCUpdateFlags.InteractingEntity;
+
                     npc.InteractingEntityId = _currentEntity.CombatFocus.Index + 32768;
                 }
 

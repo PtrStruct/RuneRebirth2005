@@ -111,6 +111,12 @@ public static class PlayerManager
         foreach (SkillEnum skill in Enum.GetValues(typeof(SkillEnum)))
         {
             var theSkill = player.Data.PlayerSkills.GetSkill(skill);
+            if (skill == SkillEnum.Hitpoints)
+            {
+                new SetSkillLevelPacket(player).Add(skill, theSkill.Experience, player.Data.CurrentHealth);
+                continue;
+            }
+            
             new SetSkillLevelPacket(player).Add(skill, theSkill.Experience, theSkill.Level);
         }
     }

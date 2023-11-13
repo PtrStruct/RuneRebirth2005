@@ -148,7 +148,15 @@ public class PlayerUpdatePacket
         if ((mask & PlayerUpdateFlags.InteractingEntity) != 0) AppendNPCInteract(player, playerFlagUpdateBlock);
         if ((mask & PlayerUpdateFlags.Appearance) != 0) AppendAppearance(player, playerFlagUpdateBlock);
         //if ((mask & PlayerUpdateFlags.FaceDirection) != 0) AppendFaceDirection(player, updatetempBlock);
-        // if ((mask & PlayerUpdateFlags.SingleHit) != 0) AppendSingleHit(player, updatetempBlock);
+        if ((mask & PlayerUpdateFlags.SingleHit) != 0) AppendSingleHit(player, playerFlagUpdateBlock);
+    }
+
+    private void AppendSingleHit(Player player, RSStream playerFlagUpdateBlock)
+    {
+        playerFlagUpdateBlock.WriteByte((byte)player.RecentDamageInformation.Amount); //hitDamage
+        playerFlagUpdateBlock.WriteByteA((byte)player.RecentDamageInformation.DamageType); //hitType
+        playerFlagUpdateBlock.WriteByteC(player.Data.CurrentHealth); //currentHealth
+        playerFlagUpdateBlock.WriteByte(player.Data.PlayerSkills.GetSkill(SkillEnum.Hitpoints).Level); //maxHealth
     }
 
     private void AppendAnimation(Player player, RSStream updatetempBlock)

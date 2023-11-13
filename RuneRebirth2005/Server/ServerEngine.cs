@@ -17,13 +17,6 @@ public class ServerEngine
 
         ConnectionHandler.Initialize();
 
-        DelayedTaskHandler.RegisterTask(new DelayedAttackTask
-        {
-            RemainingTicks = 2,
-            Task = () => { Console.WriteLine("Woo0"); }
-        });
-
-
         while (_isRunning)
         {
             var stopwatch = StartStopwatch();
@@ -63,7 +56,6 @@ public class ServerEngine
 
     private void Tick()
     {
-        
         ConnectionHandler.AcceptClients();
 
         DelayedTaskHandler.Tick();
@@ -87,8 +79,7 @@ public class ServerEngine
         /* Combat */
         CombatManager.Invoke();
 
-        
-        
+
         /* Package Player Update */
         foreach (var player in Server.Players)
         {

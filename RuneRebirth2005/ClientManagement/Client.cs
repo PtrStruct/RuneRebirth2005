@@ -90,6 +90,7 @@ public class Client
         public int HeadIcon { get; set; }
         public int CombatLevel { get; set; } = 3;
         public int TotalLevel { get; set; }
+        public int CurrentHealth { get; set; } = 10;
         public PlayerColors Colors { get; set; } = new();
         public PlayerEquipment Equipment { get; set; } = new();
         public PlayerSkills PlayerSkills { get; set; } = new();

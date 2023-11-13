@@ -23,6 +23,7 @@ public class Player : Client, IEntity
     public int AttackAnimation { get; set; } = 422;
     public int BlockAnimation { get; set; } = 404;
     public int FallAnimation { get; set; } = -1;
+    
 
     public Player()
     {
@@ -38,7 +39,7 @@ public class Player : Client, IEntity
 
     public void Reset()
     {
-        Flags |= PlayerUpdateFlags.None;
+        Flags = PlayerUpdateFlags.None;
         IsUpdateRequired = false;
         DidTeleportOrSpawn = false;
         RecentDamageInformation.HasBeenHit = false;
