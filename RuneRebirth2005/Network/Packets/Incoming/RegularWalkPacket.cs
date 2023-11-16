@@ -42,7 +42,7 @@ public class RegularWalkPacket : IPacket
 
     public void Process()
     {
-        _player.CombatFocus = null;
+        _player.NPCCombatFocus = null;
         // player.MovementHandler.Reset();
         // player.MovementHandler.SetRunToggled(running);
         //

@@ -8,23 +8,22 @@ public class CombatManager
     {
         foreach (var player in Server.Players)
         {
-            player.MeleeCombat.CalculateAttack();
+            player.PlayerMeleeCombat.Attack();
         }
 
         foreach (var npc in NPCManager.WorldNPCs)
         {
-            npc.MeleeCombat.CalculateAttack();
+            npc.Attack();
         }
-        
+
         foreach (var npc in NPCManager.WorldNPCs)
         {
-            npc.MeleeCombat.DecideCombatAnimation();
+            npc.SetCombatAnimation();
         }
 
         foreach (var player in Server.Players)
         {
-            player.MeleeCombat.DecideCombatAnimation();
+            player.PlayerMeleeCombat.SetCombatAnimation();
         }
     }
-    
 }

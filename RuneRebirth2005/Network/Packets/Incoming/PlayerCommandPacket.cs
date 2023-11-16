@@ -65,20 +65,20 @@ public class PlayerCommandPacket : IPacket
             
             
             case "kill":
-                var npcIndex = int.Parse(_commandArgs[1]);
-                var npc = NPCManager.WorldNPCs[npcIndex];
-                npc.CurrentAnimation = npc.FallAnimation;
-                npc.Flags |= NPCUpdateFlags.Animation;
-                npc.IsUpdateRequired = true;
+                // var npcIndex = int.Parse(_commandArgs[1]);
+                // var npc = NPCManager.WorldNPCs[npcIndex];
+                // npc.CurrentAnimation = npc.FallAnimation;
+                // npc.Flags |= NPCUpdateFlags.Animation;
+                // npc.IsUpdateRequired = true;
                 break;
             
             case "unkill":
-                npcIndex = int.Parse(_commandArgs[1]);
-                npc = NPCManager.WorldNPCs[npcIndex];
-                npc.Alive = true;
-                npc.CurrentAnimation = -1;
-                npc.Flags |= NPCUpdateFlags.Animation;
-                npc.IsUpdateRequired = true;
+                // npcIndex = int.Parse(_commandArgs[1]);
+                // npc = NPCManager.WorldNPCs[npcIndex];
+                // npc.Alive = true;
+                // npc.CurrentAnimation = -1;
+                // npc.Flags |= NPCUpdateFlags.Animation;
+                // npc.IsUpdateRequired = true;
                 break;
             
             case "logout":

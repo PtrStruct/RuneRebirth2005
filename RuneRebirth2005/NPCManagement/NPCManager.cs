@@ -6,7 +6,7 @@ namespace RuneRebirth2005.NPCManagement;
 public class NPCManager
 {
     public static List<NPCDefinition> _npcDefinitions = new();
-    public static List<NPC> WorldNPCs { get; set; } = new();
+    public static List<INPC> WorldNPCs { get; set; } = new();
 
     public NPCManager()
     {
@@ -14,41 +14,41 @@ public class NPCManager
 
     public static void Load()
     {
-        WorldNPCs.Add(new NPC
-        {
-            Index = 0,
-            Location = new Location(3193, 3200),
-            ModelId = 50,
-            Alive = true,
-            IsUpdateRequired = true
-        });
-
-        WorldNPCs.Add(new NPC
-        {
-            Index = 1,
-            Location = new Location(3199, 3200),
-            ModelId = 1769,
-            Alive = true,
-            IsUpdateRequired = true
-        });
-
-        WorldNPCs.Add(new NPC
-        {
-            Index = 2,
-            Location = new Location(3201, 3200),
-            ModelId = 1769,
-            Alive = true,
-            IsUpdateRequired = true
-        });
+        // WorldNPCs.Add(new NPC
+        // {
+        //     Index = 0,
+        //     Location = new Location(3193, 3200),
+        //     ModelId = 50,
+        //     Alive = true,
+        //     IsUpdateRequired = true
+        // });
+        //
+        // WorldNPCs.Add(new NPC
+        // {
+        //     Index = 1,
+        //     Location = new Location(3199, 3200),
+        //     ModelId = 1769,
+        //     Alive = true,
+        //     IsUpdateRequired = true
+        // });
+        //
+        // WorldNPCs.Add(new NPC
+        // {
+        //     Index = 2,
+        //     Location = new Location(3201, 3200),
+        //     ModelId = 1769,
+        //     Alive = true,
+        //     IsUpdateRequired = true
+        // });
 
         var npcDefs = File.ReadAllText("../../../Data/NPCDefinitions.json");
         var npcSpawns = File.ReadAllText("../../../Data/NPCSpawns.json");
-        
+
         _npcDefinitions = JsonConvert.DeserializeObject<List<NPCDefinition>>(npcDefs).OrderBy(o => o.Id).ToList();
         var NPCs = JsonConvert.DeserializeObject<List<NPCSpawn>>(npcSpawns).OrderBy(o => o.Id).ToList();
-        
-        
-        for (int i = 3; i < NPCs.Count; i++)
+
+
+        for (int i = 0; i < NPCs.Count; i++)
         {
             var npc = NPCs[i];
             LoadNewNPC(npc, i);
@@ -61,56 +61,37 @@ public class NPCManager
         if (npcDef == null) return;
 
         if (npcDef.Name == null)
-        {
             return;
-        }
 
-        var npc = new NPC
-        {
-            Index = i,
-            ModelId = npcDef.Id,
-            Name = npcDef.Name,
-            CombatLevel = npcDef.Combat,
-            SpawnLocation = new Location(npcSpawn.X, npcSpawn.Y),
-            Location = new Location(npcSpawn.X, npcSpawn.Y),
-            CanWalk = npcSpawn.Walk == 1,
-            Size = npcDef.Size,
-            AttackAnimation = npcDef.AttackAnim,
-            BlockAnimation = npcDef.DefenceAnim,
-            FallAnimation = npcDef.DeathAnim,
-            Alive = true,
-            Health = npcDef.Hitpoints == 0 ? 1 : npcDef.Hitpoints,
-            CurrentHealth = npcDef.Hitpoints == 0 ? 1 : npcDef.Hitpoints
-            
-        };
+        var npc = NPCFactory.CreateNPC(npcDef, npcSpawn, i);
 
         SetFaceBasedOnWalk(npc, npcSpawn.Walk);
 
         WorldNPCs.Add(npc);
     }
 
-    private static void SetFaceBasedOnWalk(NPC npc, int walkValue)
+    private static void SetFaceBasedOnWalk(INPC npc, int walkValue)
     {
         switch (walkValue)
         {
             case 2:
-                npc.Face = new Face(npc.Location.X, npc.Location.Y + 1);
+                npc.Face = new Face(npc.CurrentLocation.X, npc.CurrentLocation.Y + 1);
                 npc.Flags |= NPCUpdateFlags.Face;
                 break;
             case 3:
-                npc.Face = new Face(npc.Location.X, npc.Location.Y - 1);
+                npc.Face = new Face(npc.CurrentLocation.X, npc.CurrentLocation.Y - 1);
                 npc.Flags |= NPCUpdateFlags.Face;
                 break;
             case 4:
-                npc.Face = new Face(npc.Location.X + 1, npc.Location.Y);
+                npc.Face = new Face(npc.CurrentLocation.X + 1, npc.CurrentLocation.Y);
                 npc.Flags |= NPCUpdateFlags.Face;
                 break;
             case 5:
-                npc.Face = new Face(npc.Location.X - 1, npc.Location.Y);
+                npc.Face = new Face(npc.CurrentLocation.X - 1, npc.CurrentLocation.Y);
                 npc.Flags |= NPCUpdateFlags.Face;
                 break;
             default:
-                npc.Face = new Face(npc.Location.X, npc.Location.Y);
+                npc.Face = new Face(npc.CurrentLocation.X, npc.CurrentLocation.Y);
                 break;
         }
     }

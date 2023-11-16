@@ -2,23 +2,32 @@
 using RuneRebirth2005.ClientManagement;
 using RuneRebirth2005.Entities.Combat;
 using RuneRebirth2005.Network;
+using RuneRebirth2005.NPCManagement;
 using Serilog;
 
 namespace RuneRebirth2005.Entities;
 
-public class Player : Client, IEntity
+public class Player : Client, IPlayer
 {
     public PacketHandler PacketHandler { get; set; }
     public PacketStore PacketStore { get; set; } = new();
     public bool DidTeleportOrSpawn { get; set; }
     public bool IsUpdateRequired { get; set; }
+    public CombatType AttackType { get; set; }
     public bool InCombat { get; set; }
+    public void Attack()
+    {
+        throw new NotImplementedException();
+    }
+
     public PlayerUpdateFlags Flags { get; set; } = PlayerUpdateFlags.None;
     public int InteractingEntityId { get; set; } = -1;
-    public IEntity CombatFocus { get; set; }
+    public INPC NPCCombatFocus { get; set; }
+    public IPlayer PlayerCombatFocus { get; set; }
     public Weapon Weapon { get; set; }
     public DamageInformation RecentDamageInformation { get; set; } = new();
-    public MeleeCombat MeleeCombat { get; set; }
+    public PlayerMeleeCombat PlayerMeleeCombat { get; set; }
+    public ICombat Combat { get; set; }
     public int CurrentAnimation { get; set; } = -1;
     public int AttackAnimation { get; set; } = 422;
     public int BlockAnimation { get; set; } = 404;
@@ -34,7 +43,7 @@ public class Player : Client, IEntity
             Speed = 4
         };
 
-        MeleeCombat = new MeleeCombat(this);
+        PlayerMeleeCombat = new PlayerMeleeCombat(this);
     }
 
     public void Reset()
@@ -43,7 +52,7 @@ public class Player : Client, IEntity
         IsUpdateRequired = false;
         DidTeleportOrSpawn = false;
         RecentDamageInformation.HasBeenHit = false;
-        MeleeCombat.PerformedHit = false;
+        PlayerMeleeCombat.PerformedHit = false;
         CurrentAnimation = -1;
     }
 

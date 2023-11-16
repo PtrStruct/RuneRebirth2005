@@ -1,4 +1,5 @@
 ﻿using RuneRebirth2005.Entities;
+using RuneRebirth2005.Network.Outgoing;
 using RuneRebirth2005.NPCManagement;
 using Serilog;
 
@@ -22,8 +23,21 @@ public class AttackNPCPacket : IPacket
     public void Process()
     {
         var npc = NPCManager.WorldNPCs[_entityId];
+
+        if (npc.InCombat)
+        {
+            new SendPlayerMessagePacket(_player).Add("That target is already in combat.");
+            return;
+        }
+        
+        if (_player.InCombat)
+        {
+            new SendPlayerMessagePacket(_player).Add("You're already in combat.");
+            return;
+        }
+        
         _player.InteractingEntityId = _entityId;
-        _player.CombatFocus = npc;
+        _player.NPCCombatFocus = npc;
         
         _player.Flags |= PlayerUpdateFlags.InteractingEntity;
         _player.IsUpdateRequired = true;

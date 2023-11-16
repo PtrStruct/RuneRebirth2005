@@ -24,7 +24,7 @@ public class Client
     public LoginHandler LoginHandler { get; set; }
 
     public List<Player> LocalPlayers { get; set; } = new();
-    public List<NPC> LocalNPCs { get; set; } = new();
+    public List<INPC> LocalNPCs { get; set; } = new();
 
     public void Disconnect(string reason)
     {
