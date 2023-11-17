@@ -76,6 +76,52 @@ public class CasterNPC : INPC
         CurrentTick = 0;
     }
 
+    public void EndCombatCheck()
+    {
+        var PlayerFocus = PlayerCombatFocus;
+        var NPCFocus = NPCCombatFocus;
+
+        if (CurrentHealth <= 0 && (PlayerFocus != null || NPCFocus != null))
+        {
+            /* Reset combat state on both ends */
+            PerformedHit = false;
+            InteractingEntityId = -1;
+            CurrentAnimation = FallAnimation;
+            Flags |= NPCUpdateFlags.InteractingEntity;
+            Flags |= NPCUpdateFlags.Animation;
+
+            PlayerFocus.RecentDamageInformation.HasBeenHit = false;
+            PlayerFocus.RecentDamageInformation.HitByNPC = null;
+
+            PlayerCombatFocus = null;
+            NPCCombatFocus = null;
+
+            PlayerFocus.NPCCombatFocus = null;
+
+
+            IsUpdateRequired = true;
+            InCombat = false;
+
+            /* Despawn */
+            DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+            {
+                RemainingTicks = 3,
+                Task = () => { ShouldRender = false; }
+            });
+
+            /* Respawn */
+            DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+            {
+                RemainingTicks = 8,
+                Task = () =>
+                {
+                    ShouldRender = true;
+                    CurrentHealth = MaxHealth;
+                }
+            });
+        }
+    }
+
     public void SetCombatAnimation()
     {
         if (Index == -1) return;

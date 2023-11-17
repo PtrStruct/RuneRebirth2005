@@ -34,6 +34,11 @@ public class KingBlackDragon : INPC
     public INPC NPCCombatFocus { get; set; }
     public bool PerformedHit { get; set; }
     public int AttackSpeed { get; set; } = 5;
+    public void EndCombatCheck()
+    {
+        
+    }
+
     public int CurrentTick { get; set; }
 
     public void Attack()

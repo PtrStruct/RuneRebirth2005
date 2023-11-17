@@ -19,30 +19,33 @@ public class AttackNPCPacket : IPacket
         _length = parameters.Length;
         _entityId = _player.Reader.ReadSignedWordA();
     }
-    
+
     public void Process()
     {
         var npc = NPCManager.WorldNPCs[_entityId];
 
-        if (npc.InCombat)
-        {
-            new SendPlayerMessagePacket(_player).Add("That target is already in combat.");
+        if (npc.CurrentHealth <= 0)
             return;
-        }
         
-        if (_player.InCombat)
+        if (_player.NPCCombatFocus != npc && _player.NPCCombatFocus != null)
         {
             new SendPlayerMessagePacket(_player).Add("You're already in combat.");
             return;
         }
-        
-        _player.InteractingEntityId = _entityId;
-        _player.NPCCombatFocus = npc;
-        
-        _player.Flags |= PlayerUpdateFlags.InteractingEntity;
-        _player.IsUpdateRequired = true;
-        
-        Log.Information($"Attack NPC - ID:{_entityId}");
-        
+
+        if (npc.PlayerCombatFocus == null)
+        {
+            _player.InteractingEntityId = _entityId;
+            _player.NPCCombatFocus = npc;
+
+            _player.Flags |= PlayerUpdateFlags.InteractingEntity;
+            _player.IsUpdateRequired = true;
+
+            Log.Information($"Attack NPC - ID:{_entityId}");
+        }
+        else if (npc.PlayerCombatFocus != _player)
+        {
+            new SendPlayerMessagePacket(_player).Add("That target is already in combat.");
+        }
     }
 }

@@ -34,6 +34,11 @@ public class MeleeNPC : INPC
     public int AttackSpeed { get; set; } = 5;
     public DamageInformation RecentDamageReceived { get; set; } = new();
     public Face Face { get; set; }
+    public void EndCombatCheck()
+    {
+        
+    }
+
     public int CurrentTick { get; set; }
     
     public void Attack()

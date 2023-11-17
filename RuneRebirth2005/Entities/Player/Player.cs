@@ -15,6 +15,7 @@ public class Player : Client, IPlayer
     public bool IsUpdateRequired { get; set; }
     public CombatType AttackType { get; set; }
     public bool InCombat { get; set; }
+
     public void Attack()
     {
         throw new NotImplementedException();
@@ -32,7 +33,7 @@ public class Player : Client, IPlayer
     public int AttackAnimation { get; set; } = 422;
     public int BlockAnimation { get; set; } = 404;
     public int FallAnimation { get; set; } = -1;
-    
+
 
     public Player()
     {

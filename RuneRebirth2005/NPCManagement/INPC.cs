@@ -29,6 +29,7 @@ public interface INPC
     public int AttackSpeed { get; set; }
     public CombatType CombatType { get; set; }
     public void Attack();
+    public void EndCombatCheck();
     public int CurrentTick { get; set; }
     public void SetCombatAnimation();
     public bool PerformedHit { get; set; }

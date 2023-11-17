@@ -52,6 +52,8 @@ public class PlayerUpdatePacket
 
             if (!_currentPlayer.LocalPlayers.Contains(player) && player.Data.Location.IsWithinArea(_currentPlayer.Data.Location))
             {
+                /* In order to render the local player */
+                player.Flags |= PlayerUpdateFlags.Appearance;
                 _currentPlayer.LocalPlayers.Add(player);
                 AddLocalPlayer(_currentPlayer.Writer, _currentPlayer, player);
                 UpdatePlayerState(player, PlayerFlagUpdateBlock);
@@ -68,12 +70,15 @@ public class PlayerUpdatePacket
 
         foreach (var other in _currentPlayer.LocalPlayers.ToList())
         {
-            if (other.Data.Location.IsWithinArea(_currentPlayer.Data.Location) && !other.DidTeleportOrSpawn)
+            if (other.Data.Location.IsWithinArea(_currentPlayer.Data.Location))
             {
                 UpdateLocalPlayerMovement(other, _currentPlayer.Writer);
 
-                if (other.IsUpdateRequired)
+                if (other.IsUpdateRequired || other.DidTeleportOrSpawn)
+                {
+                    other.Flags |= PlayerUpdateFlags.Appearance;
                     UpdatePlayerState(other, PlayerFlagUpdateBlock);
+                }
             }
             else
             {
@@ -194,7 +199,7 @@ public class PlayerUpdatePacket
         WriteMovementAnimations(updateBlockBuffer);
 
         updateBlockBuffer.WriteQWord(player.Data.Username.ToLong());
-        updateBlockBuffer.WriteByte(player.Data.CombatLevel);
+        updateBlockBuffer.WriteByte(70);
         updateBlockBuffer.WriteWord(player.Data.TotalLevel);
 
         playerFlagUpdateBlock.WriteByteC(updateBlockBuffer.CurrentOffset);

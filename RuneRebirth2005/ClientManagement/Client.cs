@@ -88,7 +88,7 @@ public class Client
         public string Password { get; set; }
         public int Gender { get; set; }
         public int HeadIcon { get; set; }
-        public int CombatLevel { get; set; } = 3;
+        public int CombatLevel { get; set; }
         public int TotalLevel { get; set; }
         public int CurrentHealth { get; set; } = 10;
         public PlayerColors Colors { get; set; } = new();
