@@ -1,4 +1,5 @@
-﻿using RuneRebirth2005.NPCManagement;
+﻿using RuneRebirth2005.Fighting;
+using RuneRebirth2005.NPCManagement;
 
 namespace RuneRebirth2005.Entities;
 
@@ -12,7 +13,7 @@ public class NPC : Character
     public NPCUpdateFlags Flags { get; set; }
     public bool Stationary { get; set; }
     public int CombatLevel { get; set; }
-    public override int AttackSpeed { get; set; } = 3;
+    public override int AttackSpeed { get; set; }
 
     public int MaxHealth { get; set; }
     public override int CurrentHealth { get; set; }
@@ -34,21 +35,29 @@ public class NPC : Character
     public override int BlockAnimation { get; set; }
     public override int CurrentAnimation { get; set; }
     public override int AttackAnimation { get; set; }
-    
+
     public void Process()
     {
-        
         if (Flags != NPCUpdateFlags.None)
             IsUpdateRequired = true;
     }
-    
+
     public override void SetInteractionEntity(IEntity entity)
     {
-        throw new NotImplementedException();
+        InteractingEntity = entity;
     }
 
     public override void PerformAnimation(int animationId)
     {
-        throw new NotImplementedException();
+        CurrentAnimation = animationId;
+        Flags |= NPCUpdateFlags.Animation;
+    }
+
+    public void Reset()
+    {
+        Combat.PerformedHit = false;
+        Combat.WasHit = false;
+        IsUpdateRequired = false;
+        Flags = NPCUpdateFlags.None;
     }
 }

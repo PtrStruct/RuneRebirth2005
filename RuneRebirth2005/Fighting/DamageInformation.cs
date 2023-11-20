@@ -1,6 +1,7 @@
-﻿using RuneRebirth2005.NPCManagement;
+﻿using RuneRebirth2005.Entities;
+using RuneRebirth2005.NPCManagement;
 
-namespace RuneRebirth2005.Entities.Fighting;
+namespace RuneRebirth2005.Fighting;
 
 public class DamageInformation
 {

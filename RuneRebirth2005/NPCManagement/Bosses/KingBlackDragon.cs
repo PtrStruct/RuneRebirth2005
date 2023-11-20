@@ -1,5 +1,4 @@
 ﻿using RuneRebirth2005.Entities;
-using RuneRebirth2005.Entities.Combat;
 
 namespace RuneRebirth2005.NPCManagement.Bosses;
 

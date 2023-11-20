@@ -16,12 +16,13 @@ public class AttackNPCPacket : IPacket
         _player = parameters.Player;
         _opcode = parameters.OpCode;
         _length = parameters.Length;
-        // _entityId = _player.Reader.ReadSignedWordA();
+        _entityId = _player.PlayerSession.Reader.ReadSignedWordA();
     }
 
     public void Process()
     {
         var npc = Server.NPCs[_entityId];
+        _player.Combat.Attack(npc);
         /* Set Target */
         /* Set InteractingEntity*/
         // _player.Attack(npc);

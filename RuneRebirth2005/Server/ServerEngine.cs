@@ -1,9 +1,7 @@
 ﻿using System.Diagnostics;
-using RuneRebirth2005.Entities.Combat;
 using RuneRebirth2005.Network;
 using RuneRebirth2005.Update;
 using Serilog;
-using NPCUpdater = RuneRebirth2005.NPCManagement.NPCUpdater;
 
 namespace RuneRebirth2005;
 
@@ -58,63 +56,95 @@ public class ServerEngine
     {
         ConnectionHandler.AcceptClients();
 
-        // DelayedTaskHandler.Tick();
+        DelayedTaskHandler.Tick();
 
         /* Fetch Incoming Data */
-         // Log.Information("Fetching data from clients..");
-         for (int i = 0; i < Server.Players.Length; i++)
-         {
-             var player = Server.Players[i];
-             if (player == null) continue;
-             for (int j = 0; j < 25; j++)
-             {
-                 player.PlayerSession.Fetch(player);
-             }
-         }
+        // Log.Information("Fetching data from clients..");
+        for (int i = 0; i < Server.Players.Length; i++)
+        {
+            var player = Server.Players[i];
+            if (player == null) continue;
+            for (int j = 0; j < 25; j++)
+            {
+                player.PlayerSession.Fetch(player);
+            }
+        }
 
         /* Process Incoming Data */
-         // Log.Information("Processing fetched data..");
-         for (int i = 0; i < Server.Players.Length; i++)
-         {
-             var player = Server.Players[i];
-             if (player == null) continue;
-             player.PlayerSession.PacketStore.ProcessPackets();
-         }
+        // Log.Information("Processing fetched data..");
+        for (int i = 0; i < Server.Players.Length; i++)
+        {
+            var player = Server.Players[i];
+            if (player == null) continue;
+            player.PlayerSession.PacketStore.ProcessPackets();
+        }
+
 
         /* Combat */
-        // CombatManager.Invoke();
+        for (int i = 0; i < Server.Players.Length; i++)
+        {
+            if (Server.Players[i] == null) continue;
+            Server.Players[i].Combat.Process();
+        }
 
+        for (int i = 0; i < Server.NPCs.Count; i++)
+        {
+            if (Server.NPCs[i] == null) continue;
+            Server.NPCs[i].Combat.Process();
+        }
+
+         for (int i = 0; i < Server.Players.Length; i++)
+         {
+             if (Server.Players[i] == null) continue;
+             Server.Players[i].Combat.PerformAnimation();
+         }
+        
+         for (int i = 0; i < Server.NPCs.Count; i++)
+         {
+             if (Server.NPCs[i] == null) continue;
+             Server.NPCs[i].Combat.PerformAnimation();
+         }
+        
+
+        /* Process new Data for Player and NPC */
         for (int i = 0; i < Server.Players.Length; i++)
         {
             if (Server.Players[i] == null) continue;
             Server.Players[i].Process();
         }
-        
+
         for (int i = 0; i < Server.NPCs.Count; i++)
         {
             if (Server.NPCs[i] == null) continue;
             Server.NPCs[i].Process();
         }
-        
+
+        /* Update */
         for (int i = 0; i < Server.Players.Length; i++)
         {
             if (Server.Players[i] == null) continue;
             PlayerUpdater.Update(Server.Players[i]);
             NPCUpdater.Update(Server.Players[i]);
         }
-        
+
         /* Send data */
         for (int i = 0; i < Server.Players.Length; i++)
         {
             if (Server.Players[i] == null) continue;
             Server.Players[i].PlayerSession.FlushBufferedData();
         }
-        
+
         /* Reset */
         for (int i = 0; i < Server.Players.Length; i++)
         {
             if (Server.Players[i] == null) continue;
             Server.Players[i].Reset();
+        }
+
+        for (int i = 0; i < Server.NPCs.Count; i++)
+        {
+            if (Server.NPCs[i] == null) continue;
+            Server.NPCs[i].Reset();
         }
     }
 }

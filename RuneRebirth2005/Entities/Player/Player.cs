@@ -1,6 +1,6 @@
-﻿using RuneRebirth2005.Network;
+﻿using RuneRebirth2005.Fighting;
+using RuneRebirth2005.Network;
 using RuneRebirth2005.NPCManagement;
-using Serilog;
 
 namespace RuneRebirth2005.Entities;
 
@@ -47,16 +47,18 @@ public class Player : Character
     public override bool IsUpdateRequired { get; set; }
 
     // Animation and combat
-    public override Fighting.Combat Combat { get; set; }
-    public override int AttackSpeed { get; set; } = 3;
+    public override Combat Combat { get; set; }
+    public override int AttackSpeed { get; set; } = 5;
     public override void SetInteractionEntity(IEntity entity)
     {
-        throw new NotImplementedException();
+        InteractingEntity = entity;
+        Flags |= PlayerUpdateFlags.InteractingEntity;
     }
 
     public override void PerformAnimation(int animationId)
     {
-        throw new NotImplementedException();
+        CurrentAnimation = animationId;
+        Flags |= PlayerUpdateFlags.Animation;
     }
 
     public override int CurrentAnimation { get; set; }
@@ -147,6 +149,9 @@ public class Player : Character
     
     public void Reset()
     {
+        Combat.PerformedHit = false;
+        Combat.WasHit = false;
+        
         IsUpdateRequired = false;
         IsAppearanceUpdate = false;
         Flags = PlayerUpdateFlags.None;

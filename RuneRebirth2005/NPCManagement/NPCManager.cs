@@ -47,6 +47,7 @@ public class NPCManager
         mob.Location = new Location(npcSpawn.X, npcSpawn.Y);
         mob.CurrentHealth = npc.Hitpoints == 0 ? 1 : npc.Hitpoints;
         mob.MaxHealth = npc.Hitpoints == 0 ? 1 : npc.Hitpoints;
+        mob.IsUpdateRequired = true;
 
         SetFaceBasedOnWalk(mob, npcSpawn.Walk);
         mobs[index] = mob;

@@ -1,5 +1,5 @@
-﻿using RuneRebirth2005.NPCManagement;
-using RuneRebirth2005.Entities.Fighting;
+﻿using RuneRebirth2005.Fighting;
+using RuneRebirth2005.NPCManagement;
 
 namespace RuneRebirth2005.Entities;
 
@@ -17,10 +17,16 @@ public interface IEntity
     public int AttackAnimation { get; set; }
     public int BlockAnimation { get; set; }
     public int FallAnimation { get; set; }
+    
 }
 
 public abstract class Character : IEntity
 {
+    public Character()
+    {
+        Combat = new Combat(this);
+    }
+
     public abstract int Index { get; set; }
     public abstract IEntity InteractingEntity { get; set; }
     public abstract Face Face { get; set; }
@@ -32,7 +38,7 @@ public abstract class Character : IEntity
     public abstract int AttackAnimation { get; set; }
     public abstract int BlockAnimation { get; set; }
     public abstract int FallAnimation { get; set; }
-    public abstract Fighting.Combat Combat { get; set; }
+    public abstract Combat Combat { get; set; }
     public abstract int AttackSpeed { get; set; }
 
     public abstract void SetInteractionEntity(IEntity entity);

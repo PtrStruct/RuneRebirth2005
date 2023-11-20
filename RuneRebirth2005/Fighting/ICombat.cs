@@ -1,4 +1,4 @@
-﻿namespace RuneRebirth2005.Entities.Fighting;
+﻿namespace RuneRebirth2005.Fighting;
 
 public interface ICombat
 {
