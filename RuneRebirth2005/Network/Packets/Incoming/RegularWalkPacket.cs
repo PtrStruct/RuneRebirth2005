@@ -18,31 +18,31 @@ public class RegularWalkPacket : IPacket
 
     public RegularWalkPacket(PacketParameters packetParameters)
     {
-        _packetParameters = packetParameters;
-        _player = _packetParameters.Player;
-
-        _destX = -1;
-        _destY = -1;
-        _length = packetParameters.Length;
-
-        _steps = (_length - 5) / 2;
-        _path = new int[_steps, 2];
-
-        _firstStepX = _player.Reader.ReadSignedWordBigEndianA();
-        for (var i = 0; i < _steps; i++)
-        {
-            _path[i, 0] = (sbyte)_player.Reader.ReadUnsignedByte();
-            _path[i, 1] = (sbyte)_player.Reader.ReadUnsignedByte();
-        }
-
-        _firstStepY = _player.Reader.ReadSignedWordBigEndian();
-        _running = _player.Reader.ReadSignedByteC() == 1;
+        // _packetParameters = packetParameters;
+        // _player = _packetParameters.Player;
+        //
+        // _destX = -1;
+        // _destY = -1;
+        // _length = packetParameters.Length;
+        //
+        // _steps = (_length - 5) / 2;
+        // _path = new int[_steps, 2];
+        //
+        // _firstStepX = _player.Reader.ReadSignedWordBigEndianA();
+        // for (var i = 0; i < _steps; i++)
+        // {
+        //     _path[i, 0] = (sbyte)_player.Reader.ReadUnsignedByte();
+        //     _path[i, 1] = (sbyte)_player.Reader.ReadUnsignedByte();
+        // }
+        //
+        // _firstStepY = _player.Reader.ReadSignedWordBigEndian();
+        // _running = _player.Reader.ReadSignedByteC() == 1;
     }
 
 
     public void Process()
     {
-        _player.NPCCombatFocus = null;
+        // _player.NPCCombatFocus = null;
         // player.MovementHandler.Reset();
         // player.MovementHandler.SetRunToggled(running);
         //

@@ -1,5 +1,4 @@
 ﻿using RuneRebirth2005.Entities;
-using RuneRebirth2005.Network.Outgoing;
 
 namespace RuneRebirth2005.Network.Incoming;
 
@@ -18,9 +17,9 @@ public class FirstOptionClickPacket : IPacket
         _opcode = parameters.OpCode;
         _length = parameters.Length;
         
-        _interfaceId = _player.Reader.ReadSignedWordBigEndianA();
-        _index = _player.Reader.ReadSignedWordA();
-        _itemId = _player.Reader.ReadSignedWordBigEndian();
+        // _interfaceId = _player.Reader.ReadSignedWordBigEndianA();
+        // _index = _player.Reader.ReadSignedWordA();
+        // _itemId = _player.Reader.ReadSignedWordBigEndian();
         
         // var instantWriter = new RSStream(new byte[2048]);
         // instantWriter.CreateFrame(ServerOpCodes.OBJ_ADD);

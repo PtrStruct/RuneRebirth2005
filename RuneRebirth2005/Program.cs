@@ -22,14 +22,10 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 
-
-
 try
 {
-    Server.InitializePlayers();
-    BonusDefinitionLoader.Load();
+    // BonusDefinitionLoader.Load();
     NPCManager.Load();
-
 
     ServerEngine serverEngine = new ServerEngine();
     serverEngine.Run();

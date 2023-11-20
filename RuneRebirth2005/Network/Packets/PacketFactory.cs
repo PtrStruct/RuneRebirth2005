@@ -1,6 +1,5 @@
 using RuneRebirth2005.Entities;
 using RuneRebirth2005.Network.Incoming;
-using RuneRebirth2005.Network.Outgoing;
 using Serilog;
 
 namespace RuneRebirth2005.Network;

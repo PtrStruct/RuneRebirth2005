@@ -1,5 +1,4 @@
 ﻿using RuneRebirth2005.Entities;
-using RuneRebirth2005.Network.Outgoing;
 using RuneRebirth2005.NPCManagement;
 using RuneRebirth2005.PlayerManagement;
 using Serilog;
@@ -18,7 +17,7 @@ public class PlayerCommandPacket : IPacket
         _player = parameters.Player;
         _opcode = parameters.OpCode;
         _length = parameters.Length;
-        _commandArgs = _player.Reader.ReadString().Split(' ');
+        _commandArgs = _player.PlayerSession.Reader.ReadString().Split(' ');
     }
 
     public void Process()
@@ -29,14 +28,16 @@ public class PlayerCommandPacket : IPacket
         switch (command)
         {
             case "pos":
-                foreach (var message in _player.Data.Location.ToStringParts())
-                    new SendPlayerMessagePacket(_player).Add(message);
+                foreach (var message in _player.Location.ToStringParts())
+                {
+                    // new SendPlayerMessagePacket(_player).Add(message);
+                }
                 break;
             case "hair":
                 var style = int.Parse(_commandArgs[1]);
                 var color = int.Parse(_commandArgs[2]);
-                _player.Data.Appearance.Hair = style;
-                _player.Data.Colors.Hair = color;
+                _player.Appearance.Hair = style;
+                _player.Colors.Hair = color;
                 _player.IsUpdateRequired = true;
                 _player.Flags |= PlayerUpdateFlags.Appearance;
                 break;
@@ -47,23 +48,25 @@ public class PlayerCommandPacket : IPacket
                 // Check if the provided skill id is valid
                 if (skillId >= 0 && skillId < Enum.GetNames(typeof(SkillEnum)).Length)
                 {
-                    _player.Data.PlayerSkills.SetSkill((SkillEnum)skillId, level);
+                    _player.PlayerSkills.SetSkill((SkillEnum)skillId, level);
                     _player.SavePlayer();
                 }
                 else
-                    new SendPlayerMessagePacket(_player).Add("Invalid skill ID provided");
+                {
+                    // new SendPlayerMessagePacket(_player).Add("Invalid skill ID provided");
+                }
 
                 break;
 
             case "equip":
                 var itemId = int.Parse(_commandArgs[1]);
-                _player.Data.Equipment.EquipItem(itemId);
+                _player.Equipment.EquipItem(itemId);
                 _player.IsUpdateRequired = true;
                 BonusManager.RefreshBonus(_player);
                 _player.SavePlayer();
                 break;
-            
-            
+
+
             case "kill":
                 // var npcIndex = int.Parse(_commandArgs[1]);
                 // var npc = NPCManager.WorldNPCs[npcIndex];
@@ -71,7 +74,7 @@ public class PlayerCommandPacket : IPacket
                 // npc.Flags |= NPCUpdateFlags.Animation;
                 // npc.IsUpdateRequired = true;
                 break;
-            
+
             case "unkill":
                 // npcIndex = int.Parse(_commandArgs[1]);
                 // npc = NPCManager.WorldNPCs[npcIndex];
@@ -80,10 +83,10 @@ public class PlayerCommandPacket : IPacket
                 // npc.Flags |= NPCUpdateFlags.Animation;
                 // npc.IsUpdateRequired = true;
                 break;
-            
+
             case "logout":
                 _player.SavePlayer();
-                new LogoutPacket(_player).Add();
+                // new LogoutPacket(_player).Add();
                 break;
         }
     }

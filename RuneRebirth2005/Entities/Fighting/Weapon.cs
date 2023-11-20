@@ -1,4 +1,4 @@
-﻿namespace RuneRebirth2005.Entities.Combat;
+﻿namespace RuneRebirth2005.Entities.Fighting;
 
 public class Weapon
 {

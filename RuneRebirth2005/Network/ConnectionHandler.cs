@@ -30,9 +30,9 @@ public static class ConnectionHandler
             {
                 var player = PlayerManager.InitializeClient(tcpClient);
 
-                if (player.Socket.Available < 2)
+                if (player.PlayerSession.Socket.Available < 2)
                 {
-                    PlayerManager.SilentDisconnectClient(player);
+                    PlayerManager.SilentDisconnectPlayer(player);
                     return;
                 }
 
@@ -46,12 +46,11 @@ public static class ConnectionHandler
                     // player.Data.Location.X = 3200 + count;
                     // player.Data.Location.Y = 3200;
 
-                    PlayerManager.RegisterPlayer(player);
                     PlayerManager.Login(player);
                 }
                 else
                 {
-                    PlayerManager.DisconnectClient(player);
+                    PlayerManager.DisconnectPlayer(player);
                 }
             }
             catch (Exception e)

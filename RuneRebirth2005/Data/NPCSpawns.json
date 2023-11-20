@@ -3,8 +3,8 @@
     "maxHit": 1,
     "strength": 3,
     "attack": 3,
-    "x": 3193,
-    "y": 3209,
+    "x": 3199,
+    "y": 3931,
     "id": 27,
     "walk": 1,
     "height": 0
@@ -13,8 +13,8 @@
     "maxHit": 1,
     "strength": 3,
     "attack": 3,
-    "x": 3194,
-    "y": 3209,
+    "x": 3200,
+    "y": 3931,
     "id": 172,
     "walk": 1,
     "height": 0
@@ -23,8 +23,8 @@
     "maxHit": 1,
     "strength": 3,
     "attack": 3,
-    "x": 3195,
-    "y": 3209,
+    "x": 3201,
+    "y": 3931,
     "id": 90,
     "walk": 1,
     "height": 0

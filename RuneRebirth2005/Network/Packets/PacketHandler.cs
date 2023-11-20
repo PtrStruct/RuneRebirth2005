@@ -28,12 +28,12 @@ public class PacketHandler
 
         if (_state == State.READ_OPCODE)
         {
-            if (_player.Socket.Available == 0)
+            if (_player.PlayerSession.Socket.Available == 0)
             {
                 return;
             }
 
-            _player.FillStream(1);
+            _player.PlayerSession.FillStream(1);
             
             _opCode = (byte)(GetReader().ReadUnsignedByte() - GetInEncryptionKey());
             _packetLength = GameConstants.INCOMING_SIZES[_opCode];
@@ -50,12 +50,12 @@ public class PacketHandler
 
         if (_state == State.READ_VAR_SIZE)
         {
-            if (_player.Socket.Available == 0)
+            if (_player.PlayerSession.Socket.Available == 0)
             {
                 return;
             }
 
-            _player.FillStream(1);
+            _player.PlayerSession.FillStream(1);
 
             _packetLength = GetReader().ReadUnsignedByte();
             _state = State.READ_PAYLOAD;
@@ -63,28 +63,28 @@ public class PacketHandler
 
         if (_state != State.READ_PAYLOAD) return;
         
-        if (_packetLength > _player.Socket.Available)
+        if (_packetLength > _player.PlayerSession.Socket.Available)
         {
             return;
         }
-        _player.FillStream(_packetLength);
+        _player.PlayerSession.FillStream(_packetLength);
         Log.Information($"[{_opCode}] Packet Received - Length: {_packetLength}");
 
         var packet = PacketFactory.CreateClientPacket(_opCode,
             new PacketParameters { OpCode = _opCode, Length = _packetLength, Player = _player });
             
-        _player.PacketStore.AddPacket(_opCode, packet);
+        _player.PlayerSession.PacketStore.AddPacket(_opCode, packet);
         _state = State.READ_OPCODE;
     }
 
     private RSStream GetReader()
     {
-        return _player.Reader;
+        return _player.PlayerSession.Reader;
     }
 
     private int GetInEncryptionKey()
     {
-        return _player.InEncryption.GetNextKey();
+        return _player.PlayerSession.InEncryption.GetNextKey();
     }
 
 }

@@ -1,70 +1,70 @@
 ﻿using RuneRebirth2005.NPCManagement;
 using Serilog;
 
-namespace RuneRebirth2005.Entities.Combat;
+namespace RuneRebirth2005.Entities.Fighting;
 
 public class PlayerMeleeCombat
 {
-    private readonly IPlayer _currentPlayer;
+    private readonly Character _currentPlayer;
 
-    private IPlayer Target;
+    private Character Target;
     public int CurrentTick { get; set; }
     public bool PerformedHit { get; set; }
 
-    public PlayerMeleeCombat(IPlayer currentPlayer)
+    public PlayerMeleeCombat(Character currentPlayer)
     {
         _currentPlayer = currentPlayer;
-        CurrentTick = _currentPlayer.Weapon.Speed;
+        // CurrentTick = _currentPlayer.Weapon.Speed;
     }
 
     public void Attack()
     {
-        CurrentTick++;
-
-        var PlayerFocus = _currentPlayer.PlayerCombatFocus;
-        var NPCFocus = _currentPlayer.NPCCombatFocus;
-
-        if (_currentPlayer.Index == -1) return;
-        if (CurrentTick < _currentPlayer.Weapon.Speed) return;
-        if (PlayerFocus == null && NPCFocus == null) return;
-        if (PlayerFocus != null && NPCFocus != null)
-            Log.Fatal("Player Focus AND NPCFocus != null");
-
-        /* Distance checks etc.. */
-
-        /* Calculate damage */
-        int damage = 1;
-
-        if (NPCFocus != null)
-        {
-            _currentPlayer.InteractingEntityId = NPCFocus.Index;
-
-            if (!NPCFocus.InCombat)
-            {
-                NPCFocus.CurrentTick = 0;
-                DelayedTaskHandler.RegisterTask(new DelayedAttackTask
-                {
-                    RemainingTicks = 1,
-                    Task = () =>
-                    {
-                        if (NPCFocus.PlayerCombatFocus == null)
-                        {
-                            NPCFocus.PlayerCombatFocus = _currentPlayer;
-                        }
-                    }
-                });
-            }
-
-            /* Perform attack on NPC */
-
-            NPCFocus.InCombat = true;
-            NPCFocus.RecentDamageReceived.HasBeenHit = true;
-            NPCFocus.RecentDamageReceived.HitBy = _currentPlayer;
-            NPCFocus.RecentDamageReceived.Amount = damage;
-            NPCFocus.RecentDamageReceived.DamageType = damage > 0 ? DamageType.Damage : DamageType.Block;
-            NPCFocus.Flags |= NPCUpdateFlags.SingleHit;
-            NPCFocus.CurrentHealth -= damage;
-        }
+        // CurrentTick++;
+        //
+        // var PlayerFocus = _currentPlayer.PlayerCombatFocus;
+        // var NPCFocus = _currentPlayer.NPCCombatFocus;
+        //
+        // if (_currentPlayer.Index == -1) return;
+        // if (CurrentTick < _currentPlayer.Weapon.Speed) return;
+        // if (PlayerFocus == null && NPCFocus == null) return;
+        // if (PlayerFocus != null && NPCFocus != null)
+        //     Log.Fatal("Player Focus AND NPCFocus != null");
+        //
+        // /* Distance checks etc.. */
+        //
+        // /* Calculate damage */
+        // int damage = 1;
+        //
+        // if (NPCFocus != null)
+        // {
+        //     _currentPlayer.InteractingEntityId = NPCFocus.Index;
+        //
+        //     if (!NPCFocus.InCombat)
+        //     {
+        //         NPCFocus.CurrentTick = 0;
+        //         DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+        //         {
+        //             RemainingTicks = 1,
+        //             Task = () =>
+        //             {
+        //                 if (NPCFocus.PlayerCombatFocus == null)
+        //                 {
+        //                     NPCFocus.PlayerCombatFocus = _currentPlayer;
+        //                 }
+        //             }
+        //         });
+        //     }
+        //
+        //     /* Perform attack on NPC */
+        //
+        //     NPCFocus.InCombat = true;
+        //     NPCFocus.RecentDamageReceived.HasBeenHit = true;
+        //     NPCFocus.RecentDamageReceived.HitBy = _currentPlayer;
+        //     NPCFocus.RecentDamageReceived.Amount = damage;
+        //     NPCFocus.RecentDamageReceived.DamageType = damage > 0 ? DamageType.Damage : DamageType.Block;
+        //     NPCFocus.Flags |= NPCUpdateFlags.SingleHit;
+        //     NPCFocus.CurrentHealth -= damage;
+        // }
 
         // if (PlayerFocus != null)
         // {
@@ -94,25 +94,25 @@ public class PlayerMeleeCombat
         //     PlayerFocus.Data.CurrentHealth -= damage;
         // }
 
-        _currentPlayer.Flags |= PlayerUpdateFlags.InteractingEntity;
-        _currentPlayer.InCombat = true;
-        PerformedHit = true;
-        CurrentTick = 0;
+        // _currentPlayer.Flags |= PlayerUpdateFlags.InteractingEntity;
+        // _currentPlayer.InCombat = true;
+        // PerformedHit = true;
+        // CurrentTick = 0;
     }
 
     public void SetCombatAnimation()
     {
-        if (_currentPlayer.Index == -1) return;
-
-        if (PerformedHit || _currentPlayer.RecentDamageInformation.HasBeenHit)
-        {
-            _currentPlayer.Flags |= PlayerUpdateFlags.Animation;
-            PerformAnimationForEntity(_currentPlayer);
-            _currentPlayer.IsUpdateRequired = true;
-        }
+        // if (_currentPlayer.Index == -1) return;
+        //
+        // if (PerformedHit || _currentPlayer.RecentDamageInformation.HasBeenHit)
+        // {
+        //     _currentPlayer.Flags |= PlayerUpdateFlags.Animation;
+        //     PerformAnimationForEntity(_currentPlayer);
+        //     _currentPlayer.IsUpdateRequired = true;
+        // }
     }
 
-    private void PerformAnimationForEntity(IPlayer player)
+    private void PerformAnimationForEntity(Character player)
     {
         // if (entity is Player player)
         // {
@@ -152,13 +152,13 @@ public class PlayerMeleeCombat
         //     }
         // }
 
-        if (!PerformedHit && player.RecentDamageInformation.HasBeenHit)
-        {
-            player.CurrentAnimation = player.BlockAnimation;
-        }
-        else if (PerformedHit)
-        {
-            player.CurrentAnimation = player.AttackAnimation;
-        }
+        // if (!PerformedHit && player.RecentDamageInformation.HasBeenHit)
+        // {
+        //     player.CurrentAnimation = player.BlockAnimation;
+        // }
+        // else if (PerformedHit)
+        // {
+        //     player.CurrentAnimation = player.AttackAnimation;
+        // }
     }
 }
