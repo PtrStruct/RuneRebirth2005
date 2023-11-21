@@ -17,6 +17,9 @@ public interface IEntity
     public int AttackAnimation { get; set; }
     public int BlockAnimation { get; set; }
     public int FallAnimation { get; set; }
+    public CombatHit PrimaryDamage { get; set; }
+    public CombatHit SecondaryDamage { get; set; }
+    
     
 }
 
@@ -38,6 +41,8 @@ public abstract class Character : IEntity
     public abstract int AttackAnimation { get; set; }
     public abstract int BlockAnimation { get; set; }
     public abstract int FallAnimation { get; set; }
+    public abstract CombatHit PrimaryDamage { get; set; }
+    public abstract CombatHit SecondaryDamage { get; set; }
     public abstract Combat Combat { get; set; }
     public abstract int AttackSpeed { get; set; }
 

@@ -35,6 +35,8 @@ public class NPC : Character
     public override int BlockAnimation { get; set; }
     public override int CurrentAnimation { get; set; }
     public override int AttackAnimation { get; set; }
+    public override CombatHit PrimaryDamage { get; set; }
+    public override CombatHit SecondaryDamage { get; set; }
 
     public void Process()
     {

@@ -6,6 +6,7 @@ public class Combat
 {
     public Character Character { get; set; }
     public Character Target { get; set; }
+    public Character Attacker { get; set; }
     private int _attackTimer = 0;
     private HitQueue _hitQueue;
 

@@ -65,6 +65,9 @@ public class Player : Character
     public override int AttackAnimation { get; set; } = 422;
     public override int BlockAnimation { get; set; } = 424;
     public override int FallAnimation { get; set; }
+    
+    public override CombatHit PrimaryDamage { get; set; }
+    public override CombatHit SecondaryDamage { get; set; }
 
     // Network information
     public PlayerSession PlayerSession { get; }

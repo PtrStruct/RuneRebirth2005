@@ -1,4 +1,5 @@
 ﻿using RuneRebirth2005.Entities;
+using RuneRebirth2005.NPCManagement;
 
 namespace RuneRebirth2005.Fighting;
 
@@ -19,7 +20,7 @@ public class HitQueue
             var combatHit = _pendingHits[i];
             Character attacker = combatHit.Attacker;
             Character target = combatHit.Target;
-            
+
             // attacker.PerformAnimation(attacker.AttackAnimation);
             //target.PerformAnimation(target.BlockAnimation);
             // target.Combat.WasHit = true;
@@ -33,8 +34,30 @@ public class HitQueue
                 });
             }
 
-            _pendingHits.Remove(combatHit);
+            _pendingHits.Add(combatHit);
 
+            /* Set Under Attack */
+            target.Combat.Attacker = attacker;
+
+            _pendingHits.Remove(combatHit);
+        }
+
+        if (_pendingHits.Count > 0)
+        {
+            var hit = _pendingHits.First();
+            character.Combat.Target.PrimaryDamage = _pendingHits.First();
+            
+            if (character.Combat.Target is Player player)
+            {
+                player.Flags |= PlayerUpdateFlags.SingleHit;
+            }
+            else if (character.Combat.Target is NPC npc)
+            {
+                npc.Flags |= NPCUpdateFlags.SingleHit;
+            }
+
+            character.Combat.Target.IsUpdateRequired = true;
+            _pendingHits.Remove(hit);
         }
     }
 

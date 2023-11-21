@@ -164,9 +164,17 @@ public static class PlayerUpdater
         if ((mask & PlayerUpdateFlags.InteractingEntity) != 0) AppendNPCInteract(player, playerFlagUpdateBlock);
         if ((mask & PlayerUpdateFlags.Appearance) != 0) AppendAppearance(player, playerFlagUpdateBlock);
         //if ((mask & PlayerUpdateFlags.FaceDirection) != 0) AppendFaceDirection(player, updatetempBlock);
-        // if ((mask & PlayerUpdateFlags.SingleHit) != 0) AppendSingleHit(player, playerFlagUpdateBlock);
+        if ((mask & PlayerUpdateFlags.SingleHit) != 0) AppendSingleHit(player, playerFlagUpdateBlock);
     }
 
+    private static void AppendSingleHit(Player player, RSStream playerFlagUpdateBlock)
+    {
+        playerFlagUpdateBlock.WriteByte((byte)player.PrimaryDamage.Damage); //hitDamage
+        playerFlagUpdateBlock.WriteByteA((byte)player.PrimaryDamage.HitType); //hitType
+        playerFlagUpdateBlock.WriteByteC(player.CurrentHealth); //currentHealth
+        playerFlagUpdateBlock.WriteByte(player.PlayerSkills.GetSkill(SkillEnum.Hitpoints).Level); //maxHealth
+    }
+    
     private static void AppendAnimation(Player player, RSStream playerFlagUpdateBlock)
     {
         playerFlagUpdateBlock.WriteWordBigEndian(player.CurrentAnimation);

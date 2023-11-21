@@ -179,13 +179,13 @@ public static class NPCUpdater
         // //     updateBlock.WriteDWord(4);
         // // }
         // //
-        // if ((mask & NPCUpdateFlags.SingleHit) != 0)
-        // {
-        //     updateBlock.WriteByteA((byte)npc.RecentDamageReceived.Amount); //hitDamage
-        //     updateBlock.WriteByteC((byte)npc.RecentDamageReceived.DamageType); //hitType
-        //     updateBlock.WriteByteA(npc.CurrentHealth); //currentHealth
-        //     updateBlock.WriteByte(npc.MaxHealth); //maxHealth
-        // }
+         if ((mask & NPCUpdateFlags.SingleHit) != 0)
+         {
+             updateBlock.WriteByteA((byte)npc.PrimaryDamage.Damage); //hitDamage
+             updateBlock.WriteByteC((byte)npc.PrimaryDamage.HitType); //hitType
+             updateBlock.WriteByteA(npc.CurrentHealth); //currentHealth
+             updateBlock.WriteByte(npc.MaxHealth); //maxHealth
+         }
         //
          if ((mask & NPCUpdateFlags.InteractingEntity) != 0)
          {
