@@ -12,6 +12,7 @@ public class HitQueue
         if (character.CurrentHealth <= 0)
         {
             _pendingHits.Clear();
+            return;
         }
 
         /* Extract this to another function */
@@ -21,9 +22,6 @@ public class HitQueue
             Character attacker = combatHit.Attacker;
             Character target = combatHit.Target;
 
-            // attacker.PerformAnimation(attacker.AttackAnimation);
-            //target.PerformAnimation(target.BlockAnimation);
-            // target.Combat.WasHit = true;
 
             if (target.Combat.Target == null)
             {
@@ -34,7 +32,8 @@ public class HitQueue
                 });
             }
 
-            _pendingHits.Add(combatHit);
+            
+            target.Combat.HitQueue.AddHit(combatHit);
 
             /* Set Under Attack */
             target.Combat.Attacker = attacker;
@@ -45,18 +44,19 @@ public class HitQueue
         if (_pendingHits.Count > 0)
         {
             var hit = _pendingHits.First();
-            character.Combat.Target.PrimaryDamage = _pendingHits.First();
+            hit.Target.PrimaryDamage = hit;
+            hit.Target.CurrentHealth -= hit.Damage;
             
-            if (character.Combat.Target is Player player)
+            if (hit.Target is Player player)
             {
                 player.Flags |= PlayerUpdateFlags.SingleHit;
             }
-            else if (character.Combat.Target is NPC npc)
+            else if (hit.Target is NPC npc)
             {
                 npc.Flags |= NPCUpdateFlags.SingleHit;
             }
 
-            character.Combat.Target.IsUpdateRequired = true;
+            hit.Target.IsUpdateRequired = true;
             _pendingHits.Remove(hit);
         }
     }

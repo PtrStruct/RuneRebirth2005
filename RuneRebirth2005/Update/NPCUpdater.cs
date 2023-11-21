@@ -24,7 +24,7 @@ public static class NPCUpdater
                 continue;
             }
 
-            if (Server.NPCs[npc.Index] != null && player.Location.IsWithinArea(npc.Location) && npc.CurrentHealth > 0)
+            if (Server.NPCs[npc.Index] != null && player.Location.IsWithinArea(npc.Location))
             {
                 UpdateMovement(npc, player.PlayerSession.Writer);
 
@@ -166,11 +166,11 @@ public static class NPCUpdater
         //
         updateBlock.WriteByte((byte)mask);
         //
-         if ((mask & NPCUpdateFlags.Animation) != 0)
-         {
-             updateBlock.WriteWordBigEndian(npc.CurrentAnimation);
-             updateBlock.WriteByte(0); //delay
-         }
+        if ((mask & NPCUpdateFlags.Animation) != 0)
+        {
+            updateBlock.WriteWordBigEndian(npc.CurrentAnimation);
+            updateBlock.WriteByte(0); //delay
+        }
 
         //
         // // if ((mask & NPCUpdateFlags.Graphics) != 0)
@@ -179,19 +179,27 @@ public static class NPCUpdater
         // //     updateBlock.WriteDWord(4);
         // // }
         // //
-         if ((mask & NPCUpdateFlags.SingleHit) != 0)
-         {
-             updateBlock.WriteByteA((byte)npc.PrimaryDamage.Damage); //hitDamage
-             updateBlock.WriteByteC((byte)npc.PrimaryDamage.HitType); //hitType
-             updateBlock.WriteByteA(npc.CurrentHealth); //currentHealth
-             updateBlock.WriteByte(npc.MaxHealth); //maxHealth
-         }
+        if ((mask & NPCUpdateFlags.SingleHit) != 0)
+        {
+            updateBlock.WriteByteA((byte)npc.PrimaryDamage.Damage); //hitDamage
+            updateBlock.WriteByteC((byte)npc.PrimaryDamage.HitType); //hitType
+            updateBlock.WriteByteA(npc.CurrentHealth); //currentHealth
+            updateBlock.WriteByte(npc.MaxHealth); //maxHealth
+        }
+
         //
-         if ((mask & NPCUpdateFlags.InteractingEntity) != 0)
-         {
-             var id = npc.InteractingEntity.Index + 32768;
-             updateBlock.WriteWord(id);
-         }
+        if ((mask & NPCUpdateFlags.InteractingEntity) != 0)
+        {
+            if (npc.InteractingEntity != null)
+            {
+                var id = npc.InteractingEntity.Index + 32768;
+                updateBlock.WriteWord(id);
+            }
+            else
+            {
+                updateBlock.WriteWord(-1);
+            }
+        }
 
         if ((mask & NPCUpdateFlags.Face) != 0)
         {

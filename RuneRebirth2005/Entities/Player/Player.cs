@@ -64,7 +64,7 @@ public class Player : Character
     public override int CurrentAnimation { get; set; }
     public override int AttackAnimation { get; set; } = 422;
     public override int BlockAnimation { get; set; } = 424;
-    public override int FallAnimation { get; set; }
+    public override int FallAnimation { get; set; } = 836;
     
     public override CombatHit PrimaryDamage { get; set; }
     public override CombatHit SecondaryDamage { get; set; }
@@ -158,5 +158,13 @@ public class Player : Character
         IsUpdateRequired = false;
         IsAppearanceUpdate = false;
         Flags = PlayerUpdateFlags.None;
+    }
+
+    public void Respawn()
+    {
+        CurrentHealth = 10;
+        PerformAnimation(-1);
+        IsUpdateRequired = true;
+        Flags |= PlayerUpdateFlags.Appearance;
     }
 }

@@ -47,6 +47,7 @@ public class NPC : Character
     public override void SetInteractionEntity(IEntity entity)
     {
         InteractingEntity = entity;
+        Flags |= NPCUpdateFlags.InteractingEntity;
     }
 
     public override void PerformAnimation(int animationId)

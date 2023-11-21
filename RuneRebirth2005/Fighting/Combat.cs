@@ -8,7 +8,7 @@ public class Combat
     public Character Target { get; set; }
     public Character Attacker { get; set; }
     private int _attackTimer = 0;
-    private HitQueue _hitQueue;
+    public HitQueue HitQueue { get; set; }
 
     public bool PerformedHit { get; set; }
     public bool WasHit { get; set; }
@@ -17,13 +17,13 @@ public class Combat
     public Combat(Character character)
     {
         Character = character;
-        _hitQueue = new HitQueue();
+        HitQueue = new HitQueue();
     }
 
     public void Process()
     {
         /* Build Damage and Perform Animation */
-        _hitQueue.Process(Character);
+        HitQueue.Process(Character);
 
 
         if (_attackTimer > 0)
@@ -36,16 +36,39 @@ public class Combat
 
     public void PerformAnimation()
     {
+
+        if (Character.CurrentHealth <= 0)
+        {
+            Character.PerformAnimation(Character.FallAnimation);
+            Reset();
+            // Character.Combat.Attacker.Combat.Reset();
+            
+            return;
+        }
         
-         if (!PerformedHit && WasHit)
-         {
-             Character.PerformAnimation(Character.BlockAnimation);
-         }
-         else if (PerformedHit)
-         {
-             Character.PerformAnimation(Character.AttackAnimation);
-         }
+        if (Character.Combat.Target?.CurrentHealth <= 0)
+        {
+            // Character.PerformAnimation(Character.FallAnimation);
+            if (Character is Player player)
+            {
+                player.PacketSender.SendMessage("You've defeated your enemy!");
+                // player.Combat.Attacker = null;
+                player.Combat.Reset();
+            }
+            Reset();
+            // Character.Combat.Attacker.Combat.Reset();
+            return;
+        }
         
+        if (!PerformedHit && WasHit)
+        {
+            Character.PerformAnimation(Character.BlockAnimation);
+        }
+        else if (PerformedHit)
+        {
+            Character.PerformAnimation(Character.AttackAnimation);
+        }
+
         // if (PerformedHit && WasHit)
         // {
         //     Character.PerformAnimation(Character.AttackAnimation);
@@ -74,21 +97,33 @@ public class Combat
             if (_attackTimer <= 0)
             {
                 /* Perform Animation */
-                //Character.PerformAnimation(Character.AttackAnimation);
-                // Target.PerformAnimation(Target.BlockAnimation);
-
-                Character.Combat.PerformedHit = true;
-                Target.Combat.WasHit = true;
                 
-                _hitQueue.AddHit(new CombatHit
+                /* Check if can combat */
+                if (CombatHelper.CanAttack(Character, Target))
                 {
-                    Damage = 1,
-                    HitType = 1,
-                    Attacker = Character,
-                    Target = Target
-                });
-                _attackTimer = Character.AttackSpeed;
+                    Character.Combat.PerformedHit = true;
+                    Target.Combat.WasHit = true;
+
+                    Target.Combat.HitQueue.AddHit(new CombatHit
+                    {
+                        Damage = 1,
+                        HitType = 1,
+                        Attacker = Character,
+                        Target = Target
+                    });
+                    _attackTimer = Character.AttackSpeed;
+                }
             }
+        }
+    }
+
+    public void Reset()
+    {
+        if (Target != null)
+        {
+            Character.SetInteractionEntity(null);
+            Attacker = null;
+            Target = null;
         }
     }
 }

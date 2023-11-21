@@ -174,7 +174,7 @@ public static class PlayerUpdater
         playerFlagUpdateBlock.WriteByteC(player.CurrentHealth); //currentHealth
         playerFlagUpdateBlock.WriteByte(player.PlayerSkills.GetSkill(SkillEnum.Hitpoints).Level); //maxHealth
     }
-    
+
     private static void AppendAnimation(Player player, RSStream playerFlagUpdateBlock)
     {
         playerFlagUpdateBlock.WriteWordBigEndian(player.CurrentAnimation);
@@ -184,7 +184,15 @@ public static class PlayerUpdater
 
     private static void AppendNPCInteract(Player player, RSStream updatetempBlock)
     {
-        updatetempBlock.WriteWordBigEndian(player.InteractingEntity.Index);
+        if (player.InteractingEntity != null)
+        {
+            updatetempBlock.WriteWordBigEndian(player.InteractingEntity.Index);
+        }
+        else
+        {
+            updatetempBlock.WriteWordBigEndian(-1);
+
+        }
     }
 
     private static void AppendAppearance(Player player, RSStream playerFlagUpdateBlock)

@@ -32,7 +32,13 @@ public class PlayerCommandPacket : IPacket
                 {
                     // new SendPlayerMessagePacket(_player).Add(message);
                 }
+
                 break;
+
+            case "respawn":
+                _player.Respawn();
+                break;
+
             case "hair":
                 var style = int.Parse(_commandArgs[1]);
                 var color = int.Parse(_commandArgs[2]);

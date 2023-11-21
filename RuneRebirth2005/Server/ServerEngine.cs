@@ -80,7 +80,7 @@ public class ServerEngine
         }
 
 
-        /* Combat */
+        /* Combat, calculate damage to perform etc */
         for (int i = 0; i < Server.Players.Length; i++)
         {
             if (Server.Players[i] == null) continue;
@@ -93,18 +93,19 @@ public class ServerEngine
             Server.NPCs[i].Combat.Process();
         }
 
-         for (int i = 0; i < Server.Players.Length; i++)
-         {
-             if (Server.Players[i] == null) continue;
-             Server.Players[i].Combat.PerformAnimation();
-         }
-        
-         for (int i = 0; i < Server.NPCs.Count; i++)
-         {
-             if (Server.NPCs[i] == null) continue;
-             Server.NPCs[i].Combat.PerformAnimation();
-         }
-        
+        /* Combat Animations */
+        for (int i = 0; i < Server.Players.Length; i++)
+        {
+            if (Server.Players[i] == null) continue;
+            Server.Players[i].Combat.PerformAnimation();
+        }
+
+        for (int i = 0; i < Server.NPCs.Count; i++)
+        {
+            if (Server.NPCs[i] == null) continue;
+            Server.NPCs[i].Combat.PerformAnimation();
+        }
+
 
         /* Process new Data for Player and NPC */
         for (int i = 0; i < Server.Players.Length; i++)
