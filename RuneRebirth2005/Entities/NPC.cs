@@ -63,4 +63,14 @@ public class NPC : Character
         IsUpdateRequired = false;
         Flags = NPCUpdateFlags.None;
     }
+    
+    public void Respawn()
+    {
+        Combat.Reset();
+        CurrentHealth = 10;
+        MaxHealth = 10;
+        PerformAnimation(-1);
+        IsUpdateRequired = true;
+        Flags |= NPCUpdateFlags.Animation;
+    }
 }

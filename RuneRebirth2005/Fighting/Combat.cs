@@ -36,16 +36,8 @@ public class Combat
 
     public void PerformAnimation()
     {
-
-        if (Character.CurrentHealth <= 0)
-        {
-            Character.PerformAnimation(Character.FallAnimation);
-            Reset();
-            // Character.Combat.Attacker.Combat.Reset();
-            
-            return;
-        }
         
+
         if (Character.Combat.Target?.CurrentHealth <= 0)
         {
             // Character.PerformAnimation(Character.FallAnimation);
@@ -55,11 +47,11 @@ public class Combat
                 // player.Combat.Attacker = null;
                 player.Combat.Reset();
             }
+
             Reset();
             // Character.Combat.Attacker.Combat.Reset();
-            return;
         }
-        
+
         if (!PerformedHit && WasHit)
         {
             Character.PerformAnimation(Character.BlockAnimation);
@@ -68,6 +60,31 @@ public class Combat
         {
             Character.PerformAnimation(Character.AttackAnimation);
         }
+        
+         if (Character.CurrentHealth <= 0)
+         {
+             Character.PerformAnimation(Character.FallAnimation);
+             Reset();
+             // Character.Combat.Attacker.Combat.Reset();
+        
+             if (Character is Player player)
+             {
+                 DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+                 {
+                     RemainingTicks = 4,
+                     Task = () => { player.Respawn(); }
+                 });
+             }
+        
+             if (Character is NPC npc)
+             {
+                 DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+                 {
+                     RemainingTicks = 4,
+                     Task = () => { npc.Respawn(); }
+                 });
+             }
+         }
 
         // if (PerformedHit && WasHit)
         // {
@@ -97,7 +114,7 @@ public class Combat
             if (_attackTimer <= 0)
             {
                 /* Perform Animation */
-                
+
                 /* Check if can combat */
                 if (CombatHelper.CanAttack(Character, Target))
                 {

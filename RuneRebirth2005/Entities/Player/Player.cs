@@ -162,6 +162,7 @@ public class Player : Character
 
     public void Respawn()
     {
+        Combat.Reset();
         CurrentHealth = 10;
         PerformAnimation(-1);
         IsUpdateRequired = true;
