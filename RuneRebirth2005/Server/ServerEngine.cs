@@ -77,6 +77,7 @@ public class ServerEngine
             var player = Server.Players[i];
             if (player == null) continue;
             player.PlayerSession.PacketStore.ProcessPackets();
+            player.MovementHandler.Process();
         }
 
 

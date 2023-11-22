@@ -4,7 +4,7 @@ namespace RuneRebirth2005.Entities;
 
 public class Location
 {
-    private int _x, _y;
+    private int _x, _y, _z;
 
     public int X
     {
@@ -26,6 +26,12 @@ public class Location
         }
     }
 
+    public int Z
+    {
+        get => _z;
+        set { _z = value; }
+    }
+
     public int CenterChunkX { get; set; }
     public int CenterChunkY { get; set; }
     public int RegionId { get; set; }
@@ -39,6 +45,8 @@ public class Location
     public bool IsOutside => PositionRelativeToOffsetChunkX < 16 || PositionRelativeToOffsetChunkX >= 88 ||
                              PositionRelativeToOffsetChunkY < 16 || PositionRelativeToOffsetChunkY >= 88;
 
+    public Player Player { get; set; }
+
     public Location(int x, int y)
     {
         X = x;
@@ -49,7 +57,7 @@ public class Location
 
     private void Update()
     {
-        if (!IsOutside)
+        if (IsOutside)
         {
             CenterChunkX = X >> 3;
             CenterChunkY = Y >> 3;
@@ -58,6 +66,11 @@ public class Location
             OffsetChunkY = CenterChunkY - 6;
             BuildAreaStartX = OffsetChunkX << 3;
             BuildAreaStartY = OffsetChunkY << 3;
+            
+            if (Player != null)
+            {
+                Player.PacketSender.LoadRegionPacket();
+            }
         }
     }
 
@@ -70,6 +83,12 @@ public class Location
         OffsetChunkY = CenterChunkY - 6;
         BuildAreaStartX = OffsetChunkX << 3;
         BuildAreaStartY = OffsetChunkY << 3;
+    }
+
+    internal void Move(int amountX, int amountY)
+    {
+        X += amountX;
+        Y += amountY;
     }
 
     public bool IsWithinArea(Location playerLocation)

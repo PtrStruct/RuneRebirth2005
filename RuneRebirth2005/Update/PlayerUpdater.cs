@@ -191,7 +191,6 @@ public static class PlayerUpdater
         else
         {
             updatetempBlock.WriteWordBigEndian(-1);
-
         }
     }
 
@@ -232,15 +231,11 @@ public static class PlayerUpdater
         player.PlayerSession.Writer.InitBitAccess();
 
         /* Idle */
-        if (!player.IsUpdateRequired)
-        {
-            AppendIdleStand(player);
-            return;
-        }
 
-        if (player.IsUpdateRequired)
+        if (player.PlacementOrTeleport)
         {
             AppendTeleportOrSpawn(player);
+            // return;
         }
         else
         {
@@ -269,6 +264,53 @@ public static class PlayerUpdater
 
     private static void AppendMove()
     {
+        var pDir = _player.MovementHandler.PrimaryDirection;
+        var sDir = _player.MovementHandler.SecondaryDirection;
+
+        if (pDir != -1)
+        {
+            _player.PlayerSession.Writer.WriteBits(1, 1);
+            if (sDir != -1)
+                AppendRun(_player.PlayerSession.Writer, pDir, sDir, _player.IsUpdateRequired);
+            else
+                AppendWalk(_player.PlayerSession.Writer, pDir, _player.IsUpdateRequired);
+        }
+        else
+        {
+            if (_player.IsUpdateRequired)
+            {
+                _player.PlayerSession.Writer.WriteBits(1, 1);
+                AppendUpdateStand();
+            }
+            else
+            {
+                AppendIdleStand(_player);
+            }
+        }
+    }
+
+    private static void AppendUpdateStand()
+    {
+        _player.PlayerSession.Writer.WriteBits(2, 0);
+    }
+
+    private static void AppendRun(RSStream writer, int pDir, int sDir, bool updateRequired)
+    {
+        writer.WriteBits(2, 2); // 2 - running.
+
+        // Append the actual sector.
+        writer.WriteBits(3, pDir);
+        writer.WriteBits(3, sDir);
+        writer.WriteBits(1, updateRequired ? 1 : 0);
+    }
+
+    private static void AppendWalk(RSStream writer, int pDir, bool updateRequired)
+    {
+        writer.WriteBits(2, 1); // 1 - walking.
+
+        // Append the actual sector.
+        writer.WriteBits(3, pDir);
+        writer.WriteBits(1, updateRequired ? 1 : 0);
     }
 
     private static void WriteBeard(RSStream stream, Player player)

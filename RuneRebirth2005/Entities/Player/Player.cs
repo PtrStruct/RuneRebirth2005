@@ -1,4 +1,5 @@
 ﻿using RuneRebirth2005.Fighting;
+using RuneRebirth2005.Handlers;
 using RuneRebirth2005.Network;
 using RuneRebirth2005.NPCManagement;
 
@@ -22,6 +23,8 @@ public class Player : Character
     public bool IsInventoryUpdate { get; set; }
     public bool IsAppearanceUpdate { get; set; }
     public PlayerUpdateFlags Flags { get; set; }
+    public MovementHandler MovementHandler { get; set; }
+    public bool Running { get; set; }
 
     // Player representations
     public PlayerColors Colors { get; set; } = new();
@@ -45,6 +48,7 @@ public class Player : Character
     public override int Size { get; set; }
     public override int CurrentHealth { get; set; } = 10;
     public override bool IsUpdateRequired { get; set; }
+    public bool PlacementOrTeleport { get; set; }
 
     // Animation and combat
     public override Combat Combat { get; set; }
@@ -79,7 +83,10 @@ public class Player : Character
         PlayerSession = session;
         LoginHandler = new LoginHandler(this);
         PacketSender = new PacketSender(this);
+        MovementHandler = new MovementHandler(this);
+        
         Location = new Location(3200, 3930);
+        Location.Player = this;
         IsUpdateRequired = true;
     }
 
@@ -157,12 +164,17 @@ public class Player : Character
         
         IsUpdateRequired = false;
         IsAppearanceUpdate = false;
+        PlacementOrTeleport = false;
+
+        MovementHandler.PrimaryDirection = -1;
+        MovementHandler.SecondaryDirection = -1;
+        
         Flags = PlayerUpdateFlags.None;
     }
 
     public void Respawn()
     {
-        Combat.Reset();
+        // Combat.Reset();
         CurrentHealth = 10;
         PerformAnimation(-1);
         IsUpdateRequired = true;

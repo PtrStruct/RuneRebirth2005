@@ -1,6 +1,11 @@
-﻿using RuneRebirth2005;
-using RuneRebirth2005.Helpers;
+﻿using CacheReader.World;
+using RuneRebirth2005;
+using RuneRebirth2005.Data;
+using RuneRebirth2005.Data.Items;
+using RuneRebirth2005.Data.Npc;
+using RuneRebirth2005.Misc;
 using RuneRebirth2005.NPCManagement;
+using Scape05.Data.ObjectsDef;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -21,10 +26,26 @@ Log.Logger = new LoggerConfiguration()
             }))
     .CreateLogger();
 
+void ParseCache(IndexedFileSystem ifs)
+{
+    new ObjectDefinitionDecoder(ifs).Run();
+    new ItemDefinitionDecoder(ifs).Run();
+    new NpcDefinitionDecoder(ifs).Run();
+}
+
+void LoadRegionFactory(IndexedFileSystem ifs)
+{
+    RegionFactory.Load(ifs);
+    ServerConfig.Startup = false;
+}
+
+var ifs = new IndexedFileSystem("../../../Data/cache", true);
 
 try
 {
-    // BonusDefinitionLoader.Load();
+    Benchmarker.MeasureTime(() => ParseCache(ifs), "Parsing cache");
+    Benchmarker.MeasureTime(() => LoadRegionFactory(ifs), "Loading regions");
+
     NPCManager.Load();
 
     ServerEngine serverEngine = new ServerEngine();

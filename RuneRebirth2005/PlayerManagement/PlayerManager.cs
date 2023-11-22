@@ -75,6 +75,7 @@ public static class PlayerManager
         player.PacketSender.SendSidebarInterface(13, 6299);
 
         player.IsUpdateRequired = true;
+        player.PlacementOrTeleport = true;
         player.Flags |= PlayerUpdateFlags.Appearance;
     }
 }

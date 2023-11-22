@@ -30,7 +30,7 @@ public class PlayerCommandPacket : IPacket
             case "pos":
                 foreach (var message in _player.Location.ToStringParts())
                 {
-                    // new SendPlayerMessagePacket(_player).Add(message);
+                    _player.PacketSender.SendMessage(message);
                 }
 
                 break;

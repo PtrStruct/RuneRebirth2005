@@ -66,7 +66,7 @@ public class NPC : Character
     
     public void Respawn()
     {
-        Combat.Reset();
+        // Combat.Reset();
         CurrentHealth = 10;
         MaxHealth = 10;
         PerformAnimation(-1);

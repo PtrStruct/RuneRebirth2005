@@ -10,4 +10,5 @@ public class ServerConfig
     public static readonly string WELCOME_MSG = $"Welcome to {SERVER_NAME}";
     public const int MAX_NPCS = 60000;
     public const int SERVER_EXP_BONUS = 500;
+    public static bool Startup { get; set; } = true;
 }
