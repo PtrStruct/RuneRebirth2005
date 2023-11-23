@@ -35,7 +35,6 @@ public class RegularWalkPacket : IPacket
             _path[i, 0] = (sbyte)_player.PlayerSession.Reader.ReadUnsignedByte();
             _path[i, 1] = (sbyte)_player.PlayerSession.Reader.ReadUnsignedByte();
         }
-
         _firstStepY = _player.PlayerSession.Reader.ReadSignedWordBigEndian();
         _running = _player.PlayerSession.Reader.ReadSignedByteC() == 1;
     }

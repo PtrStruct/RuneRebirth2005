@@ -81,13 +81,13 @@ public static class PlayerUpdater
 
         foreach (var other in _player.LocalPlayers.ToList())
         {
-            if (other.Location.IsWithinArea(_player.Location))
+            if (other.Location.IsWithinArea(_player.Location) && !other.PlacementOrTeleport)
             {
                 UpdateLocalPlayerMovement(other, _player.PlayerSession.Writer);
 
                 if (other.IsUpdateRequired)
                 {
-                    other.Flags |= PlayerUpdateFlags.Appearance;
+                    //other.Flags = PlayerUpdateFlags.None;
                     UpdatePlayerState(other, PlayerFlagUpdateBlock);
                 }
             }
@@ -100,6 +100,79 @@ public static class PlayerUpdater
 
     private static void UpdateLocalPlayerMovement(Player player, RSStream writer)
     {
+        var pDir = player.MovementHandler.PrimaryDirection;
+        var sDir = player.MovementHandler.SecondaryDirection;
+        if (pDir != -1)
+        {
+            //player.Flags |= PlayerUpdateFlags.Appearance;
+            
+            writer.WriteBits(1, 1);
+            if (sDir != -1)
+                AppendRun(writer, pDir, sDir, player.IsUpdateRequired);
+            else
+                AppendWalk(writer, pDir, player.IsUpdateRequired);
+        }
+        else
+        {
+            /* Works */
+            // if (player.IsUpdateRequired)
+            // {
+            //     writer.WriteBits(1, 1);
+            //     writer.WriteBits(2, 0);
+            // }
+            // else
+            // {
+            //     writer.WriteBits(1, 0);
+            // }
+
+            if (player.IsUpdateRequired)
+            {
+                writer.WriteBits(1, 1);
+                writer.WriteBits(2, 0);
+            }
+            else
+            {
+                writer.WriteBits(1, 0);
+            }
+        }
+
+
+        /* Does not work */
+        // if (player.IsUpdateRequired)
+        // {
+        //     player.PlayerSession.Writer.WriteBits(1, 1);
+        //     AppendUpdateStand(player);
+        // }
+        // else
+        // {
+        //     AppendIdleStand(player);
+        // }
+
+
+        // var pDir = player.MovementHandler.PrimaryDirection;
+        // var sDir = player.MovementHandler.SecondaryDirection;
+        //
+        // if (pDir != -1)
+        // {
+        //     player.PlayerSession.Writer.WriteBits(1, 1);
+        //     if (sDir != -1)
+        //         AppendRun(player.PlayerSession.Writer, pDir, sDir, player.IsUpdateRequired);
+        //     else
+        //         AppendWalk(player.PlayerSession.Writer, pDir, player.IsUpdateRequired);
+        // }
+        // else
+        // {
+        //     if (player.IsUpdateRequired)
+        //     {
+        //         player.PlayerSession.Writer.WriteBits(1, 1);
+        //         AppendUpdateStand(player);
+        //     }
+        //     else
+        //     {
+        //         AppendIdleStand(player);
+        //     }
+        // }
+
         // var updateRequired = player.IsUpdateRequired;
         // var updateRequired = player.IsUpdateRequired;
         // var pDir = player.MovementHandler.PrimaryDirection;
@@ -127,15 +200,15 @@ public static class PlayerUpdater
 
         // writer.WriteBits(1, 0);
 
-        if (player.IsUpdateRequired)
-        {
-            writer.WriteBits(1, 1);
-            writer.WriteBits(2, 0);
-        }
-        else
-        {
-            writer.WriteBits(1, 0);
-        }
+        //if (player.IsUpdateRequired)
+        //{
+        //    writer.WriteBits(1, 1);
+        //    writer.WriteBits(2, 0);
+        //}
+        //else
+        //{
+        //    writer.WriteBits(1, 0);
+        //}
     }
 
     private static void RemovePlayer(Player other)
@@ -239,7 +312,7 @@ public static class PlayerUpdater
         }
         else
         {
-            AppendMove();
+            AppendMove(player);
         }
     }
 
@@ -262,36 +335,36 @@ public static class PlayerUpdater
         player.PlayerSession.Writer.WriteBits(7, player.Location.PositionRelativeToOffsetChunkX); // x-position
     }
 
-    private static void AppendMove()
+    private static void AppendMove(Player player)
     {
-        var pDir = _player.MovementHandler.PrimaryDirection;
-        var sDir = _player.MovementHandler.SecondaryDirection;
+        var pDir = player.MovementHandler.PrimaryDirection;
+        var sDir = player.MovementHandler.SecondaryDirection;
 
         if (pDir != -1)
         {
-            _player.PlayerSession.Writer.WriteBits(1, 1);
+            player.PlayerSession.Writer.WriteBits(1, 1);
             if (sDir != -1)
-                AppendRun(_player.PlayerSession.Writer, pDir, sDir, _player.IsUpdateRequired);
+                AppendRun(player.PlayerSession.Writer, pDir, sDir, player.IsUpdateRequired);
             else
-                AppendWalk(_player.PlayerSession.Writer, pDir, _player.IsUpdateRequired);
+                AppendWalk(player.PlayerSession.Writer, pDir, player.IsUpdateRequired);
         }
         else
         {
-            if (_player.IsUpdateRequired)
+            if (player.IsUpdateRequired)
             {
-                _player.PlayerSession.Writer.WriteBits(1, 1);
-                AppendUpdateStand();
+                player.PlayerSession.Writer.WriteBits(1, 1);
+                AppendUpdateStand(player);
             }
             else
             {
-                AppendIdleStand(_player);
+                AppendIdleStand(player);
             }
         }
     }
 
-    private static void AppendUpdateStand()
+    private static void AppendUpdateStand(Player player)
     {
-        _player.PlayerSession.Writer.WriteBits(2, 0);
+        player.PlayerSession.Writer.WriteBits(2, 0);
     }
 
     private static void AppendRun(RSStream writer, int pDir, int sDir, bool updateRequired)
