@@ -1,0 +1,205 @@
+{
+  "Username": "Elysiann",
+  "Password": "a",
+  "Gender": 0,
+  "HeadIcon": 0,
+  "CombatLevel": 0,
+  "TotalLevel": 0,
+  "CurrentHealth": 10,
+  "Colors": {
+    "Hair": 5,
+    "Torso": 8,
+    "Legs": 9,
+    "Feet": 5,
+    "Skin": 0
+  },
+  "Equipment": {
+    "EquipmentSlots": {
+      "Helmet": {
+        "ItemId": -1,
+        "Quantity": 0
+      },
+      "Cape": {
+        "ItemId": -1,
+        "Quantity": 0
+      },
+      "Amulet": {
+        "ItemId": -1,
+        "Quantity": 0
+      },
+      "Weapon": {
+        "ItemId": -1,
+        "Quantity": 0
+      },
+      "Chest": {
+        "ItemId": -1,
+        "Quantity": 0
+      },
+      "Shield": {
+        "ItemId": -1,
+        "Quantity": 0
+      },
+      "Legs": {
+        "ItemId": -1,
+        "Quantity": 0
+      },
+      "Gloves": {
+        "ItemId": -1,
+        "Quantity": 0
+      },
+      "Boots": {
+        "ItemId": -1,
+        "Quantity": 0
+      },
+      "Ring": {
+        "ItemId": -1,
+        "Quantity": 0
+      },
+      "Ammo": {
+        "ItemId": -1,
+        "Quantity": 0
+      }
+    }
+  },
+  "PlayerSkills": {
+    "Skills": {
+      "Attack": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Defence": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Strength": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Hitpoints": {
+        "Level": 10,
+        "Experience": 1154
+      },
+      "Ranged": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Prayer": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Magic": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Cooking": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Woodcutting": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Fletching": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Fishing": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Firemaking": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Crafting": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Smithing": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Mining": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Herblore": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Agility": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Thieving": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Slayer": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Farming": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Runecrafting": {
+        "Level": 1,
+        "Experience": 0
+      },
+      "Hunter": {
+        "Level": 1,
+        "Experience": 0
+      }
+    }
+  },
+  "Appearance": {
+    "Torso": 18,
+    "Arms": 26,
+    "Legs": 36,
+    "Hands": 33,
+    "Feet": 42,
+    "Hair": 1,
+    "Beard": 1
+  },
+  "MovementAnimations": {
+    "Stand": 808,
+    "StandTurn": 823,
+    "Walk": 819,
+    "Turn180": 820,
+    "Turn90CW": 821,
+    "Turn90CCW": 822,
+    "Run": 824
+  },
+  "Location": {
+    "X": 3201,
+    "Y": 3200,
+    "CenterChunkX": 400,
+    "CenterChunkY": 400,
+    "RegionId": 12850,
+    "OffsetChunkX": 394,
+    "OffsetChunkY": 394,
+    "BuildAreaStartX": 3152,
+    "BuildAreaStartY": 3152,
+    "PositionRelativeToOffsetChunkX": 48,
+    "PositionRelativeToOffsetChunkY": 48,
+    "IsOutside": false
+  },
+  "Bonuses": {
+    "Bonuses": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}
