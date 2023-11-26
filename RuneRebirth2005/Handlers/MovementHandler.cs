@@ -77,11 +77,11 @@ public class MovementHandler
         {
             Reset();
 
-            //var distance = _character.Location.GetDistance(FollowCharacter.Location);
-            //if (distance <= FollowCharacter.Size)
-            //{
-            //    return;
-            //}
+            var distance = _character.Location.GetDistance(FollowCharacter.Location);
+            if (distance <= FollowCharacter.Size)
+            {
+                return;
+            }
 
             if (_character is Player player)
             {

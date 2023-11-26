@@ -118,8 +118,7 @@ public class Combat
             {
                 if (_attackTimer <= 0)
                 {
-                    /* Perform Animation */
-
+                    
                     /* Check if can combat */
                     if (CombatHelper.CanAttack(Character, Target))
                     {

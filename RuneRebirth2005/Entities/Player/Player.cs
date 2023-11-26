@@ -45,7 +45,7 @@ public class Player : Character
     // Location and status
     public override Location Location { get; set; }
 
-    public override int Size { get; set; }
+    public override int Size { get; set; } = 1;
     public override int CurrentHealth { get; set; } = 10;
     public override bool IsUpdateRequired { get; set; }
     public bool PlacementOrTeleport { get; set; }
