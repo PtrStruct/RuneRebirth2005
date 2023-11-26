@@ -42,6 +42,11 @@ public class MovementHandler
 
     public void Process()
     {
+        if (_character.CurrentHealth <= 0)
+        {
+            return;
+        }
+        
         /* Handle Follow */
         Follow();
 
@@ -87,9 +92,9 @@ public class MovementHandler
             {
                 player.PacketSender.SendMessage($"Following NPC Size: {FollowCharacter.Size}");
             }
-            
+
             var destination = PathGenerator.GetCombatPath(_character, FollowCharacter);
-            
+
             var tiles = new List<Location>();
             tiles = PathFinder.getPathFinder().FindPath(_character, destination.X, destination.Y, true, 16, 16);
             if (tiles != null)

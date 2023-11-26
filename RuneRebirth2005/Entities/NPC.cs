@@ -1,6 +1,7 @@
 ﻿using RuneRebirth2005.Fighting;
 using RuneRebirth2005.Handlers;
 using RuneRebirth2005.NPCManagement;
+using RuneRebirth2005.World.Clipping;
 
 namespace RuneRebirth2005.Entities;
 
@@ -38,6 +39,7 @@ public class NPC : Character
     public override int AttackAnimation { get; set; }
     public override CombatHit PrimaryDamage { get; set; }
     public override CombatHit SecondaryDamage { get; set; }
+    public NPCDumbPathFinder DumbPathFinder { get; set; }
 
     public void Process()
     {

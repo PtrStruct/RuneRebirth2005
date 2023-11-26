@@ -13,8 +13,9 @@ public class NPCDumbPathFinder
         new int[] { 0, -1 }, new int[] { 1, -1 } };
 
 
-    public static Location Follow(NPC npc, IEntity following)
+    public Location Follow(Character npc, Character following)
     {
+        
         var npcTiles = TileControl.GetTiles(npc);
 
         var npcLocation = TileControl.CurrentLocation(npc);
