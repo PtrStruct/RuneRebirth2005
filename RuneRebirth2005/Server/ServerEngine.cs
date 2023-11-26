@@ -80,6 +80,13 @@ public class ServerEngine
             player.MovementHandler.Process();
         }
 
+         for (int i = 0; i < Server.NPCs.Count; i++)
+         {
+             var npc = Server.NPCs[i];
+             if (npc == null) continue;
+             npc.MovementHandler.Process();
+         }
+
 
         /* Combat, calculate damage to perform etc */
         for (int i = 0; i < Server.Players.Length; i++)

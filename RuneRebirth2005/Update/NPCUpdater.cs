@@ -93,46 +93,36 @@ public static class NPCUpdater
 
     private static void UpdateMovement(NPC npc, RSStream writer)
     {
-        if (npc.IsUpdateRequired)
+        if (npc.MovementHandler.SecondaryDirection == -1)
         {
-            writer.WriteBits(1, 1);
-            writer.WriteBits(2, 0);
+            if (npc.MovementHandler.PrimaryDirection == -1)
+            {
+                if (npc.IsUpdateRequired)
+                {
+                    writer.WriteBits(1, 1);
+                    writer.WriteBits(2, 0);
+                }
+                else
+                {
+                    writer.WriteBits(1, 0);
+                }
+            }
+            else
+            {
+                writer.WriteBits(1, 1);
+                writer.WriteBits(2, 1);
+                writer.WriteBits(3, npc.MovementHandler.PrimaryDirection);
+                writer.WriteBits(1, npc.IsUpdateRequired ? 1 : 0);
+            }
         }
         else
         {
-            writer.WriteBits(1, 0);
+            writer.WriteBits(1, 1);
+            writer.WriteBits(2, 2);
+            writer.WriteBits(3, npc.MovementHandler.PrimaryDirection);
+            writer.WriteBits(3, npc.MovementHandler.SecondaryDirection);
+            writer.WriteBits(1, npc.IsUpdateRequired ? 1 : 0);
         }
-
-        // if (npc.MovementHandler.SecondaryDirection == -1)
-        // {
-        //     if (npc.MovementHandler.PrimaryDirection == -1)
-        //     {
-        //         if (npc.IsUpdateRequired)
-        //         {
-        //             writer.WriteBits(1, 1);
-        //             writer.WriteBits(2, 0);
-        //         }
-        //         else
-        //         {
-        //             writer.WriteBits(1, 0);
-        //         }
-        //     }
-        //     else
-        //     {
-        //         writer.WriteBits(1, 1);
-        //         writer.WriteBits(2, 1);
-        //         writer.WriteBits(3, npc.MovementHandler.PrimaryDirection);
-        //         writer.WriteBits(1, npc.IsUpdateRequired ? 1 : 0);
-        //     }
-        // }
-        // else
-        // {
-        //     writer.WriteBits(1, 1);
-        //     writer.WriteBits(2, 2);
-        //     writer.WriteBits(3, npc.MovementHandler.PrimaryDirection);
-        //     writer.WriteBits(3, npc.MovementHandler.SecondaryDirection);
-        //     writer.WriteBits(1, npc.IsUpdateRequired ? 1 : 0);
-        // }
     }
 
     private static void UpdateNPCState(NPC npc, RSStream updateBlock)

@@ -39,6 +39,34 @@ public class PlayerCommandPacket : IPacket
                 _player.Respawn();
                 break;
 
+            case "npcwalk":
+                var npcIndex = int.Parse(_commandArgs[1]);
+                var npc = Server.NPCs[npcIndex];
+                if (npc != null)
+                {
+                    npc.MovementHandler.AddToPath(new Location(npc.Location.X, npc.Location.Y + 1));
+                }
+                else
+                {
+                    _player.PacketSender.SendMessage($"No NPC with index {npcIndex}");
+                }
+
+                break;
+
+            case "npcfollow":
+                npcIndex = int.Parse(_commandArgs[1]);
+                npc = Server.NPCs[npcIndex];
+                if (npc != null)
+                {
+                    npc.MovementHandler.FollowCharacter = _player;
+                }
+                else
+                {
+                    _player.PacketSender.SendMessage($"No NPC with index {npcIndex}");
+                }
+
+                break;
+
             case "hair":
                 var style = int.Parse(_commandArgs[1]);
                 var color = int.Parse(_commandArgs[2]);

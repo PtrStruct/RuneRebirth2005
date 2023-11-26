@@ -44,10 +44,10 @@ public class MovementHandler
         /* Handle Follow */
         if (_character != null && FollowCharacter != null)
         {
+            Reset();
+
             var tiles = new List<Location>();
             tiles = PathFinder.getPathFinder().FindPath(_character, FollowCharacter.Location.X, FollowCharacter.Location.Y, true, 16, 16);
-
-            Reset();
             if (tiles != null)
             {
                 for (var i = 0; i < tiles.Count; i++) AddToPath(tiles[i]);

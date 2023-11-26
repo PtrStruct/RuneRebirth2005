@@ -24,7 +24,6 @@ public class NPC : Character
     // locations
     public Location SpawnLocation { get; set; }
     public override Location Location { get; set; }
-    //public Location Location { get; set; } // this property is commented out, but grouped in location section
 
     // interaction
     public override IEntity InteractingEntity { get; set; }
@@ -32,7 +31,7 @@ public class NPC : Character
     public override bool IsUpdateRequired { get; set; }
 
     // combat and actions
-    public override Fighting.Combat Combat { get; set; }
+    public override Combat Combat { get; set; }
     public override int FallAnimation { get; set; }
     public override int BlockAnimation { get; set; }
     public override int CurrentAnimation { get; set; }
@@ -63,6 +62,8 @@ public class NPC : Character
         Combat.PerformedHit = false;
         Combat.WasHit = false;
         IsUpdateRequired = false;
+        MovementHandler.PrimaryDirection = -1;
+        MovementHandler.SecondaryDirection = -1;
         Flags = NPCUpdateFlags.None;
     }
     
