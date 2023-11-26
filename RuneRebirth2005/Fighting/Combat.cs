@@ -1,4 +1,5 @@
 ﻿using RuneRebirth2005.Entities;
+using RuneRebirth2005.World.Clipping;
 
 namespace RuneRebirth2005.Fighting;
 
@@ -103,7 +104,10 @@ public class Combat
 
     public void Attack(Character target)
     {
-        Target = target;
+        //Target = target;
+        
+        Character.MovementHandler.Reset();
+        Character.MovementHandler.FollowCharacter = target;
         Character.SetInteractionEntity(target);
     }
 

@@ -1,6 +1,8 @@
+using Microsoft.CSharp.RuntimeBinder;
 using RuneRebirth2005.Entities;
 using RuneRebirth2005.Helpers;
 using RuneRebirth2005.World.Clipping;
+using Serilog;
 
 namespace RuneRebirth2005.Handlers;
 
@@ -10,15 +12,18 @@ public class MovementHandler
     public int SecondaryDirection { get; set; } = -1;
     public bool DiscardMovementQueue { get; set; }
 
-    private readonly Player _client;
-    private bool _runToggled;
+    private readonly Character _character;
+    public bool IsRunToggled { get; set; }
+
+    public Character FollowCharacter { get; set; }
+
     private readonly LinkedList<Point> waypoints = new();
 
-    public MovementHandler(Player client)
+    public MovementHandler(Character character)
     {
-        _client = client;
+        _character = character;
     }
-    
+
     // private bool IsWithinRange()
     // {
     //     var targetLocation = _client.CombatTarget.Location;
@@ -36,68 +41,26 @@ public class MovementHandler
 
     public void Process()
     {
-        /* Combat Follow */
-        // if (_client.CombatTarget != null && !IsWithinRange())
-        // {
-        //     if (_client.CombatHandler.CombatMethod is RangeCombat)
-        //     {
-        //         var targetLocation = _client.CombatTarget.Location;
-        //         var entityLocation = _client.Location;
-        //         var entitySize = _client.Size;
-        //         var targetSize = _client.CombatTarget.Size;
-        //
-        //         if (!PathFinder.isProjectilePathClear(entityLocation.X, entityLocation.Y, 0, targetLocation.X,
-        //                 targetLocation.Y) || !IsWithinRange())
-        //         {
-        //             PacketBuilder.SendMessage("Range Following..", _client);
-        //             _client.MovementHandler.Reset();
-        //
-        //             var x = _client.CombatTarget.Location.X;
-        //             var y = _client.CombatTarget.Location.Y;
-        //
-        //             /* Follow */
-        //             var tiles = new List<Location>();
-        //             tiles = PathFinder.getPathFinder().FindRoute(_client, x, y, true, _client.CombatTarget.Size,
-        //                 _client.CombatTarget.Size);
-        //
-        //             if (tiles != null)
-        //             {
-        //                 for (var i = 0; i < tiles.Count; i++) _client.MovementHandler.AddToPath(tiles[i]);
-        //
-        //                 /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
-        //                 _client.MovementHandler.Finish();
-        //             }
-        //         }
-        //     }
-        //     else /* Melee follow */
-        //     {
-        //         PacketBuilder.SendMessage("Following..", _client);
-        //         _client.MovementHandler.Reset();
-        //
-        //         var x = _client.CombatTarget.Location.X;
-        //         var y = _client.CombatTarget.Location.Y;
-        //
-        //         /* Follow */
-        //         var tiles = new List<Location>();
-        //         tiles = PathFinder.getPathFinder().FindRoute(_client, x, y, true, _client.CombatTarget.Size,
-        //             _client.CombatTarget.Size);
-        //
-        //         if (tiles != null)
-        //         {
-        //             for (var i = 0; i < tiles.Count; i++) _client.MovementHandler.AddToPath(tiles[i]);
-        //
-        //             /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
-        //             _client.MovementHandler.Finish();
-        //         }
-        //     }
-        // }
+        /* Handle Follow */
+        if (_character != null && FollowCharacter != null)
+        {
+            var tiles = new List<Location>();
+            tiles = PathFinder.getPathFinder().FindPath(_character, FollowCharacter.Location.X, FollowCharacter.Location.Y, true, 16, 16);
+
+            Reset();
+            if (tiles != null)
+            {
+                for (var i = 0; i < tiles.Count; i++) AddToPath(tiles[i]);
+                /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
+                Finish();
+            }
+        }
 
         if (waypoints.Count == 0)
             return;
 
         var walkPoint = waypoints.First.Value;
         waypoints.RemoveFirst();
-
         var runPoint = GetRunPoint();
 
         if (walkPoint != null && walkPoint.Direction != -1)
@@ -112,16 +75,16 @@ public class MovementHandler
             SecondaryDirection = runPoint.Direction;
         }
 
-        if (_client.Location.IsOutside)
+        if (_character.Location.IsOutside && _character is Player player)
         {
-            SendMapRegionPacket();
-            Console.WriteLine("Sent Region Packet!");
+            SendNewBuildArea();
+            player.PacketSender.SendMessage("Sent new build area.");
         }
     }
 
     private Point GetRunPoint()
     {
-        if (waypoints.Count > 1 && GetRunToggled())
+        if (waypoints.Count > 1 && IsRunToggled)
         {
             var runPoint = waypoints.First.Value;
             waypoints.RemoveFirst();
@@ -133,21 +96,18 @@ public class MovementHandler
 
     private void MoveToDirection(int direction)
     {
-        _client.Location.Move(MovementHelper.DIRECTION_DELTA_X[direction],
+        Log.Information($"Before Move CharacterX: {_character.Location.X} - CharacterY: {_character.Location.Y}");
+        _character.Location.Move(MovementHelper.DIRECTION_DELTA_X[direction],
             MovementHelper.DIRECTION_DELTA_Y[direction]);
+        Log.Information($"After Move CharacterX: {_character.Location.X} - CharacterY: {_character.Location.Y}");
     }
 
-    private bool IsOutsideMapRegion()
+    private void SendNewBuildArea()
     {
-        var deltaX = _client.Location.PositionRelativeToOffsetChunkX;
-        var deltaY = _client.Location.PositionRelativeToOffsetChunkY;
-
-        return deltaX < 16 || deltaX >= 88 || deltaY < 16 || deltaY > 88;
-    }
-
-    private void SendMapRegionPacket()
-    {
-        _client.PacketSender.LoadRegionPacket();
+        if (_character is Player player)
+        {
+            player.PacketSender.BuildNewBuildAreaPacket();
+        }
     }
 
     public void AddToPath(Location location)
@@ -213,23 +173,13 @@ public class MovementHandler
     public void Reset()
     {
         waypoints.Clear();
-        var location = _client.Location;
+        var location = _character.Location;
         waypoints.AddLast(new Point(location.X, location.Y, -1));
     }
 
     public void Finish()
     {
         waypoints.RemoveFirst();
-    }
-
-    public void SetRunToggled(bool runPath)
-    {
-        _runToggled = runPath;
-    }
-
-    public bool GetRunToggled()
-    {
-        return _runToggled;
     }
 }
 
@@ -244,17 +194,5 @@ public class Point
         X = x;
         Y = y;
         Direction = direction;
-    }
-}
-
-public class Tile
-{
-    public int X { get; }
-    public int Y { get; }
-
-    public Tile(int x, int y)
-    {
-        X = x;
-        Y = y;
     }
 }

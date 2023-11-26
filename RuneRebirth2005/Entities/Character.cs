@@ -1,4 +1,5 @@
 ﻿using RuneRebirth2005.Fighting;
+using RuneRebirth2005.Handlers;
 using RuneRebirth2005.NPCManagement;
 
 namespace RuneRebirth2005.Entities;
@@ -45,6 +46,7 @@ public abstract class Character : IEntity
     public abstract CombatHit SecondaryDamage { get; set; }
     public abstract Combat Combat { get; set; }
     public abstract int AttackSpeed { get; set; }
+    public abstract MovementHandler MovementHandler { get; set; } 
 
     public abstract void SetInteractionEntity(IEntity entity);
     public abstract void PerformAnimation(int animationId);

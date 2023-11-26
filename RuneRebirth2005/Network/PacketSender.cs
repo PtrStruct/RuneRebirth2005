@@ -11,7 +11,7 @@ public class PacketSender
         _player = player;
     }
 
-    public void LoadRegionPacket()
+    public void BuildNewBuildAreaPacket()
     {
         _player.PlayerSession.Writer.CreateFrame(ServerOpCodes.REGION_LOAD);
         _player.PlayerSession.Writer.WriteWordA(_player.Location.CenterChunkX);

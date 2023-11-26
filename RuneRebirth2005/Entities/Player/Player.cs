@@ -23,7 +23,7 @@ public class Player : Character
     public bool IsInventoryUpdate { get; set; }
     public bool IsAppearanceUpdate { get; set; }
     public PlayerUpdateFlags Flags { get; set; }
-    public MovementHandler MovementHandler { get; set; }
+    public override MovementHandler MovementHandler { get; set; }
     public bool Running { get; set; }
 
     // Player representations
@@ -37,7 +37,7 @@ public class Player : Character
     public PlayerSkills PlayerSkills { get; set; } = new();
 
     // Interactions
-    public IEntity Target { get; set; }
+    //public IEntity Target { get; set; }
     public override Face Face { get; set; }
     public List<Player> LocalPlayers { get; set; } = new();
     public List<NPC> LocalNPCs { get; set; } = new();

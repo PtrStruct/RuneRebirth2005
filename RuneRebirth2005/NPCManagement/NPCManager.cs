@@ -1,6 +1,7 @@
 ﻿using System.Collections.Frozen;
 using Newtonsoft.Json;
 using RuneRebirth2005.Entities;
+using RuneRebirth2005.Handlers;
 
 namespace RuneRebirth2005.NPCManagement;
 
@@ -48,6 +49,7 @@ public class NPCManager
         mob.CurrentHealth = npc.Hitpoints == 0 ? 1 : npc.Hitpoints;
         mob.MaxHealth = npc.Hitpoints == 0 ? 1 : npc.Hitpoints;
         mob.IsUpdateRequired = true;
+        mob.MovementHandler = new MovementHandler(mob);
 
         SetFaceBasedOnWalk(mob, npcSpawn.Walk);
         mobs[index] = mob;

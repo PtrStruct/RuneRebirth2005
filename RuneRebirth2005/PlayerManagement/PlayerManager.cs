@@ -55,7 +55,7 @@ public static class PlayerManager
 
     public static void Login(Player player)
     {
-        player.PacketSender.LoadRegionPacket();
+        player.PacketSender.BuildNewBuildAreaPacket();
         player.PacketSender.SendPlayerStatus();
 
         player.PacketSender.SendSidebarInterface(0, 5855);

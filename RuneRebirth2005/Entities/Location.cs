@@ -69,7 +69,7 @@ public class Location
             
             if (Player != null)
             {
-                Player.PacketSender.LoadRegionPacket();
+                Player.PacketSender.BuildNewBuildAreaPacket();
             }
         }
     }
@@ -100,6 +100,12 @@ public class Location
     public static Location Delta(Location a, Location b)
     {
         return new Location(b.X - a.X, b.Y - a.Y);
+    }
+    
+    public int GetDistance(Location other) {
+        int deltaX = X - other.X;
+        int deltaY = Y - other.Y;
+        return (int) Math.Ceiling(Math.Sqrt(deltaX * deltaX + deltaY * deltaY));
     }
 
     public List<string> ToStringParts()

@@ -1,11 +1,11 @@
-﻿
-using RuneRebirth2005.Entities;
+﻿using RuneRebirth2005.Entities;
 using RuneRebirth2005.Helpers;
 
 namespace RuneRebirth2005.World.Clipping;
 
 public class PathFinder
 {
+    private const int DEFALT_PATH_LENGTH = 4000;
     private static readonly PathFinder pathFinder = new();
 
     public static PathFinder getPathFinder()
@@ -13,20 +13,28 @@ public class PathFinder
         return pathFinder;
     }
 
-    public List<Location> FindRoute(Player player, int destX, int destY, bool moveNear, int xLength, int yLength)
+    public List<Location> FindPath(Character character, int destX, int destY, bool moveNear, int xLength, int yLength)
     {
-        if (destX == player.Location.PositionRelativeToOffsetChunkX &&
-            destY == player.Location.PositionRelativeToOffsetChunkY && !moveNear)
+        if (destX == character.Location.PositionRelativeToOffsetChunkX &&
+            destY == character.Location.PositionRelativeToOffsetChunkY && !moveNear)
         {
-            player.PacketSender.SendMessage("ERROR!");
+            if (character is Player player)
+            {
+                player.PacketSender.SendMessage("ERROR!");
+            }
+
             return null;
         }
 
-        destX = destX - 8 * player.Location.OffsetChunkX;
-        destY = destY - 8 * player.Location.OffsetChunkY;
+        var height = character.Location.Z;
+        destX = destX - 8 * character.Location.OffsetChunkX;
+        destY = destY - 8 * character.Location.OffsetChunkY;
 
         var via = new int[104][];
         var cost = new int[104][];
+
+        var tileQueueX = new List<int>();
+        var tileQueueY = new List<int>();
 
         for (var i = 0; i < 104; i++)
         {
@@ -34,35 +42,27 @@ public class PathFinder
             cost[i] = new int[104];
         }
 
-        var tileQueueX = new List<int>();
-        var tileQueueY = new List<int>();
-
         for (var xx = 0; xx < 104; xx++)
         for (var yy = 0; yy < 104; yy++)
             cost[xx][yy] = 99999999;
 
-        var curX = player.Location.PositionRelativeToOffsetChunkX;
-        var curY = player.Location.PositionRelativeToOffsetChunkY;
+        var curX = character.Location.PositionRelativeToOffsetChunkX;
+        var curY = character.Location.PositionRelativeToOffsetChunkY;
 
         via[curX][curY] = 99;
         cost[curX][curY] = 0;
-        var tail = 0;
 
+        var tail = 0;
         tileQueueX.Add(curX);
         tileQueueY.Add(curY);
-
         var foundPath = false;
-        var pathLength = 4000;
 
-        while (tail != tileQueueX.Count && tileQueueX.Count < pathLength)
+        while (tail != tileQueueX.Count && tileQueueX.Count < DEFALT_PATH_LENGTH)
         {
             curX = tileQueueX.ElementAt(tail);
             curY = tileQueueY.ElementAt(tail);
-
-
-            /* Are these the correct value? */
-            var curAbsX = player.Location.OffsetChunkX * 8 + curX;
-            var curAbsY = player.Location.OffsetChunkY * 8 + curY;
+            var curAbsX = character.Location.OffsetChunkX * 8 + curX;
+            var curAbsY = character.Location.OffsetChunkY * 8 + curY;
 
             if (curX == destX && curY == destY)
             {
@@ -70,20 +70,10 @@ public class PathFinder
                 break;
             }
 
-            if (player.Target != null)
-            {
-                if (xLength != 0 && yLength != 0 && Region.canInteract(destX, destY, curAbsX, curAbsY, curX, curY,
-                        xLength, yLength, 0))
-                {
-                    foundPath = true;
-                    break;
-                }
-            }
-
-            tail = (tail + 1) % pathLength;
+            tail = (tail + 1) % DEFALT_PATH_LENGTH;
             var thisCost = cost[curX][curY] + 1;
             if (curY > 0 && via[curX][curY - 1] == 0 &&
-                (Region.GetClipping(curAbsX, curAbsY - 1, player.Location.Z) & 0x1280102) == 0)
+                (Region.GetClipping(curAbsX, curAbsY - 1, height) & 0x1280102) == 0)
             {
                 tileQueueX.Add(curX);
                 tileQueueY.Add(curY - 1);
@@ -93,7 +83,7 @@ public class PathFinder
 
             if (curX > 0
                 && via[curX - 1][curY] == 0
-                && (Region.GetClipping(curAbsX - 1, curAbsY, player.Location.Z) & 0x1280108) == 0)
+                && (Region.GetClipping(curAbsX - 1, curAbsY, height) & 0x1280108) == 0)
             {
                 tileQueueX.Add(curX - 1);
                 tileQueueY.Add(curY);
@@ -103,7 +93,7 @@ public class PathFinder
 
             if (curY < 104 - 1
                 && via[curX][curY + 1] == 0
-                && (Region.GetClipping(curAbsX, curAbsY + 1, player.Location.Z) & 0x1280120) == 0)
+                && (Region.GetClipping(curAbsX, curAbsY + 1, height) & 0x1280120) == 0)
             {
                 tileQueueX.Add(curX);
                 tileQueueY.Add(curY + 1);
@@ -112,7 +102,7 @@ public class PathFinder
             }
 
             if (curX < 104 - 1 && via[curX + 1][curY] == 0 &&
-                (Region.GetClipping(curAbsX + 1, curAbsY, player.Location.Z) & 0x1280180) == 0)
+                (Region.GetClipping(curAbsX + 1, curAbsY, height) & 0x1280180) == 0)
             {
                 tileQueueX.Add(curX + 1);
                 tileQueueY.Add(curY);
@@ -123,9 +113,9 @@ public class PathFinder
             if (curX > 0
                 && curY > 0
                 && via[curX - 1][curY - 1] == 0
-                && (Region.GetClipping(curAbsX - 1, curAbsY - 1, player.Location.Z) & 0x128010e) == 0
-                && (Region.GetClipping(curAbsX - 1, curAbsY, player.Location.Z) & 0x1280108) == 0
-                && (Region.GetClipping(curAbsX, curAbsY - 1, player.Location.Z) & 0x1280102) == 0)
+                && (Region.GetClipping(curAbsX - 1, curAbsY - 1, height) & 0x128010e) == 0
+                && (Region.GetClipping(curAbsX - 1, curAbsY, height) & 0x1280108) == 0
+                && (Region.GetClipping(curAbsX, curAbsY - 1, height) & 0x1280102) == 0)
             {
                 tileQueueX.Add(curX - 1);
                 tileQueueY.Add(curY - 1);
@@ -136,9 +126,9 @@ public class PathFinder
             if (curX > 0
                 && curY < 104 - 1
                 && via[curX - 1][curY + 1] == 0
-                && (Region.GetClipping(curAbsX - 1, curAbsY + 1, player.Location.Z) & 0x1280138) == 0
-                && (Region.GetClipping(curAbsX - 1, curAbsY, player.Location.Z) & 0x1280108) == 0
-                && (Region.GetClipping(curAbsX, curAbsY + 1, player.Location.Z) & 0x1280120) == 0)
+                && (Region.GetClipping(curAbsX - 1, curAbsY + 1, height) & 0x1280138) == 0
+                && (Region.GetClipping(curAbsX - 1, curAbsY, height) & 0x1280108) == 0
+                && (Region.GetClipping(curAbsX, curAbsY + 1, height) & 0x1280120) == 0)
             {
                 tileQueueX.Add(curX - 1);
                 tileQueueY.Add(curY + 1);
@@ -149,9 +139,9 @@ public class PathFinder
             if (curX < 104 - 1
                 && curY > 0
                 && via[curX + 1][curY - 1] == 0
-                && (Region.GetClipping(curAbsX + 1, curAbsY - 1, player.Location.Z) & 0x1280183) == 0
-                && (Region.GetClipping(curAbsX + 1, curAbsY, player.Location.Z) & 0x1280180) == 0
-                && (Region.GetClipping(curAbsX, curAbsY - 1, player.Location.Z) & 0x1280102) == 0)
+                && (Region.GetClipping(curAbsX + 1, curAbsY - 1, height) & 0x1280183) == 0
+                && (Region.GetClipping(curAbsX + 1, curAbsY, height) & 0x1280180) == 0
+                && (Region.GetClipping(curAbsX, curAbsY - 1, height) & 0x1280102) == 0)
             {
                 tileQueueX.Add(curX + 1);
                 tileQueueY.Add(curY - 1);
@@ -162,9 +152,9 @@ public class PathFinder
             if (curX < 104 - 1
                 && curY < 104 - 1
                 && via[curX + 1][curY + 1] == 0
-                && (Region.GetClipping(curAbsX + 1, curAbsY + 1, player.Location.Z) & 0x12801e0) == 0
-                && (Region.GetClipping(curAbsX + 1, curAbsY, player.Location.Z) & 0x1280180) == 0
-                && (Region.GetClipping(curAbsX, curAbsY + 1, player.Location.Z) & 0x1280120) == 0)
+                && (Region.GetClipping(curAbsX + 1, curAbsY + 1, height) & 0x12801e0) == 0
+                && (Region.GetClipping(curAbsX + 1, curAbsY, height) & 0x1280180) == 0
+                && (Region.GetClipping(curAbsX, curAbsY + 1, height) & 0x1280120) == 0)
             {
                 tileQueueX.Add(curX + 1);
                 tileQueueY.Add(curY + 1);
@@ -218,8 +208,8 @@ public class PathFinder
 
         int l5;
         for (var j5 = l5 = via[curX][curY];
-             curX != player.Location.PositionRelativeToOffsetChunkX ||
-             curY != player.Location.PositionRelativeToOffsetChunkY;
+             curX != character.Location.PositionRelativeToOffsetChunkX ||
+             curY != character.Location.PositionRelativeToOffsetChunkY;
              j5 = via[curX][curY])
         {
             if (j5 != l5)
@@ -243,16 +233,15 @@ public class PathFinder
 
         var tiles = new List<Location>();
 
-        var pathX = player.Location.OffsetChunkX * 8 + tileQueueX[tail];
-        var pathY = player.Location.OffsetChunkY * 8 + tileQueueY[tail];
-        // Console.WriteLine($"X: {pathX} - Y: {pathY}");
-
+        var pathX = character.Location.OffsetChunkX * 8 + tileQueueX[tail];
+        var pathY = character.Location.OffsetChunkY * 8 + tileQueueY[tail];
         tiles.Add(new Location(pathX, pathY));
+        
         for (var i = 1; i < size; i++)
         {
             tail--;
-            pathX = player.Location.OffsetChunkX * 8 + tileQueueX[tail];
-            pathY = player.Location.OffsetChunkY * 8 + tileQueueY[tail];
+            pathX = character.Location.OffsetChunkX * 8 + tileQueueX[tail];
+            pathY = character.Location.OffsetChunkY * 8 + tileQueueY[tail];
             // Console.WriteLine($"X: {pathX} - Y: {pathY}");
             tiles.Add(new Location(pathX, pathY));
         }

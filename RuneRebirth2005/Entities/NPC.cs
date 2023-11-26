@@ -1,4 +1,5 @@
 ﻿using RuneRebirth2005.Fighting;
+using RuneRebirth2005.Handlers;
 using RuneRebirth2005.NPCManagement;
 
 namespace RuneRebirth2005.Entities;
@@ -14,6 +15,7 @@ public class NPC : Character
     public bool Stationary { get; set; }
     public int CombatLevel { get; set; }
     public override int AttackSpeed { get; set; }
+    public override MovementHandler MovementHandler { get; set; }
 
     public int MaxHealth { get; set; }
     public override int CurrentHealth { get; set; }
