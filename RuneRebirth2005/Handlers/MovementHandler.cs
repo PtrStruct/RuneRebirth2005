@@ -1,6 +1,7 @@
 using Microsoft.CSharp.RuntimeBinder;
 using RuneRebirth2005.Entities;
 using RuneRebirth2005.Helpers;
+using RuneRebirth2005.World;
 using RuneRebirth2005.World.Clipping;
 using Serilog;
 
@@ -42,19 +43,7 @@ public class MovementHandler
     public void Process()
     {
         /* Handle Follow */
-        if (_character != null && FollowCharacter != null)
-        {
-            Reset();
-
-            var tiles = new List<Location>();
-            tiles = PathFinder.getPathFinder().FindPath(_character, FollowCharacter.Location.X, FollowCharacter.Location.Y, true, 16, 16);
-            if (tiles != null)
-            {
-                for (var i = 0; i < tiles.Count; i++) AddToPath(tiles[i]);
-                /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
-                Finish();
-            }
-        }
+        Follow();
 
         if (waypoints.Count == 0)
             return;
@@ -79,6 +68,36 @@ public class MovementHandler
         {
             SendNewBuildArea();
             player.PacketSender.SendMessage("Sent new build area.");
+        }
+    }
+
+    private void Follow()
+    {
+        if (_character != null && FollowCharacter != null)
+        {
+            Reset();
+
+            //var distance = _character.Location.GetDistance(FollowCharacter.Location);
+            //if (distance <= FollowCharacter.Size)
+            //{
+            //    return;
+            //}
+
+            if (_character is Player player)
+            {
+                player.PacketSender.SendMessage($"Following NPC Size: {FollowCharacter.Size}");
+            }
+            
+            var destination = PathGenerator.GetCombatPath(_character, FollowCharacter);
+            
+            var tiles = new List<Location>();
+            tiles = PathFinder.getPathFinder().FindPath(_character, destination.X, destination.Y, true, 16, 16);
+            if (tiles != null)
+            {
+                for (var i = 0; i < tiles.Count; i++) AddToPath(tiles[i]);
+                /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
+                Finish();
+            }
         }
     }
 

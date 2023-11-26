@@ -28,5 +28,15 @@
     "id": 90,
     "walk": 1,
     "height": 0
+  },
+  {
+    "maxHit": 1,
+    "strength": 3,
+    "attack": 3,
+    "x": 3197,
+    "y": 3931,
+    "id": 117,
+    "walk": 1,
+    "height": 0
   }
 ]

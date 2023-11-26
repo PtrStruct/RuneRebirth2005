@@ -236,7 +236,7 @@ public class PathFinder
         var pathX = character.Location.OffsetChunkX * 8 + tileQueueX[tail];
         var pathY = character.Location.OffsetChunkY * 8 + tileQueueY[tail];
         tiles.Add(new Location(pathX, pathY));
-        
+
         for (var i = 1; i < size; i++)
         {
             tail--;
@@ -251,6 +251,144 @@ public class PathFinder
         return tiles;
     }
 
+    public static bool IsAccessible(int x, int y, int z, int destX, int destY)
+    {
+        Location location = new Location(x, y);
+
+        if (destX == location.PositionRelativeToOffsetChunkX &&
+            destY == location.PositionRelativeToOffsetChunkY)
+        {
+            return false;
+        }
+
+        int[][] via = new int[104][];
+        int[][] cost = new int[104][];
+
+        for (var i = 0; i < 104; i++)
+        {
+            via[i] = new int[104];
+            cost[i] = new int[104];
+        }
+
+        List<int> tileQueueX = new List<int>(10000);
+        List<int> tileQueueY = new List<int>(10000);
+
+        int curX = location.PositionRelativeToOffsetChunkX;
+        int curY = location.PositionRelativeToOffsetChunkY;
+
+        via[curX][curY] = 99;
+        cost[curX][curY] = 1;
+
+        var tail = 0;
+
+        tileQueueX.Add(curX);
+        tileQueueY.Add(curY);
+
+        destX = destX - 8 * location.OffsetChunkX;
+        destY = destY - 8 * location.OffsetChunkY;
+
+        while (tail != tileQueueX.Count() && tileQueueX.Count() < 104)
+        {
+            curX = tileQueueX.ElementAt(tail);
+            curY = tileQueueY.ElementAt(tail);
+
+            int curAbsX = location.OffsetChunkX * 8 + curX;
+            int curAbsY = location.OffsetChunkY * 8 + curY;
+
+            if (curX == destX && curY == destY)
+            {
+                return true;
+            }
+
+            tail = (tail + 1) % 104;
+
+            int thisCost = cost[curX][curY] + 1;
+
+            if (curY > 0 && via[curX][curY - 1] == 0
+                         && (Region.GetClipping(curAbsX, curAbsY - 1, z) & 0x1280102) == 0)
+            {
+                tileQueueX.Add(curX);
+                tileQueueY.Add(curY - 1);
+                via[curX][curY - 1] = 1;
+                cost[curX][curY - 1] = thisCost;
+            }
+
+            if (curX > 0 && via[curX - 1][curY] == 0
+                         && (Region.GetClipping(curAbsX - 1, curAbsY, z) & 0x1280108) == 0)
+            {
+                tileQueueX.Add(curX - 1);
+                tileQueueY.Add(curY);
+                via[curX - 1][curY] = 2;
+                cost[curX - 1][curY] = thisCost;
+            }
+
+            if (curY < 104 - 1 && via[curX][curY + 1] == 0
+                               && (Region.GetClipping(curAbsX, curAbsY + 1, z) & 0x1280120) == 0)
+            {
+                tileQueueX.Add(curX);
+                tileQueueY.Add(curY + 1);
+                via[curX][curY + 1] = 4;
+                cost[curX][curY + 1] = thisCost;
+            }
+
+            if (curX < 104 - 1 && via[curX + 1][curY] == 0
+                               && (Region.GetClipping(curAbsX + 1, curAbsY, z) & 0x1280180) == 0)
+            {
+                tileQueueX.Add(curX + 1);
+                tileQueueY.Add(curY);
+                via[curX + 1][curY] = 8;
+                cost[curX + 1][curY] = thisCost;
+            }
+
+            // Diagonal movements
+
+            if (curX > 0 && curY > 0 && via[curX - 1][curY - 1] == 0
+                && (Region.GetClipping(curAbsX - 1, curAbsY - 1, z) & 0x128010e) == 0
+                && (Region.GetClipping(curAbsX - 1, curAbsY, z) & 0x1280108) == 0
+                && (Region.GetClipping(curAbsX, curAbsY - 1, z) & 0x1280102) == 0)
+            {
+                tileQueueX.Add(curX - 1);
+                tileQueueY.Add(curY - 1);
+                via[curX - 1][curY - 1] = 3;
+                cost[curX - 1][curY - 1] = thisCost;
+            }
+
+            if (curX > 0 && curY < 104 - 1 && via[curX - 1][curY + 1] == 0
+                && (Region.GetClipping(curAbsX - 1, curAbsY + 1, z) & 0x1280138) == 0
+                && (Region.GetClipping(curAbsX - 1, curAbsY, z) & 0x1280108) == 0
+                && (Region.GetClipping(curAbsX, curAbsY + 1, z) & 0x1280120) == 0)
+            {
+                tileQueueX.Add(curX - 1);
+                tileQueueY.Add(curY + 1);
+                via[curX - 1][curY + 1] = 6;
+                cost[curX - 1][curY + 1] = thisCost;
+            }
+
+            if (curX < 104 - 1 && curY > 0 && via[curX + 1][curY - 1] == 0
+                && (Region.GetClipping(curAbsX + 1, curAbsY - 1, z) & 0x1280183) == 0
+                && (Region.GetClipping(curAbsX + 1, curAbsY, z) & 0x1280180) == 0
+                && (Region.GetClipping(curAbsX, curAbsY - 1, z) & 0x1280102) == 0)
+            {
+                tileQueueX.Add(curX + 1);
+                tileQueueY.Add(curY - 1);
+                via[curX + 1][curY - 1] = 9;
+                cost[curX + 1][curY - 1] = thisCost;
+            }
+
+            if (curX < 104 - 1 && curY < 104 - 1 && via[curX + 1][curY + 1] == 0
+                && (Region.GetClipping(curAbsX + 1, curAbsY + 1, z) & 0x12801e0) == 0
+                && (Region.GetClipping(curAbsX + 1, curAbsY, z) & 0x1280180) == 0
+                && (Region.GetClipping(curAbsX, curAbsY + 1, z) & 0x1280120) == 0)
+            {
+                tileQueueX.Add(curX + 1);
+                tileQueueY.Add(curY + 1);
+                via[curX + 1][curY + 1] = 12;
+                cost[curX + 1][curY + 1] = thisCost;
+            }
+        }
+
+        return false;
+    }
 
     public static bool isProjectilePathClear(int x0, int y0, int z, int x1, int y1)
     {

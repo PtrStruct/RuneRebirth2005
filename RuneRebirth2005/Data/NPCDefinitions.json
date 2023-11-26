@@ -79,5 +79,32 @@
     "spawnx": 3097,
     "spawny": 3509,
     "walk": 1
+  },
+  {
+    "id": 117,
+    "name": "Hill giant",
+    "examine": "One of Wildy's many citizens.",
+    "combat": 21,
+    "size": 2,
+    "attackable": true,
+    "aggressive": false,
+    "retreats": false,
+    "poisonous": false,
+    "respawn": 10,
+    "maxHit": 1,
+    "hitpoints": 7,
+    "attackSpeed": 4,
+    "attackAnim": 422,
+    "defenceAnim": 1834,
+    "deathAnim": 836,
+    "attackBonus": 9,
+    "defenceMelee": 9,
+    "defenceRange": 9,
+    "defenceMage": 0,
+    "strength": 5,
+    "attack": 5,
+    "spawnx": 3197,
+    "spawny": 3931,
+    "walk": 1
   }
 ]

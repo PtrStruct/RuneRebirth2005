@@ -50,7 +50,6 @@ public class PlayerCommandPacket : IPacket
                 {
                     _player.PacketSender.SendMessage($"No NPC with index {npcIndex}");
                 }
-
                 break;
 
             case "npcfollow":
@@ -89,7 +88,6 @@ public class PlayerCommandPacket : IPacket
                 {
                     // new SendPlayerMessagePacket(_player).Add("Invalid skill ID provided");
                 }
-
                 break;
 
             case "equip":
