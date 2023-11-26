@@ -102,6 +102,15 @@ public class Location
         return new Location(b.X - a.X, b.Y - a.Y);
     }
     
+    public bool IsWithinDistance(Location other, int distance) {
+        if(Z != other.Z)
+            return false;
+        
+        int deltaX = Math.Abs(X - other.X);
+        int deltaY = Math.Abs(Y - other.Y);
+        return deltaX <= distance && deltaY <= distance;
+    }
+    
     public int GetDistance(Location other) {
         int deltaX = X - other.X;
         int deltaY = Y - other.Y;

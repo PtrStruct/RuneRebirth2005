@@ -37,16 +37,15 @@ public class Combat
 
     public void PerformAnimation()
     {
-        
-
         if (Character.Combat.Target?.CurrentHealth <= 0)
         {
             // Character.PerformAnimation(Character.FallAnimation);
             if (Character is Player player)
             {
                 player.PacketSender.SendMessage("You've defeated your enemy!");
+                player.MovementHandler.Reset();
                 // player.Combat.Attacker = null;
-                player.Combat.Reset();
+                
             }
 
             Reset();
@@ -61,31 +60,31 @@ public class Combat
         {
             Character.PerformAnimation(Character.AttackAnimation);
         }
-        
-         if (Character.CurrentHealth <= 0)
-         {
-             Character.PerformAnimation(Character.FallAnimation);
-             Reset();
-             // Character.Combat.Attacker.Combat.Reset();
-        
-             if (Character is Player player)
-             {
-                 DelayedTaskHandler.RegisterTask(new DelayedAttackTask
-                 {
-                     RemainingTicks = 4,
-                     Task = () => { player.Respawn(); }
-                 });
-             }
-        
-             if (Character is NPC npc)
-             {
-                 DelayedTaskHandler.RegisterTask(new DelayedAttackTask
-                 {
-                     RemainingTicks = 4,
-                     Task = () => { npc.Respawn(); }
-                 });
-             }
-         }
+
+        if (Character.CurrentHealth <= 0)
+        {
+            Character.PerformAnimation(Character.FallAnimation);
+            Reset();
+            // Character.Combat.Attacker.Combat.Reset();
+
+            if (Character is Player player)
+            {
+                DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+                {
+                    RemainingTicks = 4,
+                    Task = () => { player.Respawn(); }
+                });
+            }
+
+            if (Character is NPC npc)
+            {
+                DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+                {
+                    RemainingTicks = 4,
+                    Task = () => { npc.Respawn(); }
+                });
+            }
+        }
 
         // if (PerformedHit && WasHit)
         // {
@@ -104,8 +103,8 @@ public class Combat
 
     public void Attack(Character target)
     {
-        //Target = target;
-        
+        Target = target;
+
         Character.MovementHandler.Reset();
         Character.MovementHandler.FollowCharacter = target;
         Character.SetInteractionEntity(target);
@@ -115,27 +114,35 @@ public class Combat
     {
         if (Target != null)
         {
-            if (_attackTimer <= 0)
+            if (CanReach(Character, Target))
             {
-                /* Perform Animation */
-
-                /* Check if can combat */
-                if (CombatHelper.CanAttack(Character, Target))
+                if (_attackTimer <= 0)
                 {
-                    Character.Combat.PerformedHit = true;
-                    Target.Combat.WasHit = true;
+                    /* Perform Animation */
 
-                    Target.Combat.HitQueue.AddHit(new CombatHit
+                    /* Check if can combat */
+                    if (CombatHelper.CanAttack(Character, Target))
                     {
-                        Damage = 1,
-                        HitType = 1,
-                        Attacker = Character,
-                        Target = Target
-                    });
-                    _attackTimer = Character.AttackSpeed;
+                        Character.Combat.PerformedHit = true;
+                        Target.Combat.WasHit = true;
+
+                        Target.Combat.HitQueue.AddHit(new CombatHit
+                        {
+                            Damage = 1,
+                            HitType = 1,
+                            Attacker = Character,
+                            Target = Target
+                        });
+                        _attackTimer = Character.AttackSpeed;
+                    }
                 }
             }
         }
+    }
+
+    private bool CanReach(Character attacker, Character target)
+    {
+        return attacker.Location.IsWithinDistance(target.Location, 1);
     }
 
     public void Reset()
@@ -145,6 +152,7 @@ public class Combat
             Character.SetInteractionEntity(null);
             Attacker = null;
             Target = null;
+            Character.MovementHandler.FollowCharacter = null;
         }
     }
 }

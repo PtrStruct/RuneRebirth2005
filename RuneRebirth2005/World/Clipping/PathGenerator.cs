@@ -87,7 +87,7 @@ public static class PathGenerator
         return new Location(lowX, lowY);
     }
     
-    public static int GetManhattanDistance(int x, int y, int x2, int y2) {
+    static int GetManhattanDistance(int x, int y, int x2, int y2) {
         return Math.Abs(x - x2) + Math.Abs(y - y2);
     }
 }
