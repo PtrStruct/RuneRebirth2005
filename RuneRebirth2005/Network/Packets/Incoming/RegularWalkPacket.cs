@@ -46,6 +46,7 @@ public class RegularWalkPacket : IPacket
 
         _player.Combat.Target = null;
         // _player.NPCCombatFocus = null;
+        _player.SetInteractionEntity(null);
         _player.MovementHandler.Reset();
         _player.MovementHandler.FollowCharacter = null;
         _player.MovementHandler.IsRunToggled = _running;

@@ -111,6 +111,39 @@ public class Location
         return deltaX <= distance && deltaY <= distance;
     }
     
+    public Location[] GetOuterTiles(int size)
+    {
+        Location[] tiles = new Location[size * 4];
+        int index = 0;
+
+        for (int x = 0; x < size; x++)
+        {
+            tiles[index++] = new Location(X + x, Y - 1);
+            tiles[index++] = new Location(X + x, Y + size);
+        }
+
+        for (int y = 0; y < size; y++)
+        {
+            tiles[index++] = new Location(X - 1, Y + y);
+            tiles[index++] = new Location(X + size, Y + y);
+        }
+
+        return tiles;
+    }
+    
+    public static bool IsPlayerInsideNPC(IEntity player, IEntity npc)
+    {
+        var npcBottomLeft = npc.Location;
+        var npcSize = npc.Size;
+        var npcTopRight = new Location(npcBottomLeft.X + npcSize - 1, npcBottomLeft.Y + npcSize - 1);
+    
+        var playerLocation = player.Location;
+        var playerXInside = (playerLocation.X >= npcBottomLeft.X) & (playerLocation.X <= npcTopRight.X);
+        var playerYInside = (playerLocation.Y >= npcBottomLeft.Y) & (playerLocation.Y <= npcTopRight.Y);
+    
+        return playerXInside & playerYInside;
+    }
+    
     public int GetDistance(Location other) {
         int deltaX = X - other.X;
         int deltaY = Y - other.Y;
@@ -131,4 +164,18 @@ public class Location
 
         return messageParts;
     }
+    
+    public override bool Equals(object obj) 
+    {
+        var loc = obj as Location;
+        if(loc == null) 
+            return false; 
+        return X == loc.X && Y == loc.Y && Z == loc.Z;
+    }
+
+    public override int GetHashCode() 
+    {
+        return HashCode.Combine(X, Y, Z);
+    }
+    
 }

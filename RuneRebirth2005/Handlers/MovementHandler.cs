@@ -84,12 +84,6 @@ public class MovementHandler
         {
             Reset();
 
-            var distance = _character.Location.GetDistance(FollowCharacter.Location);
-            if (distance <= FollowCharacter.Size)
-            {
-                return;
-            }
-
             if (_character is Player player)
             {
                 player.PacketSender.SendMessage($"Following NPC Size: {FollowCharacter.Size}");
@@ -107,6 +101,16 @@ public class MovementHandler
             {
                 var npcX = theNpc.Location.X;
                 var npcY = theNpc.Location.Y;
+
+                if (theNpc.Location.Equals(FollowCharacter.Location))
+                {
+                    Reset();
+                    /* Too predictable? */
+                    StepAway(theNpc);
+                    Finish();
+                    return;
+                }
+
                 var nextTile = theNpc.DumbPathFinder.Follow(_character, FollowCharacter);
                 if (nextTile != null)
                 {
@@ -115,6 +119,46 @@ public class MovementHandler
                 }
             }
         }
+    }
+
+    private void StepAway(Character character)
+    {
+        if (character.MovementHandler.CanWalk(-1, 0))
+            character.MovementHandler.AddToPath(new Location(character.Location.X - 1, character.Location.Y + 0));
+        else if (character.MovementHandler.CanWalk(1, 0))
+            character.MovementHandler.AddToPath(new Location(character.Location.X + 1, character.Location.Y + 0));
+        else if (character.MovementHandler.CanWalk(0, character.Location.Y + -1))
+            character.MovementHandler.AddToPath(new Location(character.Location.X, character.Location.Y + -1));
+        else if (character.MovementHandler.CanWalk(0, 1))
+            character.MovementHandler.AddToPath(new Location(character.Location.X, character.Location.Y + 1));
+    }
+
+    bool CanWalk(int deltaX, int deltaY)
+    {
+        Location to = new Location(_character.Location.X + deltaX, _character.Location.Y + deltaY);
+
+        return canWalk(_character.Location, to, _character.Size);
+    }
+
+    static bool canWalk(Location from, Location to, int size)
+    {
+        return Region.canMove(from, to, size, size);
+    }
+
+    static double CalculateDistance(double x1, double y1, int x2, int y2)
+    {
+        double horizontalDistance = Math.Abs(x2 - x1);
+        double verticalDistance = Math.Abs(y2 - y1);
+
+        if (horizontalDistance == 0 || verticalDistance == 0)
+        {
+            // Adjacent tiles
+            return 1;
+        }
+
+        // Diagonal tiles
+        double diagonalDistance = Math.Sqrt(Math.Pow(horizontalDistance, 2) + Math.Pow(verticalDistance, 2));
+        return diagonalDistance;
     }
 
     private Point GetRunPoint()

@@ -1,6 +1,7 @@
 ﻿using CacheReader.World;
 using RuneRebirth2005.Data;
 using RuneRebirth2005.Data.ObjectsDef;
+using RuneRebirth2005.Entities;
 
 namespace RuneRebirth2005.World;
 
@@ -738,6 +739,10 @@ public class Region
                 Console.WriteLine("Invalid direction: " + direction);
                 return false;
         }
+    }
+    
+    public static bool canMove(Location start, Location end, int xLength, int yLength) {
+        return canMove(start.X, start.Y, end.X, end.Y, start.Z, xLength, yLength);
     }
 
     public static bool CanShoot(int x, int y, int z, int direction)
