@@ -114,17 +114,6 @@ public static class PlayerUpdater
         }
         else
         {
-            /* Works */
-            // if (player.IsUpdateRequired)
-            // {
-            //     writer.WriteBits(1, 1);
-            //     writer.WriteBits(2, 0);
-            // }
-            // else
-            // {
-            //     writer.WriteBits(1, 0);
-            // }
-
             if (player.IsUpdateRequired)
             {
                 writer.WriteBits(1, 1);
@@ -135,80 +124,6 @@ public static class PlayerUpdater
                 writer.WriteBits(1, 0);
             }
         }
-
-
-        /* Does not work */
-        // if (player.IsUpdateRequired)
-        // {
-        //     player.PlayerSession.Writer.WriteBits(1, 1);
-        //     AppendUpdateStand(player);
-        // }
-        // else
-        // {
-        //     AppendIdleStand(player);
-        // }
-
-
-        // var pDir = player.MovementHandler.PrimaryDirection;
-        // var sDir = player.MovementHandler.SecondaryDirection;
-        //
-        // if (pDir != -1)
-        // {
-        //     player.PlayerSession.Writer.WriteBits(1, 1);
-        //     if (sDir != -1)
-        //         AppendRun(player.PlayerSession.Writer, pDir, sDir, player.IsUpdateRequired);
-        //     else
-        //         AppendWalk(player.PlayerSession.Writer, pDir, player.IsUpdateRequired);
-        // }
-        // else
-        // {
-        //     if (player.IsUpdateRequired)
-        //     {
-        //         player.PlayerSession.Writer.WriteBits(1, 1);
-        //         AppendUpdateStand(player);
-        //     }
-        //     else
-        //     {
-        //         AppendIdleStand(player);
-        //     }
-        // }
-
-        // var updateRequired = player.IsUpdateRequired;
-        // var updateRequired = player.IsUpdateRequired;
-        // var pDir = player.MovementHandler.PrimaryDirection;
-        // var sDir = player.MovementHandler.SecondaryDirection;
-        // if (pDir != -1)
-        // {
-        //     writer.WriteBits(1, 1);
-        //     if (sDir != -1)
-        //         AppendRun(writer, pDir, sDir, updateRequired);
-        //     else
-        //         AppendWalk(writer, pDir, updateRequired);
-        // }
-        // else
-        // {
-        //     if (updateRequired)
-        //     {
-        //         writer.WriteBits(1, 1);
-        //         AppendStand(writer);
-        //     }
-        //     else
-        //     {
-        //         writer.WriteBits(1, 0);
-        //     }
-        // }
-
-        // writer.WriteBits(1, 0);
-
-        //if (player.IsUpdateRequired)
-        //{
-        //    writer.WriteBits(1, 1);
-        //    writer.WriteBits(2, 0);
-        //}
-        //else
-        //{
-        //    writer.WriteBits(1, 0);
-        //}
     }
 
     private static void RemovePlayer(Player other)

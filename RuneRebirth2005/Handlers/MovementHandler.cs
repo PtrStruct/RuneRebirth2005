@@ -46,9 +46,11 @@ public class MovementHandler
         {
             return;
         }
-        
+
         /* Handle Follow */
+
         Follow();
+
 
         if (waypoints.Count == 0)
             return;
@@ -91,17 +93,26 @@ public class MovementHandler
             if (_character is Player player)
             {
                 player.PacketSender.SendMessage($"Following NPC Size: {FollowCharacter.Size}");
+                var destination = PathGenerator.GetCombatPath(_character, FollowCharacter);
+                var tiles = new List<Location>();
+                tiles = PathFinder.getPathFinder().FindPath(_character, destination.X, destination.Y, true, 16, 16);
+                if (tiles != null)
+                {
+                    for (var i = 0; i < tiles.Count; i++) AddToPath(tiles[i]);
+                    /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
+                    Finish();
+                }
             }
-
-            var destination = PathGenerator.GetCombatPath(_character, FollowCharacter);
-
-            var tiles = new List<Location>();
-            tiles = PathFinder.getPathFinder().FindPath(_character, destination.X, destination.Y, true, 16, 16);
-            if (tiles != null)
+            else if (_character is NPC theNpc)
             {
-                for (var i = 0; i < tiles.Count; i++) AddToPath(tiles[i]);
-                /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
-                Finish();
+                var npcX = theNpc.Location.X;
+                var npcY = theNpc.Location.Y;
+                var nextTile = theNpc.DumbPathFinder.Follow(_character, FollowCharacter);
+                if (nextTile != null)
+                {
+                    AddToPath(new Location(npcX + nextTile.X, npcY + nextTile.Y));
+                    Finish();
+                }
             }
         }
     }
