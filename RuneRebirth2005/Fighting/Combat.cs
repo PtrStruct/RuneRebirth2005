@@ -23,83 +23,23 @@ public class Combat
 
     public void Process()
     {
+        /* Thank you kimi <3 */
+        if (Character?.CurrentHealth <= 0 || Target?.CurrentHealth <= 0)
+        {
+            return;
+        }
+        
         /* Build Damage and Perform Animation */
         HitQueue.Process(Character);
 
-
         if (_attackTimer > 0)
             _attackTimer--;
-
 
         /* Add Damage (Display hit splat and lower health) */
         DoCombat();
     }
 
-    public void PerformAnimation()
-    {
-        if (Character.Combat.Target?.CurrentHealth <= 0)
-        {
-            // Character.PerformAnimation(Character.FallAnimation);
-            if (Character is Player player)
-            {
-                player.PacketSender.SendMessage("You've defeated your enemy!");
-                player.MovementHandler.Reset();
-                // player.Combat.Attacker = null;
-                
-            }
-
-            Reset();
-            // Character.Combat.Attacker.Combat.Reset();
-        }
-
-        if (!PerformedHit && WasHit)
-        {
-            Character.PerformAnimation(Character.BlockAnimation);
-        }
-        else if (PerformedHit)
-        {
-            Character.PerformAnimation(Character.AttackAnimation);
-        }
-
-        if (Character.CurrentHealth <= 0)
-        {
-            Character.PerformAnimation(Character.FallAnimation);
-            Reset();
-            // Character.Combat.Attacker.Combat.Reset();
-
-            if (Character is Player player)
-            {
-                DelayedTaskHandler.RegisterTask(new DelayedAttackTask
-                {
-                    RemainingTicks = 4,
-                    Task = () => { player.Respawn(); }
-                });
-            }
-
-            if (Character is NPC npc)
-            {
-                DelayedTaskHandler.RegisterTask(new DelayedAttackTask
-                {
-                    RemainingTicks = 4,
-                    Task = () => { npc.Respawn(); }
-                });
-            }
-        }
-
-        // if (PerformedHit && WasHit)
-        // {
-        //     Character.PerformAnimation(Character.AttackAnimation);
-        // }
-        //
-        // if (!PerformedHit && WasHit)
-        // {
-        //     Character.PerformAnimation(Character.BlockAnimation);
-        // }
-        // else
-        // {
-        //     Character.PerformAnimation(-1);
-        // }
-    }
+    
 
     public void Attack(Character target)
     {
@@ -118,7 +58,6 @@ public class Combat
             {
                 if (_attackTimer <= 0)
                 {
-                    
                     /* Check if can combat */
                     if (CombatHelper.CanAttack(Character, Target))
                     {
@@ -144,6 +83,53 @@ public class Combat
         return attacker.Location.IsWithinDistance(target.Location, 1);
     }
 
+    public void PerformAnimation()
+    {
+        if (Character.Combat.Target?.CurrentHealth <= 0)
+        {
+            if (Character is Player player)
+            {
+                player.PacketSender.SendMessage("You've defeated your enemy!");
+                player.MovementHandler.Reset();
+            }
+
+            Reset();
+        }
+
+        if (!PerformedHit && WasHit)
+        {
+            Character.PerformAnimation(Character.BlockAnimation);
+        }
+        else if (PerformedHit)
+        {
+            Character.PerformAnimation(Character.AttackAnimation);
+        }
+
+        if (Character.CurrentHealth <= 0)
+        {
+            Character.PerformAnimation(Character.FallAnimation);
+            Reset();
+
+            if (Character is Player player)
+            {
+                DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+                {
+                    RemainingTicks = 4,
+                    Task = () => { player.Respawn(); }
+                });
+            }
+
+            if (Character is NPC npc)
+            {
+                DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+                {
+                    RemainingTicks = 4,
+                    Task = () => { npc.Respawn(); }
+                });
+            }
+        }
+    }
+    
     public void Reset()
     {
         if (Target != null)

@@ -85,7 +85,7 @@ public class Player : Character
         PacketSender = new PacketSender(this);
         MovementHandler = new MovementHandler(this);
         
-        Location = new Location(3200, 3930);
+        Location = new Location(3200, 3930); ////3293, 3174 3200, 3930
         Location.Player = this;
         IsUpdateRequired = true;
     }

@@ -134,10 +134,10 @@ public static class NPCUpdater
         // //     mask |= NPCUpdateFlags.Animation;
         // // }
         // //
-        // // if (npc.Flags.HasFlag(NPCUpdateFlags.Graphics))
-        // // {
-        // //     mask |= NPCUpdateFlags.Graphics;
-        // // }
+        // //if (npc.Flags.HasFlag(NPCUpdateFlags.Graphics))
+        // //{
+        // //    mask |= NPCUpdateFlags.Graphics;
+        // //}
         // //
         // // if (npc.Flags.HasFlag(NPCUpdateFlags.SingleHit))
         // // {
@@ -163,11 +163,11 @@ public static class NPCUpdater
         }
 
         //
-        // // if ((mask & NPCUpdateFlags.Graphics) != 0)
-        // // {
-        // //     updateBlock.WriteWordBigEndian(npc.GraphicsId);
-        // //     updateBlock.WriteDWord(4);
-        // // }
+        if ((mask & NPCUpdateFlags.Graphics) != 0)
+        {
+            updateBlock.WriteWordBigEndian(npc.GraphicsId);
+            updateBlock.WriteDWord(4);
+        }
         // //
         if ((mask & NPCUpdateFlags.SingleHit) != 0)
         {

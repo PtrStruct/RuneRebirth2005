@@ -554,7 +554,6 @@ public class Region
         return (GetClipping(x - 1, y - 1, z) & 0x128010e) != 0;
     }
 
-
     public static bool ProjectileBlockedNorth(int x, int y, int z)
     {
         return (GetProjectileClipping(x, y + 1, z) & 0x1280120) != 0;

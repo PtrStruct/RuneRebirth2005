@@ -1,4 +1,5 @@
 ﻿using RuneRebirth2005.Entities;
+using RuneRebirth2005.Fighting;
 using RuneRebirth2005.NPCManagement;
 using RuneRebirth2005.PlayerManagement;
 using Serilog;
@@ -50,6 +51,7 @@ public class PlayerCommandPacket : IPacket
                 {
                     _player.PacketSender.SendMessage($"No NPC with index {npcIndex}");
                 }
+
                 break;
 
             case "npcfollow":
@@ -74,6 +76,88 @@ public class PlayerCommandPacket : IPacket
                 _player.IsUpdateRequired = true;
                 _player.Flags |= PlayerUpdateFlags.Appearance;
                 break;
+
+            case "cast":
+                var gfx = int.Parse(_commandArgs[1]);
+                npcIndex = int.Parse(_commandArgs[2]);
+                npc = Server.NPCs[npcIndex];
+
+                // _player.Flags |= PlayerUpdateFlags.Graphics;
+                // npc.GraphicsId = 220;
+
+                /* Origin */
+
+                int pX = _player.Location.X;
+                int pY = _player.Location.Y;
+
+                int nX = npc.Location.X;
+                int nY = npc.Location.Y;
+
+                int offX = (pY - nY);
+                int offY = (pX - nX);
+
+                _player.SetInteractionEntity(npc);
+                _player.PerformAnimation(711);
+                _player.PacketSender.CreateProjectile(pX, pY, offX, offY, 50, 78, 91, 43, 31, (npc.Index + 1), 50);
+
+                DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+                {
+                    RemainingTicks = 3,
+                    Task = () =>
+                    {
+                        npc.Combat.HitQueue.AddHit(new CombatHit
+                        {
+                            Attacker = _player,
+                            Damage = 1,
+                            Target = npc,
+                            HitType = 1
+                        });
+                    }
+                });
+
+                break;
+
+            case "npccast":
+                gfx = int.Parse(_commandArgs[1]);
+                npcIndex = int.Parse(_commandArgs[2]);
+                npc = Server.NPCs[npcIndex];
+
+                // _player.Flags |= PlayerUpdateFlags.Graphics;
+                // npc.GraphicsId = 220;
+
+                /* Origin */
+
+                pX = _player.Location.X;
+                pY = _player.Location.Y;
+
+                nX = npc.Location.X;
+                nY = npc.Location.Y;
+
+                offX = (pY - nY);
+                offY = (pX - nX);
+
+                npc.SetInteractionEntity(npc);
+                npc.PerformAnimation(711);
+                _player.PacketSender.CreateProjectile(nX, nY, offX, offY, 50, 78, 91, 43, 31, (_player.Index - 1), 50);
+
+                DelayedTaskHandler.RegisterTask(new DelayedAttackTask
+                {
+                    RemainingTicks = 3,
+                    Task = () =>
+                    {
+                        _player.Combat.HitQueue.AddHit(new CombatHit
+                        {
+                            Attacker = npc,
+                            Damage = 1,
+                            Target = _player,
+                            HitType = 1
+                        });
+                    }
+                });
+
+                break;
+
+
             case "level":
                 var skillId = int.Parse(_commandArgs[1]);
                 var level = int.Parse(_commandArgs[2]);
@@ -88,6 +172,7 @@ public class PlayerCommandPacket : IPacket
                 {
                     // new SendPlayerMessagePacket(_player).Add("Invalid skill ID provided");
                 }
+
                 break;
 
             case "equip":

@@ -40,6 +40,7 @@ public class NPC : Character
     public override CombatHit PrimaryDamage { get; set; }
     public override CombatHit SecondaryDamage { get; set; }
     public NPCDumbPathFinder DumbPathFinder { get; set; }
+    public int GraphicsId { get; set; }
 
     public void Process()
     {

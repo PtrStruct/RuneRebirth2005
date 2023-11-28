@@ -39,6 +39,30 @@ public class PacketSender
         _player.PlayerSession.Writer.WriteWordA(_interfaceId);
         _player.PlayerSession.Writer.EndFrameVarSizeWord();
     }
+    
+    public void CreateProjectile(int x, int y, int offX, int offY, int angle, int speed, int gfxMoving, int startHeight, int endHeight, int lockon, int time)
+    {
+        if(_player.PlayerSession.Writer != null && _player != null) 
+        {
+            /* Update Player Location */
+            _player.PlayerSession.Writer.CreateFrame(ServerOpCodes.PLAYER_LOCATION);
+            _player.PlayerSession.Writer.WriteByteC((y - (_player.Location.OffsetChunkY * 8)) - 2);
+            _player.PlayerSession.Writer.WriteByteC((x - (_player.Location.OffsetChunkX * 8)) - 3);
+            
+            _player.PlayerSession.Writer.CreateFrame(ServerOpCodes.PROJECTILE);
+            _player.PlayerSession.Writer.WriteByte(angle);
+            _player.PlayerSession.Writer.WriteByte(offY);
+            _player.PlayerSession.Writer.WriteByte(offX);
+            _player.PlayerSession.Writer.WriteWord(lockon);
+            _player.PlayerSession.Writer.WriteWord(gfxMoving);
+            _player.PlayerSession.Writer.WriteByte(startHeight);
+            _player.PlayerSession.Writer.WriteByte(endHeight);
+            _player.PlayerSession.Writer.WriteWord(time);
+            _player.PlayerSession.Writer.WriteWord(speed);
+            _player.PlayerSession.Writer.WriteByte(16);
+            _player.PlayerSession.Writer.WriteByte(64);
+        }
+    }
 
     public void UpdateSlot(EquipmentSlot slot, int itemId, int amount)
     {
