@@ -1,4 +1,6 @@
-﻿using CacheReader.World;
+﻿using System.Text.Json;
+using CacheReader.World;
+using Newtonsoft.Json;
 using RuneRebirth2005;
 using RuneRebirth2005.Data;
 using RuneRebirth2005.Data.Items;
@@ -9,6 +11,7 @@ using Scape05.Data.ObjectsDef;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.SystemConsole.Themes;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
@@ -48,6 +51,25 @@ try
 
     NPCManager.Load();
 
+    var npclist = new List<NpcData>();
+    foreach (var npcDefinition in NpcDefinitionDecoder.NpcDefinitions)
+    {
+        var def = npcDefinition.Value;
+
+        var npcData = new NpcData
+        {
+            ModelId = def.Id,
+            Name = def.Name,
+            Description = def.Description,
+            CombatLevel = def.CombatLevel
+        };
+        npclist.Add(npcData);
+    }
+
+    var json = JsonSerializer.Serialize(npclist, new JsonSerializerOptions {WriteIndented = true});
+    File.WriteAllText("npcdata.json", json);
+
+    
     ServerEngine serverEngine = new ServerEngine();
     serverEngine.Run();
 }
@@ -58,4 +80,12 @@ catch (Exception ex)
 finally
 {
     Log.CloseAndFlush();
+}
+
+class NpcData
+{
+    public int ModelId { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public int CombatLevel { get; set; }
 }

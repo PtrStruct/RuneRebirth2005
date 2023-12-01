@@ -26,11 +26,6 @@ public interface IEntity
 
 public abstract class Character : IEntity
 {
-    public Character()
-    {
-        Combat = new Combat(this);
-    }
-
     public abstract int Index { get; set; }
     public abstract IEntity InteractingEntity { get; set; }
     public abstract Face Face { get; set; }
@@ -44,7 +39,7 @@ public abstract class Character : IEntity
     public abstract int FallAnimation { get; set; }
     public abstract CombatHit PrimaryDamage { get; set; }
     public abstract CombatHit SecondaryDamage { get; set; }
-    public abstract Combat Combat { get; set; }
+    public abstract CombatBase Combat { get; set; }
     public abstract int AttackSpeed { get; set; }
     public abstract MovementHandler MovementHandler { get; set; } 
 

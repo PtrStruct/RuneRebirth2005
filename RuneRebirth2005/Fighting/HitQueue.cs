@@ -5,20 +5,27 @@ namespace RuneRebirth2005.Fighting;
 
 public class HitQueue
 {
-    private List<CombatHit> _pendingHits = new List<CombatHit>();
+    List<CombatHit> PerformedHits { get; } = new();
+    List<CombatHit> ReceivedHits { get; } = new();
 
-    public void Process(Character character)
+    public void AddHit(CombatHit hit, bool isPerformed)
     {
-        if (character.CurrentHealth <= 0)
+        if (isPerformed)
         {
-            _pendingHits.Clear();
-            return;
+            PerformedHits.Add(hit);
         }
-
-        /* Extract this to another function */
-        for (int i = 0; i < _pendingHits.Count; i++)
+        else
         {
-            var combatHit = _pendingHits[i];
+            ReceivedHits.Add(hit);
+        }
+    }
+
+    private void ProcessPerformedHits(Character character)
+    {
+        // Insert logic for processing performed hits...
+        for (int i = 0; i < PerformedHits.Count; i++)
+        {
+            var combatHit = PerformedHits[i];
             Character attacker = combatHit.Attacker;
             Character target = combatHit.Target;
 
@@ -32,21 +39,31 @@ public class HitQueue
                 });
             }
 
-            
-            target.Combat.HitQueue.AddHit(combatHit);
+            target.Combat.HitQueue.AddHit(combatHit, false);
 
             /* Set Under Attack */
             target.Combat.Attacker = attacker;
 
-            _pendingHits.Remove(combatHit);
+            PerformedHits.Remove(combatHit);
         }
 
-        if (_pendingHits.Count > 0)
+        PerformedHits.Clear();
+    }
+
+    private void ProcessReceivedHits(Character character)
+    {
+        if (character.CurrentHealth <= 0)
         {
-            var hit = _pendingHits.First();
+            ReceivedHits.Clear();
+            return;
+        }
+
+        if (ReceivedHits.Count > 0)
+        {
+            var hit = ReceivedHits.First();
             hit.Target.PrimaryDamage = hit;
             hit.Target.CurrentHealth -= hit.Damage;
-            
+
             if (hit.Target is Player player)
             {
                 player.Flags |= PlayerUpdateFlags.SingleHit;
@@ -57,13 +74,16 @@ public class HitQueue
             }
 
             hit.Target.IsUpdateRequired = true;
-            _pendingHits.Remove(hit);
+            ReceivedHits.Remove(hit);
         }
+
+        ReceivedHits.Clear();
     }
 
-    public void AddHit(CombatHit hit)
+    public void Process(Character character)
     {
-        _pendingHits.Add(hit);
+        ProcessPerformedHits(character);
+        ProcessReceivedHits(character);
     }
 }
 

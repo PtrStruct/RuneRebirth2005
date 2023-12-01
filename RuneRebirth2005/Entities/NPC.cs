@@ -32,7 +32,7 @@ public class NPC : Character
     public override bool IsUpdateRequired { get; set; }
 
     // combat and actions
-    public override Combat Combat { get; set; }
+    public override CombatBase Combat { get; set; }
     public override int FallAnimation { get; set; }
     public override int BlockAnimation { get; set; }
     public override int CurrentAnimation { get; set; }
@@ -41,6 +41,11 @@ public class NPC : Character
     public override CombatHit SecondaryDamage { get; set; }
     public NPCDumbPathFinder DumbPathFinder { get; set; }
     public int GraphicsId { get; set; }
+    
+    public NPC()
+    {
+        Combat = new NPCCombat(this);
+    }
 
     public void Process()
     {

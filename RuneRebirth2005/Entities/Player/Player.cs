@@ -51,7 +51,7 @@ public class Player : Character
     public bool PlacementOrTeleport { get; set; }
 
     // Animation and combat
-    public override Combat Combat { get; set; }
+    public override CombatBase Combat { get; set; }
     public override int AttackSpeed { get; set; } = 5;
     public override void SetInteractionEntity(IEntity entity)
     {
@@ -84,6 +84,7 @@ public class Player : Character
         LoginHandler = new LoginHandler(this);
         PacketSender = new PacketSender(this);
         MovementHandler = new MovementHandler(this);
+        Combat = new PlayerCombat(this);
         
         Location = new Location(3200, 3930); ////3293, 3174 3200, 3930
         Location.Player = this;

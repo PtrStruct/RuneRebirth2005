@@ -1,5 +1,6 @@
 ﻿using RuneRebirth2005.Entities;
 using RuneRebirth2005.Fighting;
+using RuneRebirth2005.Helpers;
 using RuneRebirth2005.NPCManagement;
 using RuneRebirth2005.PlayerManagement;
 using Serilog;
@@ -111,7 +112,7 @@ public class PlayerCommandPacket : IPacket
                             Damage = 1,
                             Target = npc,
                             HitType = 1
-                        });
+                        }, true);
                     }
                 });
 
@@ -122,11 +123,13 @@ public class PlayerCommandPacket : IPacket
                 npcIndex = int.Parse(_commandArgs[2]);
                 npc = Server.NPCs[npcIndex];
 
+                var b = NpcHelper.npcs.FirstOrDefault(x => x.Value.Id == npc.ModelId).Value.ProjectileId;
+
                 // _player.Flags |= PlayerUpdateFlags.Graphics;
                 // npc.GraphicsId = 220;
 
                 /* Origin */
-
+                //91
                 pX = _player.Location.X;
                 pY = _player.Location.Y;
 
@@ -138,7 +141,7 @@ public class PlayerCommandPacket : IPacket
 
                 npc.SetInteractionEntity(npc);
                 npc.PerformAnimation(711);
-                _player.PacketSender.CreateProjectile(nX, nY, offX, offY, 50, 78, 91, 43, 31, (_player.Index - 1), 50);
+                _player.PacketSender.CreateProjectile(nX, nY, offX, offY, 50, 78, b, 43, 31, (_player.Index - 1), 50);
 
                 DelayedTaskHandler.RegisterTask(new DelayedAttackTask
                 {
@@ -151,7 +154,7 @@ public class PlayerCommandPacket : IPacket
                             Damage = 1,
                             Target = _player,
                             HitType = 1
-                        });
+                        }, true);
                     }
                 });
 
