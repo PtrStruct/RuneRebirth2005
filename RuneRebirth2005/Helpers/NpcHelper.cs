@@ -63,7 +63,7 @@ public class NpcHelper
         { 5362, new NpcCombat { Id = 5362, AttackType = 3, ProjectileId = 393, EndGfx = 430 } },
         { 1590, new NpcCombat { Id = 1590, AttackType = 3, ProjectileId = 393, EndGfx = 430 } },
         { 1591, new NpcCombat { Id = 1591, AttackType = 3, ProjectileId = 393, EndGfx = 430 } },
-        { 1592, new NpcCombat { Id = 1592, AttackType = 3, ProjectileId = 393, EndGfx = 430 } },
+        { 1592, new NpcCombat { Id = 1592, AttackType = 3, ProjectileId = 393, EndGfx = 430 } }
     };
 }
 
@@ -73,4 +73,27 @@ public class NpcCombat
     public int ProjectileId { get; set; }
     public int AttackType { get; set; }
     public int EndGfx { get; set; }
+    public int AttackDistance
+    {
+        get
+        {
+            int distanceNeeded = 1;
+            switch (AttackType)
+            {
+                case 1:
+                    distanceNeeded += 7;
+                    break;
+                case 2:
+                    distanceNeeded += 9;
+                    break;
+                default:
+                    if (AttackType > 2)
+                    {
+                        distanceNeeded += 4;
+                    }
+                    break;
+            }
+            return distanceNeeded;
+        }
+    }
 }

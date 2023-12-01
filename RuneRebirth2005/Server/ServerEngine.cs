@@ -87,9 +87,7 @@ public class ServerEngine
             player.MovementHandler.Process();
         }
 
-         
-
-
+        
         /* Combat, calculate damage to perform etc */
         for (int i = 0; i < Server.Players.Length; i++)
         {
