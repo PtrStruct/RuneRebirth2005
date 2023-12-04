@@ -58,6 +58,7 @@ public static class BufferUtil
         ms.Seek(count, SeekOrigin.Current);
     }
 
+    
     public static int GetUByte(this MemoryStream stream)
     {
         return stream.ReadByte() & 0xFF;

@@ -24,6 +24,8 @@ public class NpcHelper
         { 2881, new NpcCombat { Id = 2881, AttackType = 1, ProjectileId = 298 } },
         { 2028, new NpcCombat { Id = 2028, AttackType = 1, ProjectileId = 27 } },
         { 3762, new NpcCombat { Id = 3762, AttackType = 1 } },
+        { 27, new NpcCombat { Id = 27, AttackType = 1, ProjectileId = 18 } },
+        { 168, new NpcCombat { Id = 168, AttackType = 1, ProjectileId = 10 } },
 
         // NPCs with AttackType = 2
         { 2591, new NpcCombat { Id = 2591, AttackType = 2 } },
@@ -38,6 +40,7 @@ public class NpcHelper
         { 2882, new NpcCombat { Id = 2882, AttackType = 2, ProjectileId = 162, EndGfx = 477 } },
         { 2463, new NpcCombat { Id = 2463, AttackType = 2 } },
         { 3752, new NpcCombat { Id = 3752, AttackType = 2 } },
+
 
         // NPCs with AttackType = 2 and partial examples
         { 2025, new NpcCombat { Id = 2025, AttackType = 2, ProjectileId = 162, EndGfx = 163 } }, // Partial example
@@ -73,6 +76,7 @@ public class NpcCombat
     public int ProjectileId { get; set; }
     public int AttackType { get; set; }
     public int EndGfx { get; set; }
+
     public int AttackDistance
     {
         get
@@ -91,8 +95,10 @@ public class NpcCombat
                     {
                         distanceNeeded += 4;
                     }
+
                     break;
             }
+
             return distanceNeeded;
         }
     }

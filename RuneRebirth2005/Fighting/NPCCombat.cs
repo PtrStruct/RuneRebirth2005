@@ -43,8 +43,15 @@ public class NPCCombat : CombatBase
     private bool CanReach(Character attacker, Character target)
     {
         var npc = Character as NPC;
-        NpcHelper.npcs.TryGetValue(npc.ModelId, out var data);
-        return attacker.Location.IsWithinDistance(target.Location, data.AttackDistance);
+        var foundData = NpcHelper.npcs.TryGetValue(npc.ModelId, out var data);
+        if (foundData)
+        {
+            return attacker.Location.IsWithinDistance(target.Location, data.AttackDistance);
+        }
+        else
+        {
+            return attacker.Location.IsWithinDistance(target.Location, 1);
+        }
     }
 
     public override void PerformAnimation()
@@ -61,6 +68,7 @@ public class NPCCombat : CombatBase
         else if (PerformedHit)
         {
             Character.PerformAnimation(Character.AttackAnimation);
+
             if (Target is Player player)
             {
                 var pX = player.Location.X;
@@ -69,14 +77,26 @@ public class NPCCombat : CombatBase
                 var nX = Character.Location.X;
                 var nY = Character.Location.Y;
 
-                var offX = (pY - nY) * -1;
-                var offY = (pX - nX) * -1;
+                var offX = (nY - pY) * -1;
+                var offY = (nX - pX) * -1;
+
 
                 var npc = Character as NPC;
 
-                NpcHelper.npcs.TryGetValue(npc.ModelId, out var data);
-                
-                player.PacketSender.CreateProjectile(nX, nY, offX, offY, 50, 85, data.ProjectileId, 43, 31, (-player.Index) -1, 65);
+                var caster = NpcHelper.npcs.TryGetValue(npc.ModelId, out var data);
+                if (caster)
+                {
+                    if (data.AttackType == 1) /* Ranged */
+                    {
+                        player.PacketSender.CreateProjectile(nX, nY, offX, offY, 50, 85, 10,
+                            43, 31, -(player.Index) - 1, 65);
+                    }
+                    else if (data.AttackType == 2) /* Magic */
+                    {
+                        player.PacketSender.CreateProjectile(nX, nY, offX, offY, 50, 100, data.ProjectileId, 43, 31,
+                            (-player.Index) - 1, 65);
+                    }
+                }
             }
         }
 

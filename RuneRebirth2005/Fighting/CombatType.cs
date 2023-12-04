@@ -3,6 +3,7 @@
 public enum CombatType
 {
     Melee,
-    Caster,
-    Hybrid
+    RANGE,
+    MAGE,
+    DRAGONFIRE
 }
