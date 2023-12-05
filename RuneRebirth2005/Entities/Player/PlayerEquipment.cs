@@ -32,8 +32,7 @@ public class PlayerEquipment
 
     public bool EquipItem(int itemID, int amount = 1)
     {
-        if (GameConstants.IsItemInArray(itemID, GameConstants.BOWS) ||
-            GameConstants.IsItemInArray(itemID, GameConstants.OTHER_RANGE_WEAPONS))
+        if (GameConstants.IsItemInArray(itemID, GameConstants.BOWS) || GameConstants.IsItemInArray(itemID, GameConstants.OTHER_RANGE_WEAPONS))
         {
             SetItem(EquipmentSlot.Weapon, new EquipmentItem { ItemId = itemID, Quantity = amount });
         }
@@ -79,8 +78,9 @@ public class PlayerEquipment
         }
         else
         {
-            Log.Warning($"Matching item type not found for item id: {itemID}.");
-            return false;
+            SetItem(EquipmentSlot.Weapon, new EquipmentItem { ItemId = itemID, Quantity = amount });
+            // Log.Warning($"Matching item type not found for item id: {itemID}.");
+            // return false;
         }
 
         return true;
@@ -97,6 +97,60 @@ public class PlayerEquipment
             Log.Warning($"Slot does not exist: {slot}.");
         }
     }
+    
+    public EquipmentSlot GetEquipmentSlotByItemId(int itemID)
+    {
+        if (GameConstants.IsItemInArray(itemID, GameConstants.BOWS) || GameConstants.IsItemInArray(itemID, GameConstants.OTHER_RANGE_WEAPONS))
+        {
+            return EquipmentSlot.Weapon;
+        }
+        else if (GameConstants.IsItemInArray(itemID, GameConstants.ARROWS))
+        {
+            return EquipmentSlot.Ammo;
+        }
+        else if (GameConstants.IsItemInArray(itemID, GameConstants.capes))
+        {
+            return EquipmentSlot.Cape;
+        }
+        else if (GameConstants.IsItemInArray(itemID, GameConstants.boots))
+        {
+            return EquipmentSlot.Boots;
+        }
+        else if (GameConstants.IsItemInArray(itemID, GameConstants.gloves))
+        {
+            return EquipmentSlot.Gloves;
+        }
+        else if (GameConstants.IsItemInArray(itemID, GameConstants.shields))
+        {
+            return EquipmentSlot.Shield;
+        }
+        else if (GameConstants.IsItemInArray(itemID, GameConstants.hats))
+        {
+            return EquipmentSlot.Helmet;
+        }
+        else if (GameConstants.IsItemInArray(itemID, GameConstants.amulets))
+        {
+            return EquipmentSlot.Amulet;
+        }
+        else if (GameConstants.IsItemInArray(itemID, GameConstants.rings))
+        {
+            return EquipmentSlot.Ring;
+        }
+        else if (GameConstants.IsItemInArray(itemID, GameConstants.body))
+        {
+            return EquipmentSlot.Chest;
+        }
+        else if (GameConstants.IsItemInArray(itemID, GameConstants.legs))
+        {
+            return EquipmentSlot.Legs;
+        }
+        else
+        {
+            // Default to Weapon if no match
+            return EquipmentSlot.Weapon;
+        }
+    }
+    
 }
 
 public class EquipmentItem

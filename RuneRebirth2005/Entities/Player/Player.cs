@@ -22,6 +22,7 @@ public class Player : Character
     public int TotalLevel { get; set; }
     public bool IsInventoryUpdate { get; set; }
     public bool IsAppearanceUpdate { get; set; }
+    public PlayerInventory PlayerInventory { get; set; } = new();
     public PlayerUpdateFlags Flags { get; set; }
     public override MovementHandler MovementHandler { get; set; }
     public bool Running { get; set; }

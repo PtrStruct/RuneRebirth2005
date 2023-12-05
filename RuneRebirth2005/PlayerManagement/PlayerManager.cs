@@ -74,6 +74,16 @@ public static class PlayerManager
         player.PacketSender.SendSidebarInterface(12, 147);
         player.PacketSender.SendSidebarInterface(13, 6299);
 
+        player.PlayerInventory.AddItem(1277);
+        player.PlayerInventory.AddItem(851);
+
+        for (int i = 0; i < player.PlayerInventory.Inventory.Length; i++)
+        {
+            var item = player.PlayerInventory.Inventory[i];
+            player.PacketSender.UpdateSlot(i, item.ItemId, item.Amount, GameInterfaces.DefaultInventory);
+        }
+
+
         player.IsUpdateRequired = true;
         player.PlacementOrTeleport = true;
         player.Flags |= PlayerUpdateFlags.Appearance;

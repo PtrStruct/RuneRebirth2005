@@ -64,11 +64,11 @@ public class PacketSender
         }
     }
 
-    public void UpdateSlot(EquipmentSlot slot, int itemId, int amount)
+    public void UpdateSlot(int slot, int itemId, int amount, int frameId)
     {
         _player.PlayerSession.Writer.CreateFrameVarSizeWord(ServerOpCodes.ITEM_SLOT_SET);
-        _player.PlayerSession.Writer.WriteWord(1688);
-        _player.PlayerSession.Writer.WriteByte((int)slot);
+        _player.PlayerSession.Writer.WriteWord(frameId);
+        _player.PlayerSession.Writer.WriteByte(slot);
         _player.PlayerSession.Writer.WriteWord(itemId + 1);
         if (amount > 254)
         {
@@ -81,6 +81,7 @@ public class PacketSender
         }
         _player.PlayerSession.Writer.EndFrameVarSizeWord();
     }
+    
 
     public void SendSidebarInterface(int _tabId, int _displayId)
     {

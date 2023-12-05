@@ -18,6 +18,10 @@ public static class PacketFactory
                 return new PlayerCommandPacket(parameters);
             case 72:
                 return new AttackNPCPacket(parameters);
+            case 41:
+                return new EquipItemPacket(parameters);
+            case 214:
+                return new MoveInventoryItemPacket(parameters);
             default:
                 Log.Error($"No packet class implementation for opcode {opcode}.");
                 break;
