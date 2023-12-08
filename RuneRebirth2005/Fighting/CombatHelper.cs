@@ -11,21 +11,21 @@ public class CombatHelper
         if (attacker.CurrentHealth <= 0 || target.CurrentHealth <= 0)
         {
             attacker.Combat.Reset();
-            
+
             return false;
         }
-        
+
         /* Only do this check if we're not in multi */
         if (IsAttacked(attacker) && attacker.Combat.Attacker != target)
         {
             if (attacker is Player player)
             {
                 player.PacketSender.SendMessage("You are already under attack!");
+                return false;
             }
 
             /* Reset combat */
             attacker.Combat.Reset();
-            return false;
         }
 
         if (IsAttacked(target) && target.Combat.Attacker != attacker)
@@ -33,11 +33,11 @@ public class CombatHelper
             if (attacker is Player player)
             {
                 player.PacketSender.SendMessage("They are already under attack!");
+                return false;
             }
 
             /* Reset combat */
             attacker.Combat.Reset();
-            return false;
         }
 
         return true;

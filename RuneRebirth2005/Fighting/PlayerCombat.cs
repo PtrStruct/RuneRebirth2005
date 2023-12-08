@@ -60,7 +60,7 @@ public class PlayerCombat : CombatBase
         }
         else if (PerformedHit)
         {
-            Character.PerformAnimation(Character.AttackAnimation);
+            Character.PerformAnimation(GetWepAnim(_character.Equipment.GetItem(EquipmentSlot.Weapon).Name));
         }
 
         if (Character.CurrentHealth <= 0)
@@ -74,6 +74,101 @@ public class PlayerCombat : CombatBase
                 RemainingTicks = 4,
                 Task = () => { player.Respawn(); }
             });
+        }
+    }
+
+    public int GetWepAnim(string weaponName)
+    {
+        // if (playerEquipment[playerWeapon] <= 0)
+        // {
+        //     switch (fightMode)
+        //     {
+        //         case 0:
+        //             return 422;
+        //         case 2:
+        //             return 423;
+        //         case 1:
+        //             return 451;
+        //         default:
+        //             throw new ArgumentOutOfRangeException();
+        //     }
+        // }
+
+        // if (weaponName.Contains("knife")
+        //     || weaponName.Contains("dart")
+        //     || weaponName.Contains("javelin")
+        //     || weaponName.Contains("thrownaxe"))
+        // {
+        //     return 806;
+        // }
+        //
+        // if (weaponName.Contains("halberd"))
+        // {
+        //     return 440;
+        // }
+        //
+        // if (weaponName.StartsWith("dragon dagger"))
+        // {
+        //     return 402;
+        // }
+        //
+        // if (weaponName.EndsWith("dagger"))
+        // {
+        //     return 412;
+        // }
+        //
+        // if (weaponName.Contains("2h sword")
+        //     || weaponName.Contains("godsword")
+        //     || weaponName.Contains("aradomin sword"))
+        // {
+        //     return 4307;
+        // }
+        //
+        if (weaponName.Contains("sword"))
+        {
+            return 451;
+        }
+
+        //
+        // if (weaponName.Contains("karil"))
+        // {
+        //     return 2075;
+        // }
+        //
+        if (weaponName.Contains("bow") && !weaponName.Contains("'bow"))
+        {
+            return 426;
+        }
+
+        if (weaponName.Contains("'bow"))
+        {
+            return 4230;
+        }
+
+        switch (_character.Equipment.GetItem(EquipmentSlot.Weapon).ItemId)
+        {
+            case 6522:
+                return 2614;
+            case 4153:
+                return 1665;
+            case 4726:
+                return 2080;
+            case 4747:
+                return 814;
+            case 4718:
+                return 2067;
+            case 4710:
+                return 406;
+            case 4755:
+                return 2062;
+            case 4734:
+                return 2075;
+            case 4151:
+                return 1658;
+            case 6528:
+                return 2661;
+            default:
+                return 451;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using RuneRebirth2005.Entities;
+﻿using RuneRebirth2005.Data.Items;
+using RuneRebirth2005.Entities;
 using RuneRebirth2005.Fighting;
 using RuneRebirth2005.Helpers;
 using RuneRebirth2005.NPCManagement;
@@ -180,7 +181,8 @@ public class PlayerCommandPacket : IPacket
 
             case "equip":
                 var itemId = int.Parse(_commandArgs[1]);
-                _player.Equipment.EquipItem(itemId);
+                var def = ItemDefinition.Lookup(itemId);
+                _player.Equipment.EquipItem(itemId,def.Name);
                 _player.IsUpdateRequired = true;
                 BonusManager.RefreshBonus(_player);
                 _player.SavePlayer();

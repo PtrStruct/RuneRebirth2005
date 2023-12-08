@@ -1,4 +1,5 @@
-﻿using RuneRebirth2005.Entities;
+﻿using RuneRebirth2005.Data.Items;
+using RuneRebirth2005.Entities;
 
 namespace RuneRebirth2005.Network.Incoming;
 
@@ -44,7 +45,8 @@ public class EquipItemPacket : IPacket
         }
 
         /* Equip */
-        _player.Equipment.EquipItem(clickedItem.ItemId, clickedItem.Amount);
+        var definition = ItemDefinition.Lookup(clickedItem.ItemId);
+        _player.Equipment.EquipItem(clickedItem.ItemId, definition.Name, clickedItem.Amount);
 
         
         /* Replace */
