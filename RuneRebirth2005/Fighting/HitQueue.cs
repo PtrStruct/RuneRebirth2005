@@ -22,7 +22,6 @@ public class HitQueue
 
     private void ProcessPerformedHits(Character character)
     {
-        // Insert logic for processing performed hits...
         for (int i = 0; i < PerformedHits.Count; i++)
         {
             var combatHit = PerformedHits[i];

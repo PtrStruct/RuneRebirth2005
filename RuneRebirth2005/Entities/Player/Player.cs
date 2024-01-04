@@ -87,7 +87,7 @@ public class Player : Character
         MovementHandler = new MovementHandler(this);
         Combat = new PlayerCombat(this);
         
-        Location = new Location(3200, 3930); ////3293, 3174 3200, 3930
+        Location = new Location(3239, 3218); ////3293, 3174 3200, 3930, 3200, 3930
         Location.Player = this;
         IsUpdateRequired = true;
     }

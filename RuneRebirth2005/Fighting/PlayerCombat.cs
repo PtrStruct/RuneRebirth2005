@@ -1,4 +1,5 @@
 ﻿using RuneRebirth2005.Entities;
+using RuneRebirth2005.World;
 
 namespace RuneRebirth2005.Fighting;
 
@@ -41,6 +42,7 @@ public class PlayerCombat : CombatBase
 
     private bool CanReach(Character attacker, Character target)
     {
+        
         return attacker.Location.IsWithinDistance(target.Location, 1);
     }
 

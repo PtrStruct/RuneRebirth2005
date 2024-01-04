@@ -33,6 +33,7 @@ public class NPCCombat : CombatBase
                             Attacker = Character,
                             Target = Target
                         }, true);
+
                         AttackTimer = Character.AttackSpeed;
                     }
                 }
@@ -44,6 +45,7 @@ public class NPCCombat : CombatBase
     {
         var npc = Character as NPC;
         var foundData = NpcHelper.npcs.TryGetValue(npc.ModelId, out var data);
+        
         if (foundData)
         {
             return attacker.Location.IsWithinDistance(target.Location, data.AttackDistance);
@@ -93,7 +95,8 @@ public class NPCCombat : CombatBase
                     }
                     else if (data.AttackType == 2) /* Magic */
                     {
-                        player.PacketSender.CreateProjectile(nX, nY, offX, offY, 50, 100, data.ProjectileId, 43, 31,
+                        player.PacketSender.CreateProjectile(nX, nY, offX, offY, 50, 100, data.ProjectileId, 43,
+                            31,
                             (-player.Index) - 1, 65);
                     }
                 }
@@ -113,5 +116,4 @@ public class NPCCombat : CombatBase
             });
         }
     }
-    
 }
