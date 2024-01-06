@@ -22,6 +22,18 @@ public static  class MovementHelper
         return -1;
     }
     
+    public static int Direction(int srcX, int srcY, int x, int y)
+    {
+        double dx = (double)x - srcX, dy = (double)y - srcY;
+        double angle = Math.Atan(dy / dx);
+        angle = angle * (180.0 / Math.PI);
+        if (double.IsNaN(angle))
+            return -1;
+        if (Math.Sign(dx) < 0)
+            angle += 180.0;
+        return (int)((((90 - angle) / 22.5) + 16) % 16);
+    }
+    
     public static int GetDirection(int srcX, int srcY, int destX, int destY)
     {
         int dx = destX - srcX;

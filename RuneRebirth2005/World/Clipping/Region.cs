@@ -34,7 +34,7 @@ public class Region
     {
         var regionX = x >> 3;
         var regionY = y >> 3;
-        var regionId = ((regionX >> 3) << 8) + (regionY >> 3);
+        var regionId = ((regionX / 8) << 8) + (regionY / 8);
         return regionId;
     }
 
@@ -47,7 +47,7 @@ public class Region
             _clips[height] = new int[64][];
             for (var i = 0; i < 64; i++) _clips[height][i] = new int[64];
         }
-
+        
         _clips[height][x - regionAbsX][y - regionAbsY] |= shift;
     }
 
@@ -99,8 +99,12 @@ public class Region
         if (height > 3) height = 0;
 
         foreach (var r in RegionFactory.GetRegions())
-            if (r.Value.Id == GetRegionId(x, y))
+        {
+            var rId = r.Value.Id;
+            var regionId = GetRegionId(x, y);
+            if (rId == regionId)
                 return r.Value.GetClip(x, y, height);
+        }
 
         return 0;
     }
@@ -451,6 +455,7 @@ public class Region
 
     public static void AddObject(int objectId, int x, int y, int height, int type, int direction, bool startUp)
     {
+        var item = ObjectDefinition.Lookup(objectId);
         if (ObjectDefinition.Lookup(objectId) == null)
         {
         }
@@ -493,12 +498,10 @@ public class Region
         {
             if (ObjectDefinition.Lookup(objectId).IsSolid)
             {
-                AddClippingForVariableObject(x, y, height, type, direction,
-                    ObjectDefinition.Lookup(objectId).IsClipped);
+                AddClippingForVariableObject(x, y, height, type, direction, ObjectDefinition.Lookup(objectId).IsClipped);
 
                 if (ObjectDefinition.Lookup(objectId).IsImpenetrable)
-                    AddProjectileClippingForVariableObject(x, y, height, type, direction,
-                        ObjectDefinition.Lookup(objectId).IsClipped);
+                    AddProjectileClippingForVariableObject(x, y, height, type, direction, ObjectDefinition.Lookup(objectId).IsClipped);
             }
         }
 
@@ -513,12 +516,12 @@ public class Region
         }
     }
 
-    
+
     public static bool Blocked(int x, int y, int z)
     {
         return (GetClipping(x, y, z) & 0x1000000) != 0;
     }
-    
+
     public static bool BlockedNorth(int x, int y, int z)
     {
         return (GetClipping(x, y + 1, z) & 0x1280120) != 0;
@@ -539,16 +542,21 @@ public class Region
         return (GetClipping(x, y - 1, z) & 0x1280102) != 0;
     }
 
-    public static bool BlockedNorthEast(int x, int y, int z) {
+    public static bool BlockedNorthEast(int x, int y, int z)
+    {
         return (GetClipping(x + 1, y + 1, z) & 0x12801e0) != 0;
     }
-    public static bool BlockedNorthWest(int x, int y, int z) {
+
+    public static bool BlockedNorthWest(int x, int y, int z)
+    {
         return (GetClipping(x - 1, y + 1, z) & 0x1280138) != 0;
     }
-    public static bool BlockedSouthEast(int x, int y, int z) {
+
+    public static bool BlockedSouthEast(int x, int y, int z)
+    {
         return (GetClipping(x + 1, y - 1, z) & 0x1280183) != 0;
     }
-    
+
     public static bool BlockedSouthWest(int x, int y, int z)
     {
         return (GetClipping(x - 1, y - 1, z) & 0x128010e) != 0;
@@ -739,8 +747,9 @@ public class Region
                 return false;
         }
     }
-    
-    public static bool canMove(Location start, Location end, int xLength, int yLength) {
+
+    public static bool canMove(Location start, Location end, int xLength, int yLength)
+    {
         return canMove(start.X, start.Y, end.X, end.Y, start.Z, xLength, yLength);
     }
 
@@ -864,6 +873,146 @@ public class Region
         return true;
     }
 
+    /* Correct one */
+    public static bool canProjectileMove(int startX, int startY, int endX, int endY, int height, int xLength,
+        int yLength)
+    {
+        int diffX = endX - startX;
+        int diffY = endY - startY;
+        // height %= 4;
+        int max = Math.Max(Math.Abs(diffX), Math.Abs(diffY));
+        for (int ii = 0; ii < max; ii++)
+        {
+            int currentX = endX - diffX;
+            int currentY = endY - diffY;
+            for (int i = 0; i < xLength; i++)
+            {
+                for (int i2 = 0; i2 < yLength; i2++)
+                {
+                    if (diffX < 0 && diffY < 0)
+                    {
+                        if ((GetClipping(currentX + i - 1, currentY + i2 - 1, height) & (UNLOADED_TILE
+                                | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED | PROJECTILE_EAST_BLOCKED
+                                | PROJECTILE_NORTH_EAST_BLOCKED | PROJECTILE_NORTH_BLOCKED)) != 0
+                            || (GetClipping(currentX + i - 1, currentY + i2, height)
+                                & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
+                                   | PROJECTILE_EAST_BLOCKED)) != 0
+                            || (GetClipping(currentX + i, currentY + i2 - 1, height)
+                                & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
+                                   | PROJECTILE_NORTH_BLOCKED)) != 0)
+                        {
+                            return false;
+                        }
+                    }
+                    else if (diffX > 0 && diffY > 0)
+                    {
+                        if ((GetClipping(currentX + i + 1, currentY + i2 + 1, height) & (UNLOADED_TILE
+                                | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED | PROJECTILE_WEST_BLOCKED
+                                | PROJECTILE_SOUTH_WEST_BLOCKED | PROJECTILE_SOUTH_BLOCKED)) != 0
+                            || (GetClipping(currentX + i + 1, currentY + i2, height)
+                                & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
+                                   | PROJECTILE_WEST_BLOCKED)) != 0
+                            || (GetClipping(currentX + i, currentY + i2 + 1, height)
+                                & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
+                                   | PROJECTILE_SOUTH_BLOCKED)) != 0)
+                        {
+                            return false;
+                        }
+                    }
+                    else if (diffX < 0 && diffY > 0)
+                    {
+                        if ((GetClipping(currentX + i - 1, currentY + i2 + 1, height) & (UNLOADED_TILE
+                                | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED | PROJECTILE_SOUTH_BLOCKED
+                                | PROJECTILE_SOUTH_EAST_BLOCKED | PROJECTILE_EAST_BLOCKED)) != 0
+                            || (GetClipping(currentX + i - 1, currentY + i2, height)
+                                & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
+                                   | PROJECTILE_EAST_BLOCKED)) != 0
+                            || (GetClipping(currentX + i, currentY + i2 + 1, height)
+                                & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
+                                   | PROJECTILE_SOUTH_BLOCKED)) != 0)
+                        {
+                            return false;
+                        }
+                    }
+                    else if (diffX > 0 && diffY < 0)
+                    {
+                        if ((GetClipping(currentX + i + 1, currentY + i2 - 1, height) & (UNLOADED_TILE
+                                | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED | PROJECTILE_WEST_BLOCKED
+                                | PROJECTILE_NORTH_BLOCKED | PROJECTILE_NORTH_WEST_BLOCKED)) != 0
+                            || (GetClipping(currentX + i + 1, currentY + i2, height)
+                                & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
+                                   | PROJECTILE_WEST_BLOCKED)) != 0
+                            || (GetClipping(currentX + i, currentY + i2 - 1, height)
+                                & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
+                                   | PROJECTILE_NORTH_BLOCKED)) != 0)
+                        {
+                            return false;
+                        }
+                    }
+                    else if (diffX > 0 && diffY == 0)
+                    {
+                        if ((GetClipping(currentX + i + 1, currentY + i2, height)
+                             & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
+                                | PROJECTILE_WEST_BLOCKED)) != 0)
+                        {
+                            return false;
+                        }
+                    }
+                    else if (diffX < 0 && diffY == 0)
+                    {
+                        if ((GetClipping(currentX + i - 1, currentY + i2, height)
+                             & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
+                                | PROJECTILE_EAST_BLOCKED)) != 0)
+                        {
+                            return false;
+                        }
+                    }
+                    else if (diffX == 0 && diffY > 0)
+                    {
+                        if ((GetClipping(currentX + i, currentY + i2 + 1, height) & (UNLOADED_TILE
+                                | /*
+                                   * BLOCKED_TILE |
+                                   */UNKNOWN | PROJECTILE_TILE_BLOCKED | PROJECTILE_SOUTH_BLOCKED)) != 0)
+                        {
+                            return false;
+                        }
+                    }
+                    else if (diffX == 0 && diffY < 0)
+                    {
+                        if ((GetClipping(currentX + i, currentY + i2 - 1, height) & (UNLOADED_TILE
+                                | /*
+                                   * BLOCKED_TILE |
+                                   */UNKNOWN | PROJECTILE_TILE_BLOCKED | PROJECTILE_NORTH_BLOCKED)) != 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            if (diffX < 0)
+            {
+                diffX++;
+            }
+            else if (diffX > 0)
+            {
+                diffX--;
+            }
+
+            if (diffY < 0)
+            {
+                diffY++; // change
+            }
+            else if (diffY > 0)
+            {
+                diffY--;
+            }
+        }
+
+        return true;
+    }
+
+
     public static bool canInteract(int dstX, int dstY, int absX, int absY, int curX,
         int curY, int sizeX, int sizeY, int walkToData)
     {
@@ -889,4 +1038,311 @@ public class Region
                || (curY == maxY + 1 && curX >= dstX && curX <= maxX && (clipping & 0x20) == 0
                    && (walkToData & 1) == 0);
     }
+
+    public const int PROJECTILE_NORTH_WEST_BLOCKED = 0x200;
+    public const int PROJECTILE_NORTH_BLOCKED = 0x400;
+    public const int PROJECTILE_NORTH_EAST_BLOCKED = 0x800;
+    public const int PROJECTILE_EAST_BLOCKED = 0x1000;
+    public const int PROJECTILE_SOUTH_EAST_BLOCKED = 0x2000;
+    public const int PROJECTILE_SOUTH_BLOCKED = 0x4000;
+    public const int PROJECTILE_SOUTH_WEST_BLOCKED = 0x8000;
+    public const int PROJECTILE_WEST_BLOCKED = 0x10000;
+    public const int PROJECTILE_TILE_BLOCKED = 0x20000;
+    public const int UNKNOWN = 0x80000;
+    public const int BLOCKED_TILE = 0x200000;
+    public const int UNLOADED_TILE = 0x1000000;
+    public const int OCEAN_TILE = 2097152;
+
+    public static bool BlockedShot(int x, int y, int height, int moveTypeX, int moveTypeY)
+    {
+        try
+        {
+            if (height > 3)
+                height = 0;
+
+            int checkX = (x + moveTypeX);
+            int checkY = (y + moveTypeY);
+
+            if (moveTypeX == -1 && moveTypeY == 0)
+                return ProjectileBlockedWest(x + 1, y, height);
+            else if (moveTypeX == 1 && moveTypeY == 0)
+                return ProjectileBlockedEast(x - 1, y, height);
+            else if (moveTypeX == 0 && moveTypeY == -1)
+                return Region.ProjectileBlockedSouth(x, y + 1, height);
+            else if (moveTypeX == 0 && moveTypeY == 1)
+                return ProjectileBlockedNorth(x, y - 1, height);
+            else if (moveTypeX == -1 && moveTypeY == -1)
+                return BlockedRangeSouthWest(x + 1, y + 1, height);
+            else if (moveTypeX == 1 && moveTypeY == -1)
+                return BlockedRangeSouthEast(x - 1, y + 1, height);
+            else if (moveTypeX == -1 && moveTypeY == 1)
+                return BlockedRangeNorthWest(x + 1, y - 1, height);
+            else if (moveTypeX == 1 && moveTypeY == 1)
+                return BlockedRangeNorthEast(x - 1, y - 1, height);
+            else
+                return false;
+        }
+        catch (Exception)
+        {
+            return true;
+        }
+    }
+
+    public static bool BlockedRangeWest(int x, int y, int z)
+    {
+        int type = Region.GetClipping(x - 1, y, z);
+        bool isSet = (type & 0x0002000) != 0;
+
+        if (isSet)
+        {
+            if (((type - 0x0002000) & 0x1280108) == 0 || 
+                ((type - 0x0002000) & 0x1280108) == 256 || 
+                ((type - 0x0002000) & 0x1280108) == 2 || 
+                ((type - 0x0002000) & 0x1280108) == 32 || 
+                ((type - 0x0002000) & 0x1280108) == 8 || 
+                GetClipping(x - 1, y, z) == 0)
+            {
+                return true;
+            }
+            return false;
+        }
+        else
+        {
+            if ((GetClipping(x - 1, y, z) & 0x1280108) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public static bool BlockedRangeEast(int x, int y, int z)
+    {
+        int type = Region.GetClipping(x + 1, y, z);
+        bool isSet = (type & 0x0002000) != 0;
+
+        if ((type - 0x0002000) == 224)
+            return false;
+
+        if (isSet)
+        {
+            if (((GetClipping(x + 1, y, z) - 0x0002000) & 0x1280180) == 0 || 
+                ((GetClipping(x + 1, y, z) - 0x0002000) & 0x1280180) == 128 ||
+                ((GetClipping(x + 1, y, z) - 0x0002000) & 0x1280180) == 256 || 
+                ((GetClipping(x + 1, y, z) - 0x0002000) & 0x1280180) == 32 ||
+                GetClipping(x + 1, y, z) == 0)
+            {
+                return true;
+            }
+        
+            return false;
+        }
+        else
+        {
+            if ((GetClipping(x + 1, y, z) & 0x1280180) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public static bool BlockedRangeSouth(int x, int y, int z)
+    {
+        int type = Region.GetClipping(x, y - 1, z);
+        bool isSet = (type & 0x0002000) != 0;
+
+        if (isSet)
+        {
+            if ((((type - 0x0002000) & 0x1280102) == 0) ||
+                (((type - 0x0002000) & 0x1280102) == 256) ||
+                (((type - 0x0002000) & 0x1280102) == 2) ||
+                (((type - 0x0002000) & 0x1280102) == 32) ||
+                GetClipping(x, y - 1, z) == 0)
+            {
+                return true;
+            }
+        
+            return false;
+        }
+        else
+        {
+            if ((GetClipping(x, y - 1, z) & 0x1280102) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+    
+    public static bool BlockedRangeNorth(int x, int y, int z)
+    {
+        int clip = GetClipping(x, y + 1, z);
+        string hex = clip.ToString("X");
+        int type = Region.GetClipping(x, y + 1, z);
+
+        bool isSet = (type & 0x0002000) != 0;
+
+        if (isSet)
+        {
+            if (((GetClipping(x, y + 1, z) - 0x0002000) & 0x1280120) == 0 || 
+                ((GetClipping(x, y + 1, z) - 0x0002000) & 0x1280120) == 288 || 
+                ((GetClipping(x, y + 1, z) - 0x0002000) & 0x1280120) == 256 || 
+                ((GetClipping(x, y + 1, z) - 0x0002000) & 0x1280120) == 32 || 
+                GetClipping(x, y + 1, z) == 0)
+            {
+                return true;
+            }
+            return false;
+        }
+        else
+        {
+            if ((GetClipping(x, y + 1, z) & 0x1280120) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+    
+    public static bool BlockedRangeSouthWest(int x, int y, int z)
+    {
+        int type = Region.GetClipping(x - 1, y - 1, z);
+        bool isSet = (type & 0x0002000) != 0;
+
+        if (isSet)
+        {
+            if (((type - 0x0002000) & 0x128010e) == 0 || 
+                ((type - 0x0002000) & 0x128010e) == 8 ||
+                ((type - 0x0002000) & 0x128010e) == 256 || 
+                ((type - 0x0002000) & 0x128010e) == 2 || 
+                ((type - 0x0002000) & 0x128010e) == 32 ||
+                GetClipping(x - 1, y - 1, z) == 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        else
+        {
+            if ((GetClipping(x - 1, y - 1, z) & 0x128010e) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+    
+    public static bool BlockedRangeSouthEast(int x, int y, int z)
+    {
+        int type = Region.GetClipping(x + 1, y - 1, z);
+        bool isSet = (type & 0x0002000) != 0;
+
+        if (isSet)
+        {
+            if (((type - 0x0002000) & 0x1280183) == 0 || 
+                ((type - 0x0002000) & 0x1280183) == 256 || 
+                ((type - 0x0002000) & 0x1280183) == 128 || 
+                ((type - 0x0002000) & 0x1280183) == 2 || 
+                ((type - 0x0002000) & 0x1280183) == 32 || 
+                GetClipping(x + 1, y - 1, z) == 0)
+            {
+                return true;
+            }
+        
+            return false;
+        }
+        else
+        {
+            if ((GetClipping(x + 1, y - 1, z) & 0x1280183) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+    
+    public static bool BlockedRangeNorthWest(int x, int y, int z)
+    {
+        int type = Region.GetClipping(x - 1, y + 1, z);
+        bool isSet = (type & 0x0002000) != 0;
+
+        if (isSet)
+        {
+            if (((type - 0x0002000) & 0x1280138) == 0 || 
+                ((type - 0x0002000) & 0x1280138) == 8 ||
+                ((type - 0x0002000) & 0x1280138) == 256 || 
+                ((type - 0x0002000) & 0x1280138) == 2 || 
+                ((type - 0x0002000) & 0x1280138) == 32 || 
+                GetClipping(x - 1, y + 1, z) == 0)
+            {
+                return true;
+            }
+        
+            return false;
+        }
+        else
+        {
+            if ((GetClipping(x - 1, y + 1, z) & 0x1280138) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+    
+    public static bool BlockedRangeNorthEast(int x, int y, int z)
+    {
+        int type = Region.GetClipping(x + 1, y + 1, z);
+        bool isSet = (type & 0x0002000) != 0;
+
+        if (isSet)
+        {
+            if (((type - 0x0002000) & 0x12801e0) == 0 || 
+                ((type - 0x0002000) & 0x12801e0) == 256 || 
+                ((type - 0x0002000) & 0x12801e0) == 128 || 
+                ((type - 0x0002000) & 0x12801e0) == 2 || 
+                ((type - 0x0002000) & 0x12801e0) == 32 || 
+                GetClipping(x + 1, y + 1, z) == 0)
+            {
+                return true;
+            }
+        
+            return false;
+        }
+        else
+        {
+            if ((GetClipping(x + 1, y + 1, z) & 0x12801e0) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
 }

@@ -82,6 +82,7 @@ public class RegularWalkPacket : IPacket
             /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
             _player.MovementHandler.Finish();
         }
+        
         //
         // Console.WriteLine($"Built {nameof(RegularWalkPacket)}");
     }

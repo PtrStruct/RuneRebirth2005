@@ -9,6 +9,19 @@ namespace RuneRebirth2005.Handlers;
 
 public class MovementHandler
 {
+    private int[] newWalkCmdX = new int[walkingQueueSize];
+    private int[] newWalkCmdY = new int[walkingQueueSize];
+    public int newWalkCmdSteps = 0;
+    private bool newWalkCmdIsRunning = false;
+    protected int[] travelBackX = new int[walkingQueueSize];
+    protected int[] travelBackY = new int[walkingQueueSize];
+    protected int numTravelBackSteps = 0;
+    public const int walkingQueueSize = 50;
+    public int[] walkingQueueX = new int[walkingQueueSize];
+    public int[] walkingQueueY = new int[walkingQueueSize];
+    public int wQueueReadPtr = 0;
+    public int wQueueWritePtr = 0;
+
     public int PrimaryDirection { get; set; } = -1;
     public int SecondaryDirection { get; set; } = -1;
     public bool DiscardMovementQueue { get; set; }
@@ -39,6 +52,134 @@ public class MovementHandler
 
     private bool IsInRange(int entityCoordinate, int targetCoordinate, int entitySize, int targetSize) =>
         entityCoordinate >= targetCoordinate - entitySize && entityCoordinate <= targetCoordinate + targetSize;
+
+    public void PreProcess()
+    {
+        newWalkCmdSteps = 0;
+    }
+
+    public void addToWalkingQueue(int x, int y)
+    {
+        int next = (wQueueWritePtr + 1) % walkingQueueSize;
+        if (next == wQueueWritePtr)
+        {
+            return;
+        }
+
+        walkingQueueX[wQueueWritePtr] = x;
+        walkingQueueY[wQueueWritePtr] = y;
+        wQueueWritePtr = next;
+    }
+
+    public void NewProcess()
+    {
+        if (newWalkCmdSteps > 0)
+        {
+            int firstX = newWalkCmdX[0], firstY = newWalkCmdY[0];
+
+            int lastDir = 0;
+            bool found = false;
+            numTravelBackSteps = 0;
+            int ptr = wQueueReadPtr;
+            int dir = MovementHelper.Direction(_character.Location.X, _character.Location.Y, firstX, firstY);
+            if (dir != -1 && (dir & 1) != 0)
+            {
+                do
+                {
+                    lastDir = dir;
+                    if (--ptr < 0)
+                        ptr = walkingQueueSize - 1;
+
+                    travelBackX[numTravelBackSteps] = walkingQueueX[ptr];
+                    travelBackY[numTravelBackSteps++] = walkingQueueY[ptr];
+                    dir = MovementHelper.Direction(walkingQueueX[ptr],
+                        walkingQueueY[ptr], firstX, firstY);
+                    if (lastDir != dir)
+                    {
+                        found = true;
+                        break;
+                    }
+                } while (ptr != wQueueWritePtr);
+            }
+            else
+                found = true;
+
+            if (!found)
+                Log.Error("Vertex unable to be located.");
+            else
+            {
+                wQueueWritePtr = wQueueReadPtr;
+
+                addToWalkingQueue(_character.Location.X, _character.Location.Y);
+
+                if (dir != -1 && (dir & 1) != 0)
+                {
+                    for (int i = 0; i < numTravelBackSteps - 1; i++)
+                    {
+                        addToWalkingQueue(travelBackX[i], travelBackY[i]);
+                    }
+
+                    int wayPointX2 = travelBackX[numTravelBackSteps - 1],
+                        wayPointY2 = travelBackY[numTravelBackSteps - 1];
+                    int wayPointX1, wayPointY1;
+                    if (numTravelBackSteps == 1)
+                    {
+                        wayPointX1 = _character.Location.X;
+                        wayPointY1 = _character.Location.Y;
+                    }
+                    else
+                    {
+                        wayPointX1 = travelBackX[numTravelBackSteps - 2];
+                        wayPointY1 = travelBackY[numTravelBackSteps - 2];
+                    }
+
+                    dir = MovementHelper.Direction(wayPointX1, wayPointY1, wayPointX2,
+                        wayPointY2);
+                    if (dir == -1 || (dir & 1) != 0)
+                    {
+                        Log.Error("Unable to locate point.");
+                    }
+                    else
+                    {
+                        dir >>= 1;
+                        found = false;
+                        int x = wayPointX1, y = wayPointY1;
+                        while (x != wayPointX2 || y != wayPointY2)
+                        {
+                            x += MovementHelper.DIRECTION_DELTA_X[dir];
+                            y += MovementHelper.DIRECTION_DELTA_Y[dir];
+                            if ((MovementHelper.Direction(x, y, firstX, firstY) & 1) == 0)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            Log.Error("Unable to locate point.");
+                        }
+                        else
+                            addToWalkingQueue(wayPointX1, wayPointY1);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < numTravelBackSteps; i++)
+                    {
+                        addToWalkingQueue(travelBackX[i], travelBackY[i]);
+                    }
+                }
+
+                for (int i = 0; i < newWalkCmdSteps; i++)
+                {
+                    addToWalkingQueue(newWalkCmdX[i], newWalkCmdY[i]);
+                }
+            }
+
+            //isRunning = isNewWalkCmdIsRunning() || isRunning2;
+        }
+    }
 
     public void Process()
     {
@@ -82,14 +223,25 @@ public class MovementHandler
     {
         if (_character != null && FollowCharacter != null)
         {
-            Reset();
+            if (_character.Location.IsWithinDistance(FollowCharacter.Location, 8))
+            {
+                Reset();
+                return;
+            }
 
+            Reset();
             if (_character is Player player)
             {
-                player.PacketSender.SendMessage($"Following NPC Size: {FollowCharacter.Size}");
+                // player.PacketSender.SendMessage($"Following NPC Size: {FollowCharacter.Size}");
+
                 var destination = PathGenerator.GetCombatPath(_character, FollowCharacter);
                 var tiles = new List<Location>();
+
+                player.PacketSender.SendMessage(
+                    $"Following NPC Size: {FollowCharacter.Size} to Position: X: {destination.X} - Y: {destination.Y}");
+
                 tiles = PathFinder.getPathFinder().FindPath(_character, destination.X, destination.Y, true, 16, 16);
+
                 if (tiles != null)
                 {
                     for (var i = 0; i < tiles.Count; i++) AddToPath(tiles[i]);

@@ -408,6 +408,11 @@ public class PathFinder
         var incrX = x0 < x1;
         var incrY = y0 < y1;
 
+        if (!IsAccessible(x0, y0, z, pX, pY)) 
+        {
+            return false;
+        }
+        
         while (true)
         {
             if (x != x1) x += incrX ? 1 : -1;

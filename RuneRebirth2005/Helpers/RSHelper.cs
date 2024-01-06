@@ -2,6 +2,11 @@
 
 public static class RSHelper
 {
+    
+    public static sbyte[] directionDeltaX = { 0, 1, 1, 1, 0, -1, -1, -1 };
+
+    public static sbyte[] directionDeltaY = { 1, 1, 0, -1, -1, -1, 0, 1 };
+    
     public static long ToLong(this string s)
     {
         var l = 0L;

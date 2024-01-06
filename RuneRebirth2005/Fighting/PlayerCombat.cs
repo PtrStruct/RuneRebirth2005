@@ -1,5 +1,7 @@
-﻿using RuneRebirth2005.Entities;
+﻿using System.Reflection;
+using RuneRebirth2005.Entities;
 using RuneRebirth2005.World;
+using RuneRebirth2005.World.Clipping;
 
 namespace RuneRebirth2005.Fighting;
 
@@ -23,8 +25,8 @@ public class PlayerCombat : CombatBase
                     /* Check if can combat */
                     if (CombatHelper.CanAttack(Character, Target))
                     {
-                        Character.Combat.PerformedHit = true;
                         Target.Combat.WasHit = true;
+                        Character.Combat.PerformedHit = true;
 
                         Target.Combat.HitQueue.AddHit(new CombatHit
                         {
@@ -42,8 +44,170 @@ public class PlayerCombat : CombatBase
 
     private bool CanReach(Character attacker, Character target)
     {
+        /* Check if we're using melee or mage / range */
         
-        return attacker.Location.IsWithinDistance(target.Location, 1);
+        /* Melee Path Blocked */
+        //if (MeleePathBlocked(attacker, target)) return false;
+        
+        /* Check If Range Path Blocked */
+        if (ProjectilePathBlocked(attacker, target)) return false;
+        
+        /* Check if we're in a valid distance */
+        return attacker.Location.IsWithinDistance(target.Location, 8);
+    }
+
+    private bool ProjectilePathBlocked(Character attacker, Character target)
+    {
+        if (PathBlockedP(attacker, target))
+        {
+            // if (c.usingBow || c.usingMagic || usingOtherRangeWeapons || c.autocasting || UsingCrystalBow())
+            // {
+                // PathFinder.getPathFinder().FindPath(attacker, target.Location.X , target.Location.Y, true, 8, 8);
+                
+                attacker.MovementHandler.Reset();
+                var tiles = PathFinder.getPathFinder().FindPath(attacker, target.Location.X , target.Location.Y, true, 8, 8);
+
+                if (tiles != null)
+                {
+                    for (var i = 0; i < tiles.Count; i++) attacker.MovementHandler.AddToPath(tiles[i]);
+                    /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
+                    attacker.MovementHandler.Finish();
+                }
+
+                return true;
+
+                // }
+
+                // if (!c.usingBow && !c.usingMagic && !usingOtherRangeWeapons && !c.autocasting)
+                // {
+                //     if (c.absX < NPCHandler.npcs[i].absX && Region.GetClipping(NPCHandler.npcs[i].absX - NPCHandler.NpcSize(i), NPCHandler.npcs[i].absY, NPCHandler.npcs[i].heightLevel, -1, 0))
+                //     {
+                //         PathFinder.GetPathFinder().FindRoute(c,
+                //             NPCHandler.npcs[i].absX - NPCHandler.NpcSize(i),
+                //             NPCHandler.npcs[i].absY, true, 1, 1);
+                //     }
+                //     else if (c.absX > NPCHandler.npcs[i].absX && Region.GetClipping(NPCHandler.npcs[i].absX + NPCHandler.NpcSize(i), NPCHandler.npcs[i].absY, NPCHandler.npcs[i].heightLevel, -1, 0))
+                //     {
+                //         PathFinder.GetPathFinder().FindRoute(c,
+                //             NPCHandler.npcs[i].absX + NPCHandler.NpcSize(i),
+                //             NPCHandler.npcs[i].absY, true, 1, 1);
+                //     }
+                //     else if (c.absY > NPCHandler.npcs[i].absY && Region.GetClipping(NPCHandler.npcs[i].absX, NPCHandler.npcs[i].absY + NPCHandler.NpcSize(i), NPCHandler.npcs[i].heightLevel, -1, 0))
+                //     {
+                //         
+                //         PathFinder.GetPathFinder().FindRoute(c,
+                //             NPCHandler.npcs[i].absX,
+                //             NPCHandler.npcs[i].absY + NPCHandler.NpcSize(i), true, 1, 1);
+                //     }
+                //     else if (c.absY < NPCHandler.npcs[i].absY && Region.GetClipping(NPCHandler.npcs[i].absX, NPCHandler.npcs[i].absY - NPCHandler.NpcSize(i), NPCHandler.npcs[i].heightLevel, -1, 0))
+                //     {
+                //         PathFinder.GetPathFinder().FindRoute(c,
+                //             NPCHandler.npcs[i].absX,
+                //             NPCHandler.npcs[i].absY - NPCHandler.NpcSize(i), true, 1, 1);
+                //     }
+                //     else if (Region.GetClipping(NPCHandler.npcs[i].absX - 1, NPCHandler.npcs[i].absY, NPCHandler.npcs[i].heightLevel, -1, 0))
+                //     {
+                //         PathFinder.GetPathFinder().FindRoute(c,
+                //             NPCHandler.npcs[i].absX - 1,
+                //             NPCHandler.npcs[i].absY, true, 1, 1);
+                //     }
+                //     else if (Region.GetClipping(NPCHandler.npcs[i].absX + 1, NPCHandler.npcs[i].absY, NPCHandler.npcs[i].heightLevel, -1, 0))
+                //     {
+                //         PathFinder.GetPathFinder().FindRoute(c,
+                //             NPCHandler.npcs[i].absX + 1,
+                //             NPCHandler.npcs[i].absY, true, 1, 1);
+                //     }
+                //     else if (Region.GetClipping(NPCHandler.npcs[i].absX, NPCHandler.npcs[i].absY + 1, NPCHandler.npcs[i].heightLevel, -1, 0))
+                //     {
+                //         PathFinder.GetPathFinder().FindRoute(c,
+                //             NPCHandler.npcs[i].absX,
+                //             NPCHandler.npcs[i].absY + 1, true, 1, 1);
+                //     } 
+                //     else if (Region.GetClipping(NPCHandler.npcs[i].absX, NPCHandler.npcs[i].absY - 1, NPCHandler.npcs[i].heightLevel, -1, 0))
+                //     {
+                //         PathFinder.GetPathFinder().FindRoute(c,
+                //             NPCHandler.npcs[i].absX,
+                //             NPCHandler.npcs[i].absY - 1, true, 1, 1);
+                //     }
+                //     else 
+                //     {
+                //         PathFinder.GetPathFinder().FindRoute(c,
+                //             NPCHandler.npcs[i].absX,
+                //             NPCHandler.npcs[i].absY, true, 1, 1);
+                //     }
+                // }
+                // c.attackTimer = 0;
+                // return;
+        }
+
+        return false;
+    }
+
+    private static bool MeleePathBlocked(Character attacker, Character target)
+    {
+        if (PathBlocked(attacker, target))
+        {
+            if (attacker.Location.X < target.Location.X && Region.GetClipping(target.Location.X - target.Size,
+                    target.Location.Y, target.Location.Z, -1, 0))
+            {
+                PathFinder.getPathFinder().FindPath(attacker, target.Location.X - 1, target.Location.Y, true, 1, 1);
+                return true;
+            }
+            else if (attacker.Location.X > target.Location.X && Region.GetClipping(target.Location.X + target.Size,
+                         target.Location.Y, target.Location.Z, -1, 0))
+            {
+                return true;
+            }
+            else if (attacker.Location.Y < target.Location.Y && Region.GetClipping(target.Location.X,
+                         target.Location.Y - target.Size, target.Location.Z, -1, 0))
+            {
+                PathFinder.getPathFinder().FindPath(attacker, target.Location.X, target.Location.Y - 1, true, 1, 1);
+                return true;
+            }
+            else if (attacker.Location.Y > target.Location.Y && Region.GetClipping(target.Location.X,
+                         target.Location.Y + target.Size, target.Location.Z, -1, 0))
+            {
+                attacker.MovementHandler.Reset();
+                var tiles = PathFinder.getPathFinder().FindPath(attacker, target.Location.X + target.Size,
+                    target.Location.Y,
+                    true, 1, 1);
+
+                if (tiles != null)
+                {
+                    for (var i = 0; i < tiles.Count; i++) attacker.MovementHandler.AddToPath(tiles[i]);
+                    /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
+                    attacker.MovementHandler.Finish();
+                }
+
+                return true;
+            }
+            else if (Region.GetClipping(target.Location.X - 1, target.Location.Y, target.Location.Z, -1, 0))
+            {
+                PathFinder.getPathFinder().FindPath(attacker, target.Location.X - 1, target.Location.Y, true, 1, 1);
+                return true;
+            }
+            else if (Region.GetClipping(target.Location.X + 1, target.Location.Y, target.Location.Z, -1, 0))
+            {
+                PathFinder.getPathFinder().FindPath(attacker, target.Location.X + 1, target.Location.Y, true, 1, 1);
+                return true;
+            }
+            else if (Region.GetClipping(target.Location.X, target.Location.Y + 1, target.Location.Z, -1, 0))
+            {
+                PathFinder.getPathFinder().FindPath(attacker, target.Location.X, target.Location.Y + 1, true, 1, 1);
+                return true;
+            }
+            else if (Region.GetClipping(target.Location.X, target.Location.Y - 1, target.Location.Z, -1, 0))
+            {
+                PathFinder.getPathFinder().FindPath(attacker, target.Location.X, target.Location.Y - 1, true, 1, 1);
+                return true;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public override void PerformAnimation()
@@ -172,5 +336,186 @@ public class PlayerCombat : CombatBase
             default:
                 return 451;
         }
+    }
+
+    public static bool PathBlocked(Character attacker, Character victim)
+    {
+        double offsetX = Math.Abs(attacker.Location.X - victim.Location.X);
+        double offsetY = Math.Abs(attacker.Location.Y - victim.Location.Y);
+
+        int distance = TileControl.CalculateDistance(attacker, victim);
+
+        if (distance == 0)
+        {
+            return true;
+        }
+
+        offsetX = offsetX > 0 ? offsetX / distance : 0;
+        offsetY = offsetY > 0 ? offsetY / distance : 0;
+
+        var path = new int[distance][];
+
+        int curX = attacker.Location.X;
+        int curY = attacker.Location.Y;
+
+        double currentTileXCount = 0.0;
+        double currentTileYCount = 0.0;
+
+        while (distance > 0)
+        {
+            distance--;
+            int nextMoveX = 0;
+            int nextMoveY = 0;
+
+            if (curX > victim.Location.X)
+            {
+                currentTileXCount += offsetX;
+                if (currentTileXCount >= 1.0)
+                {
+                    nextMoveX--;
+                    curX--;
+                    currentTileXCount -= offsetX;
+                }
+            }
+            else if (curX < victim.Location.X)
+            {
+                currentTileXCount += offsetX;
+                if (currentTileXCount >= 1.0)
+                {
+                    nextMoveX++;
+                    curX++;
+                    currentTileXCount -= offsetX;
+                }
+            }
+
+            if (curY > victim.Location.Y)
+            {
+                currentTileYCount += offsetY;
+                if (currentTileYCount >= 1.0)
+                {
+                    nextMoveY--;
+                    curY--;
+                    currentTileYCount -= offsetY;
+                }
+            }
+            else if (curY < victim.Location.Y)
+            {
+                currentTileYCount += offsetY;
+                if (currentTileYCount >= 1.0)
+                {
+                    nextMoveY++;
+                    curY++;
+                    currentTileYCount -= offsetY;
+                }
+            }
+
+            path[distance] = new int[] { curX, curY, attacker.Location.Z, nextMoveX, nextMoveY };
+        }
+
+        for (int i = 0; i < path.Length; i++)
+        {
+            if (!Region.GetClipping(path[i][0], path[i][1], path[i][2], path[i][3], path[i][4]))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static bool PathBlockedP(Character attacker, Character victim)
+    {
+        double offsetX = Math.Abs(attacker.Location.X - victim.Location.X);
+        double offsetY = Math.Abs(attacker.Location.Y - victim.Location.Y);
+
+        int distance = TileControl.CalculateDistance(attacker, victim);
+
+        if (distance == 0)
+        {
+            return true;
+        }
+
+        offsetX = offsetX > 0 ? offsetX / distance : 0;
+        offsetY = offsetY > 0 ? offsetY / distance : 0;
+
+        int[][] path = new int[distance][];
+        for (int j = 0; j < distance; j++)
+            path[j] = new int[7];
+
+        int curX = attacker.Location.X;
+        int curY = attacker.Location.Y;
+        int next = 0;
+        int nextMoveX = 0;
+        int nextMoveY = 0;
+
+        double currentTileXCount = 0.0;
+        double currentTileYCount = 0.0;
+
+        while (distance > 0)
+        {
+            distance--;
+            nextMoveX = 0;
+            nextMoveY = 0;
+            if (curX > victim.Location.X)
+            {
+                currentTileXCount += offsetX;
+                if (currentTileXCount >= 1.0)
+                {
+                    nextMoveX--;
+                    curX--;
+                    currentTileXCount -= offsetX;
+                }
+            }
+            else if (curX < victim.Location.X)
+            {
+                currentTileXCount += offsetX;
+                if (currentTileXCount >= 1.0)
+                {
+                    nextMoveX++;
+                    curX++;
+                    currentTileXCount -= offsetX;
+                }
+            }
+
+            if (curY > victim.Location.Y)
+            {
+                currentTileYCount += offsetY;
+                if (currentTileYCount >= 1.0)
+                {
+                    nextMoveY--;
+                    curY--;
+                    currentTileYCount -= offsetY;
+                }
+            }
+            else if (curY < victim.Location.Y)
+            {
+                currentTileYCount += offsetY;
+                if (currentTileYCount >= 1.0)
+                {
+                    nextMoveY++;
+                    curY++;
+                    currentTileYCount -= offsetY;
+                }
+            }
+
+            path[next][0] = curX;
+            path[next][1] = curY;
+            path[next][2] = attacker.Location.Z;
+            path[next][3] = nextMoveX;
+            path[next][4] = nextMoveY;
+            path[next][5] = attacker.Location.X;
+            path[next][6] = attacker.Location.Y;
+            next++;
+        }
+
+        for (int i = 0; i < path.Length; i++)
+        {
+            if (!Region.BlockedShot(path[i][0], path[i][1], path[i][2], path[i][3], path[i][4]))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

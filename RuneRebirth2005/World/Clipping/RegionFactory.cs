@@ -64,39 +64,67 @@ public class RegionFactory
         var regionX = (regionId >> 8) * 64; // Region ID is bitshifted to get X position
         var regionY = (regionId & 0xff) * 64; // Region ID is bitshifted and AND'd against 0xff to get Y position
         var positionArray = new int[4, 64, 64];
+        var someArrayBoolean = new bool[4,64,64];
 
         for (var localz = 0; localz < 4; localz++)
-        for (var localx = 0; localx < 64; localx++)
-        for (var localy = 0; localy < 64; localy++)
-            while (true)
+        {
+            for (var localx = 0; localx < 64; localx++)
             {
-                var v = str2.ReadByte();
-                if (v == 0) break;
-
-                if (v == 1)
+                for (var localy = 0; localy < 64; localy++)
                 {
-                    str2.Skip(1);
-                    break;
-                }
+                    while (true)
+                    {
+                        var v = str2.ReadByte();
+                        if (v == 0) break;
 
-                if (v <= 49)
-                    str2.Skip(1);
-                else if (v <= 81) positionArray[localz, localx, localy] = v - 49; // Clipping data is gathered.
+                        if (v == 1)
+                        {
+                            str2.Skip(1);
+                            break;
+                        }
+
+                        if (v == 2)
+                        {
+                            someArrayBoolean[localz, localx, localy] = true;
+                        }
+
+                        if (v <= 49)
+                            str2.Skip(1);
+                        else if (v <= 81) positionArray[localz, localx, localy] = v - 49;
+                    }
+                }
             }
+        }
 
 
         for (var localz = 0; localz < 4; localz++)
-        for (var localx = 0; localx < 64; localx++)
-        for (var localy = 0; localy < 64; localy++)
-            if ((positionArray[localz, localx, localy] & 1) == 1)
+        {
+            for (var localx = 0; localx < 64; localx++)
             {
-                var height = localz;
-                if ((positionArray[1, localx, localy] & 2) == 2) height--;
-
-                if (height >= 0 && height <= 3)
-                    //GameEngine.getLogger(Region.class).debug("Adding clipping at x,y " + (regionX + localx) + "," + (regionY + localy) + " at height: " + localz);
-                    Region.AddClipping(regionX + localx, regionY + localy, height, 0x200000);
+                for (var localy = 0; localy < 64; localy++)
+                {
+                    if ((positionArray[localz, localx, localy] & 1) == 1)
+                    {
+                        int height = localz;
+                        if ((positionArray[1, localx, localy] & 2) == 2)
+                        {
+                            height--;
+                        }
+                        if (height >= 0 && height <= 3)
+                        {
+                            if (someArrayBoolean[localz, localx, localy])
+                            {
+                                Region.AddClipping(regionX + localx, regionY + localy, height, (264 + 0x0002000));
+                            }
+                            else
+                            {
+                                Region.AddClipping(regionX + localx, regionY + localy, height, (256 + 0x0002000));
+                            }
+                        }
+                    }
+                }
             }
+        }
 
 
         var objectId = -1;
@@ -115,11 +143,15 @@ public class RegionFactory
                 var objectData = str1.GetUByte();
                 var type = objectData >> 2;
                 var direction = objectData & 0x3;
-                if (objectX < 0 || objectX >= 64 || objectY < 0 ||
-                    objectY >= 64) continue; //Checks the object position is not outside the bounds of a region (0-64)
+                if (objectX < 0 || objectX >= 64 || objectY < 0 || objectY >= 64) continue; //Checks the object position is not outside the bounds of a region (0-64)
 
                 if ((positionArray[1, objectX, objectY] & 2) == 2) objectHeight--;
 
+                if (regionX + objectX == 3238 && regionY + objectY == 3224)
+                {
+                    
+                }
+                
                 if (objectHeight >= 0 && objectHeight <= 3)
                     Region.AddObject(objectId, regionX + objectX, regionY + objectY, objectHeight, type, direction, ServerConfig.Startup);
             }

@@ -4,6 +4,7 @@ using RuneRebirth2005.Fighting;
 using RuneRebirth2005.Helpers;
 using RuneRebirth2005.NPCManagement;
 using RuneRebirth2005.PlayerManagement;
+using RuneRebirth2005.World;
 using Serilog;
 
 namespace RuneRebirth2005.Network.Incoming;
@@ -35,6 +36,11 @@ public class PlayerCommandPacket : IPacket
                 {
                     _player.PacketSender.SendMessage(message);
                 }
+                
+                _player.PacketSender.SendMessage($"Clipping: {Region.GetClipping(_player.Location.X, _player.Location.Y, _player.Location.Z)}");
+                _player.PacketSender.SendMessage($"GetProjectileClipping /w South Mask: {(Region.GetProjectileClipping(_player.Location.X, _player.Location.Y, _player.Location.Z) & 0x1280102)}");
+                _player.PacketSender.SendMessage($"GetProjectileClipping: {Region.GetProjectileClipping(_player.Location.X, _player.Location.Y, _player.Location.Z)}");
+                _player.PacketSender.SendMessage($"ProjectileBlockedSouth: {Region.ProjectileBlockedSouth(_player.Location.X, _player.Location.Y, _player.Location.Z)}");
 
                 break;
 

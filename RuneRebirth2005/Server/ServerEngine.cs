@@ -55,11 +55,9 @@ public class ServerEngine
     private void Tick()
     {
         ConnectionHandler.AcceptClients();
-
         DelayedTaskHandler.Tick();
 
         /* Fetch Incoming Data */
-        // Log.Information("Fetching data from clients..");
         for (int i = 0; i < Server.Players.Length; i++)
         {
             var player = Server.Players[i];
@@ -69,24 +67,14 @@ public class ServerEngine
                 player.PlayerSession.Fetch(player);
             }
         }
-
-        for (int i = 0; i < Server.NPCs.Count; i++)
-        {
-            var npc = Server.NPCs[i];
-            if (npc == null) continue;
-            npc.MovementHandler.Process();
-        }
         
         /* Process Incoming Data */
-        // Log.Information("Processing fetched data..");
         for (int i = 0; i < Server.Players.Length; i++)
         {
             var player = Server.Players[i];
             if (player == null) continue;
             player.PlayerSession.PacketStore.ProcessPackets();
-            player.MovementHandler.Process();
         }
-
 
         /* Combat, calculate damage to perform etc */
         for (int i = 0; i < Server.Players.Length; i++)
@@ -113,8 +101,7 @@ public class ServerEngine
             if (Server.NPCs[i] == null) continue;
             Server.NPCs[i].Combat.PerformAnimation();
         }
-
-
+        
         /* Process new Data for Player and NPC */
         for (int i = 0; i < Server.Players.Length; i++)
         {
@@ -126,6 +113,14 @@ public class ServerEngine
         {
             if (Server.NPCs[i] == null) continue;
             Server.NPCs[i].Process();
+        }
+        
+        /* Movement */
+        for (int i = 0; i < Server.Players.Length; i++)
+        {
+            var player = Server.Players[i];
+            if (player == null) continue;
+            player.MovementHandler.Process();
         }
 
         /* Update */
