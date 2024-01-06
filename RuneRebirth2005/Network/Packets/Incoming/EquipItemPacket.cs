@@ -49,6 +49,7 @@ public class EquipItemPacket : IPacket
         _player.Equipment.EquipItem(clickedItem.ItemId, definition.Name, clickedItem.Amount);
 
         
+        
         /* Replace */
         _player.PlayerInventory.Inventory[_index] = new InventorySlot
         {
@@ -68,6 +69,11 @@ public class EquipItemPacket : IPacket
             _player.PacketSender.UpdateSlot(i, item.ItemId, item.Amount, GameInterfaces.DefaultInventory);
         }
 
+        if (GameConstants.IsItemInArray(_player.Equipment.GetItem(EquipmentSlot.Weapon).ItemId, GameConstants.BOWS))
+            _player.UsingBow = true;
+        else
+            _player.UsingBow = false;
+        
         _player.IsAppearanceUpdate = true;
     }
 }

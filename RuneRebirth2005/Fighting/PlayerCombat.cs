@@ -18,7 +18,7 @@ public class PlayerCombat : CombatBase
     {
         if (Target != null)
         {
-            if (CanReach(Character, Target))
+            if (CanReach(_character, Target))
             {
                 if (AttackTimer <= 0)
                 {
@@ -42,18 +42,22 @@ public class PlayerCombat : CombatBase
         }
     }
 
-    private bool CanReach(Character attacker, Character target)
+    private bool CanReach(Player attacker, Character target)
     {
         /* Check if we're using melee or mage / range */
-        
-        /* Melee Path Blocked */
-        //if (MeleePathBlocked(attacker, target)) return false;
-        
-        /* Check If Range Path Blocked */
-        if (ProjectilePathBlocked(attacker, target)) return false;
-        
-        /* Check if we're in a valid distance */
-        return attacker.Location.IsWithinDistance(target.Location, 8);
+
+        if (attacker.UsingBow)
+        {
+            /* Check If Range Path Blocked */
+            if (ProjectilePathBlocked(attacker, target) || !attacker.Location.IsWithinDistance(target.Location, 8)) return false;
+        }
+        else
+        {
+            /* Melee Path Blocked */
+            if (MeleePathBlocked(attacker, target) || !attacker.Location.IsWithinDistance(target.Location, 1)) return false;
+        }
+
+        return true;
     }
 
     private bool ProjectilePathBlocked(Character attacker, Character target)
@@ -62,82 +66,82 @@ public class PlayerCombat : CombatBase
         {
             // if (c.usingBow || c.usingMagic || usingOtherRangeWeapons || c.autocasting || UsingCrystalBow())
             // {
-                // PathFinder.getPathFinder().FindPath(attacker, target.Location.X , target.Location.Y, true, 8, 8);
-                
-                attacker.MovementHandler.Reset();
-                var tiles = PathFinder.getPathFinder().FindPath(attacker, target.Location.X , target.Location.Y, true, 8, 8);
+            // PathFinder.getPathFinder().FindPath(attacker, target.Location.X , target.Location.Y, true, 8, 8);
 
-                if (tiles != null)
-                {
-                    for (var i = 0; i < tiles.Count; i++) attacker.MovementHandler.AddToPath(tiles[i]);
-                    /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
-                    attacker.MovementHandler.Finish();
-                }
+            attacker.MovementHandler.Reset();
+            var tiles = PathFinder.getPathFinder().FindPath(attacker, target.Location.X, target.Location.Y, true, 8, 8);
 
-                return true;
+            if (tiles != null)
+            {
+                for (var i = 0; i < tiles.Count; i++) attacker.MovementHandler.AddToPath(tiles[i]);
+                /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
+                attacker.MovementHandler.Finish();
+            }
 
-                // }
+            return true;
 
-                // if (!c.usingBow && !c.usingMagic && !usingOtherRangeWeapons && !c.autocasting)
-                // {
-                //     if (c.absX < NPCHandler.npcs[i].absX && Region.GetClipping(NPCHandler.npcs[i].absX - NPCHandler.NpcSize(i), NPCHandler.npcs[i].absY, NPCHandler.npcs[i].heightLevel, -1, 0))
-                //     {
-                //         PathFinder.GetPathFinder().FindRoute(c,
-                //             NPCHandler.npcs[i].absX - NPCHandler.NpcSize(i),
-                //             NPCHandler.npcs[i].absY, true, 1, 1);
-                //     }
-                //     else if (c.absX > NPCHandler.npcs[i].absX && Region.GetClipping(NPCHandler.npcs[i].absX + NPCHandler.NpcSize(i), NPCHandler.npcs[i].absY, NPCHandler.npcs[i].heightLevel, -1, 0))
-                //     {
-                //         PathFinder.GetPathFinder().FindRoute(c,
-                //             NPCHandler.npcs[i].absX + NPCHandler.NpcSize(i),
-                //             NPCHandler.npcs[i].absY, true, 1, 1);
-                //     }
-                //     else if (c.absY > NPCHandler.npcs[i].absY && Region.GetClipping(NPCHandler.npcs[i].absX, NPCHandler.npcs[i].absY + NPCHandler.NpcSize(i), NPCHandler.npcs[i].heightLevel, -1, 0))
-                //     {
-                //         
-                //         PathFinder.GetPathFinder().FindRoute(c,
-                //             NPCHandler.npcs[i].absX,
-                //             NPCHandler.npcs[i].absY + NPCHandler.NpcSize(i), true, 1, 1);
-                //     }
-                //     else if (c.absY < NPCHandler.npcs[i].absY && Region.GetClipping(NPCHandler.npcs[i].absX, NPCHandler.npcs[i].absY - NPCHandler.NpcSize(i), NPCHandler.npcs[i].heightLevel, -1, 0))
-                //     {
-                //         PathFinder.GetPathFinder().FindRoute(c,
-                //             NPCHandler.npcs[i].absX,
-                //             NPCHandler.npcs[i].absY - NPCHandler.NpcSize(i), true, 1, 1);
-                //     }
-                //     else if (Region.GetClipping(NPCHandler.npcs[i].absX - 1, NPCHandler.npcs[i].absY, NPCHandler.npcs[i].heightLevel, -1, 0))
-                //     {
-                //         PathFinder.GetPathFinder().FindRoute(c,
-                //             NPCHandler.npcs[i].absX - 1,
-                //             NPCHandler.npcs[i].absY, true, 1, 1);
-                //     }
-                //     else if (Region.GetClipping(NPCHandler.npcs[i].absX + 1, NPCHandler.npcs[i].absY, NPCHandler.npcs[i].heightLevel, -1, 0))
-                //     {
-                //         PathFinder.GetPathFinder().FindRoute(c,
-                //             NPCHandler.npcs[i].absX + 1,
-                //             NPCHandler.npcs[i].absY, true, 1, 1);
-                //     }
-                //     else if (Region.GetClipping(NPCHandler.npcs[i].absX, NPCHandler.npcs[i].absY + 1, NPCHandler.npcs[i].heightLevel, -1, 0))
-                //     {
-                //         PathFinder.GetPathFinder().FindRoute(c,
-                //             NPCHandler.npcs[i].absX,
-                //             NPCHandler.npcs[i].absY + 1, true, 1, 1);
-                //     } 
-                //     else if (Region.GetClipping(NPCHandler.npcs[i].absX, NPCHandler.npcs[i].absY - 1, NPCHandler.npcs[i].heightLevel, -1, 0))
-                //     {
-                //         PathFinder.GetPathFinder().FindRoute(c,
-                //             NPCHandler.npcs[i].absX,
-                //             NPCHandler.npcs[i].absY - 1, true, 1, 1);
-                //     }
-                //     else 
-                //     {
-                //         PathFinder.GetPathFinder().FindRoute(c,
-                //             NPCHandler.npcs[i].absX,
-                //             NPCHandler.npcs[i].absY, true, 1, 1);
-                //     }
-                // }
-                // c.attackTimer = 0;
-                // return;
+            // }
+
+            // if (!c.usingBow && !c.usingMagic && !usingOtherRangeWeapons && !c.autocasting)
+            // {
+            //     if (c.absX < NPCHandler.npcs[i].absX && Region.GetClipping(NPCHandler.npcs[i].absX - NPCHandler.NpcSize(i), NPCHandler.npcs[i].absY, NPCHandler.npcs[i].heightLevel, -1, 0))
+            //     {
+            //         PathFinder.GetPathFinder().FindRoute(c,
+            //             NPCHandler.npcs[i].absX - NPCHandler.NpcSize(i),
+            //             NPCHandler.npcs[i].absY, true, 1, 1);
+            //     }
+            //     else if (c.absX > NPCHandler.npcs[i].absX && Region.GetClipping(NPCHandler.npcs[i].absX + NPCHandler.NpcSize(i), NPCHandler.npcs[i].absY, NPCHandler.npcs[i].heightLevel, -1, 0))
+            //     {
+            //         PathFinder.GetPathFinder().FindRoute(c,
+            //             NPCHandler.npcs[i].absX + NPCHandler.NpcSize(i),
+            //             NPCHandler.npcs[i].absY, true, 1, 1);
+            //     }
+            //     else if (c.absY > NPCHandler.npcs[i].absY && Region.GetClipping(NPCHandler.npcs[i].absX, NPCHandler.npcs[i].absY + NPCHandler.NpcSize(i), NPCHandler.npcs[i].heightLevel, -1, 0))
+            //     {
+            //         
+            //         PathFinder.GetPathFinder().FindRoute(c,
+            //             NPCHandler.npcs[i].absX,
+            //             NPCHandler.npcs[i].absY + NPCHandler.NpcSize(i), true, 1, 1);
+            //     }
+            //     else if (c.absY < NPCHandler.npcs[i].absY && Region.GetClipping(NPCHandler.npcs[i].absX, NPCHandler.npcs[i].absY - NPCHandler.NpcSize(i), NPCHandler.npcs[i].heightLevel, -1, 0))
+            //     {
+            //         PathFinder.GetPathFinder().FindRoute(c,
+            //             NPCHandler.npcs[i].absX,
+            //             NPCHandler.npcs[i].absY - NPCHandler.NpcSize(i), true, 1, 1);
+            //     }
+            //     else if (Region.GetClipping(NPCHandler.npcs[i].absX - 1, NPCHandler.npcs[i].absY, NPCHandler.npcs[i].heightLevel, -1, 0))
+            //     {
+            //         PathFinder.GetPathFinder().FindRoute(c,
+            //             NPCHandler.npcs[i].absX - 1,
+            //             NPCHandler.npcs[i].absY, true, 1, 1);
+            //     }
+            //     else if (Region.GetClipping(NPCHandler.npcs[i].absX + 1, NPCHandler.npcs[i].absY, NPCHandler.npcs[i].heightLevel, -1, 0))
+            //     {
+            //         PathFinder.GetPathFinder().FindRoute(c,
+            //             NPCHandler.npcs[i].absX + 1,
+            //             NPCHandler.npcs[i].absY, true, 1, 1);
+            //     }
+            //     else if (Region.GetClipping(NPCHandler.npcs[i].absX, NPCHandler.npcs[i].absY + 1, NPCHandler.npcs[i].heightLevel, -1, 0))
+            //     {
+            //         PathFinder.GetPathFinder().FindRoute(c,
+            //             NPCHandler.npcs[i].absX,
+            //             NPCHandler.npcs[i].absY + 1, true, 1, 1);
+            //     } 
+            //     else if (Region.GetClipping(NPCHandler.npcs[i].absX, NPCHandler.npcs[i].absY - 1, NPCHandler.npcs[i].heightLevel, -1, 0))
+            //     {
+            //         PathFinder.GetPathFinder().FindRoute(c,
+            //             NPCHandler.npcs[i].absX,
+            //             NPCHandler.npcs[i].absY - 1, true, 1, 1);
+            //     }
+            //     else 
+            //     {
+            //         PathFinder.GetPathFinder().FindRoute(c,
+            //             NPCHandler.npcs[i].absX,
+            //             NPCHandler.npcs[i].absY, true, 1, 1);
+            //     }
+            // }
+            // c.attackTimer = 0;
+            // return;
         }
 
         return false;
@@ -150,7 +154,16 @@ public class PlayerCombat : CombatBase
             if (attacker.Location.X < target.Location.X && Region.GetClipping(target.Location.X - target.Size,
                     target.Location.Y, target.Location.Z, -1, 0))
             {
-                PathFinder.getPathFinder().FindPath(attacker, target.Location.X - 1, target.Location.Y, true, 1, 1);
+                attacker.MovementHandler.Reset();
+                var tiles = PathFinder.getPathFinder().FindPath(attacker, target.Location.X, target.Location.Y, true, 1, 1);
+
+                if (tiles != null)
+                {
+                    for (var i = 0; i < tiles.Count; i++) attacker.MovementHandler.AddToPath(tiles[i]);
+                    /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
+                    attacker.MovementHandler.Finish();
+                }
+                
                 return true;
             }
             else if (attacker.Location.X > target.Location.X && Region.GetClipping(target.Location.X + target.Size,

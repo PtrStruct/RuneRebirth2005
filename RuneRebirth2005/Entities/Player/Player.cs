@@ -54,6 +54,9 @@ public class Player : Character
     // Animation and combat
     public override CombatBase Combat { get; set; }
     public override int AttackSpeed { get; set; } = 5;
+
+    public bool UsingBow { get; set; }
+    
     public override void SetInteractionEntity(IEntity entity)
     {
         InteractingEntity = entity;
