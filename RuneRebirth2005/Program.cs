@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using CacheReader.World;
-using Newtonsoft.Json;
+﻿using CacheReader.World;
 using RuneRebirth2005;
 using RuneRebirth2005.Data;
 using RuneRebirth2005.Data.Items;
@@ -11,7 +9,6 @@ using Scape05.Data.ObjectsDef;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.SystemConsole.Themes;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
@@ -61,12 +58,4 @@ catch (Exception ex)
 finally
 {
     Log.CloseAndFlush();
-}
-
-class NpcData
-{
-    public int ModelId { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public int CombatLevel { get; set; }
 }
