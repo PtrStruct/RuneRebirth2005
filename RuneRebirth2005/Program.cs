@@ -49,28 +49,8 @@ try
     Benchmarker.MeasureTime(() => ParseCache(ifs), "Parsing cache");
     Benchmarker.MeasureTime(() => LoadRegionFactory(ifs), "Loading regions");
 
-    NPCManager.Load();
     NPCLoader.Load();
 
-    var npclist = new List<NpcData>();
-    foreach (var npcDefinition in NpcDefinitionDecoder.NpcDefinitions)
-    {
-        var def = npcDefinition.Value;
-
-        var npcData = new NpcData
-        {
-            ModelId = def.Id,
-            Name = def.Name,
-            Description = def.Description,
-            CombatLevel = def.CombatLevel
-        };
-        npclist.Add(npcData);
-    }
-
-    var json = JsonSerializer.Serialize(npclist, new JsonSerializerOptions {WriteIndented = true});
-    File.WriteAllText("npcdata.json", json);
-
-    
     ServerEngine serverEngine = new ServerEngine();
     serverEngine.Run();
 }
