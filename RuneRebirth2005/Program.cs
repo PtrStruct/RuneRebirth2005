@@ -50,6 +50,7 @@ try
     Benchmarker.MeasureTime(() => LoadRegionFactory(ifs), "Loading regions");
 
     NPCManager.Load();
+    NPCLoader.Load();
 
     var npclist = new List<NpcData>();
     foreach (var npcDefinition in NpcDefinitionDecoder.NpcDefinitions)

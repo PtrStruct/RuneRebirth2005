@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using RuneRebirth2005.Entities;
 using RuneRebirth2005.Network;
 using RuneRebirth2005.Update;
 using Serilog;
@@ -121,6 +122,14 @@ public class ServerEngine
             var player = Server.Players[i];
             if (player == null) continue;
             player.MovementHandler.Process();
+        }
+        
+        for (int i = 0; i < Server.NPCs.Count; i++)
+        {
+            var npc = Server.NPCs[i];
+            if (npc == null) continue;
+            // npc.MovementHandler.AddToPath(new Location(npc.Location.X + 1, npc.Location.Y));
+            npc.MovementHandler.Process();
         }
 
         /* Update */

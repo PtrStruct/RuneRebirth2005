@@ -40,7 +40,7 @@ public static class NPCUpdater
             }
         }
 
-        foreach (var npc in Server.NPCs.Values)
+        foreach (var npc in Server.NPCs)
         {
             if (player.LocalNPCs.Count >= 255)
                 break;

@@ -250,18 +250,6 @@ public class MovementHandler
                     Finish();
                 }
                 
-                // if (player.UsingBow)
-                // {
-                //     /* Check If Range Path Blocked */
-                //     if (ProjectilePathBlocked(attacker, target) || !attacker.Location.IsWithinDistance(target.Location, 8)) return false;
-                // }
-                // else
-                // {
-                //     /* Melee Path Blocked */
-                //     if (MeleePathBlocked(attacker, target) || !attacker.Location.IsWithinDistance(target.Location, 1)) return false;
-                // }
-                //
-                // attacker.MovementHandler.Reset();
                 
             }
             else if (_character is NPC theNpc)

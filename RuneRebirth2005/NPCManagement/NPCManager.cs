@@ -25,7 +25,7 @@ public class NPCManager
             LoadNewNPC(spawn, npc, i);
         }
 
-        Server.NPCs = mobs.ToFrozenDictionary();
+        // Server.NPCs = mobs.ToFrozenDictionary();
     }
 
     private static void LoadNewNPC(NPCSpawn npcSpawn, NPCDefinition npc, int index)

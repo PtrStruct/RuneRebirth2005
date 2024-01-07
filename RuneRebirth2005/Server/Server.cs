@@ -7,5 +7,5 @@ namespace RuneRebirth2005;
 public class Server
 {
     public static Player[] Players { get; set; } = new Player[ServerConfig.MAX_PLAYERS];
-    public static FrozenDictionary<int, NPC> NPCs { get; set; }
+    public static List<NPC> NPCs { get; set; } = new();
 }

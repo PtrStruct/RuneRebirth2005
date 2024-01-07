@@ -45,6 +45,7 @@ public class NPC : Character
     public NPC()
     {
         Combat = new NPCCombat(this);
+        MovementHandler = new MovementHandler(this);
     }
 
     public void Process()
