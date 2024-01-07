@@ -49,14 +49,21 @@ public class PlayerCombat : CombatBase
         if (attacker.UsingBow)
         {
             /* Check If Range Path Blocked */
-            if (ProjectilePathBlocked(attacker, target) || !attacker.Location.IsWithinDistance(target.Location, 8)) return false;
+            if (ProjectilePathBlocked(attacker, target) || !attacker.Location.IsWithinDistance(target.Location, 8))
+            {
+                attacker.MovementHandler.FollowCharacter = target;
+                return false;
+            }
         }
         else
         {
             /* Melee Path Blocked */
-            if (MeleePathBlocked(attacker, target) || !attacker.Location.IsWithinDistance(target.Location, 1)) return false;
+            if (MeleePathBlocked(attacker, target) || !attacker.Location.IsWithinDistance(target.Location, 1))
+                return false;
         }
 
+        attacker.MovementHandler.Reset();
+        attacker.MovementHandler.FollowCharacter = null;
         return true;
     }
 
@@ -155,7 +162,8 @@ public class PlayerCombat : CombatBase
                     target.Location.Y, target.Location.Z, -1, 0))
             {
                 attacker.MovementHandler.Reset();
-                var tiles = PathFinder.getPathFinder().FindPath(attacker, target.Location.X, target.Location.Y, true, 1, 1);
+                var tiles = PathFinder.getPathFinder()
+                    .FindPath(attacker, target.Location.X, target.Location.Y, true, 1, 1);
 
                 if (tiles != null)
                 {
@@ -163,7 +171,7 @@ public class PlayerCombat : CombatBase
                     /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
                     attacker.MovementHandler.Finish();
                 }
-                
+
                 return true;
             }
             else if (attacker.Location.X > target.Location.X && Region.GetClipping(target.Location.X + target.Size,

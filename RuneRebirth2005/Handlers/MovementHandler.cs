@@ -223,13 +223,14 @@ public class MovementHandler
     {
         if (_character != null && FollowCharacter != null)
         {
-            if (_character.Location.IsWithinDistance(FollowCharacter.Location, 8))
-            {
-                Reset();
-                return;
-            }
+            // if (_character.Location.IsWithinDistance(FollowCharacter.Location, 8))
+            // {
+            //     Reset();
+            //     return;
+            // }
 
             Reset();
+            
             if (_character is Player player)
             {
                 // player.PacketSender.SendMessage($"Following NPC Size: {FollowCharacter.Size}");
@@ -248,6 +249,20 @@ public class MovementHandler
                     /* Remove the first waypoint, aka the tile we're standing on, otherwise it'll take an extra tick to start walking */
                     Finish();
                 }
+                
+                // if (player.UsingBow)
+                // {
+                //     /* Check If Range Path Blocked */
+                //     if (ProjectilePathBlocked(attacker, target) || !attacker.Location.IsWithinDistance(target.Location, 8)) return false;
+                // }
+                // else
+                // {
+                //     /* Melee Path Blocked */
+                //     if (MeleePathBlocked(attacker, target) || !attacker.Location.IsWithinDistance(target.Location, 1)) return false;
+                // }
+                //
+                // attacker.MovementHandler.Reset();
+                
             }
             else if (_character is NPC theNpc)
             {
