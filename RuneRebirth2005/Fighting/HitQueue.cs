@@ -60,23 +60,27 @@ public class HitQueue
         if (ReceivedHits.Count > 0)
         {
             var hit = ReceivedHits.First();
-            hit.Target.PrimaryDamage = hit;
-            hit.Target.CurrentHealth -= hit.Damage;
-
-            if (hit.Target is Player player)
+            hit.Delay--;
+            
+            if (hit.Delay <= 0)
             {
-                player.Flags |= PlayerUpdateFlags.SingleHit;
-            }
-            else if (hit.Target is NPC npc)
-            {
-                npc.Flags |= NPCUpdateFlags.SingleHit;
-            }
+                hit.Target.PrimaryDamage = hit;
+                hit.Target.CurrentHealth -= hit.Damage;
 
-            hit.Target.IsUpdateRequired = true;
-            ReceivedHits.Remove(hit);
+                if (hit.Target is Player player)
+                {
+                    player.Flags |= PlayerUpdateFlags.SingleHit;
+                }
+                else if (hit.Target is NPC npc)
+                {
+                    npc.Flags |= NPCUpdateFlags.SingleHit;
+                }
+
+                hit.Target.IsUpdateRequired = true;
+                ReceivedHits.Remove(hit);    
+            }
         }
-
-        ReceivedHits.Clear();
+        //ReceivedHits.Clear();
     }
 
     public void Process(Character character)
@@ -92,4 +96,5 @@ public class CombatHit
     public Character Target { get; set; }
     public int Damage { get; set; }
     public int HitType { get; set; }
+    public int Delay { get; set; }
 }

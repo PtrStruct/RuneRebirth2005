@@ -891,13 +891,13 @@ public class Region
                 {
                     if (diffX < 0 && diffY < 0)
                     {
-                        if ((GetClipping(currentX + i - 1, currentY + i2 - 1, height) & (UNLOADED_TILE
+                        if ((GetProjectileClipping(currentX + i - 1, currentY + i2 - 1, height) & (UNLOADED_TILE
                                 | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED | PROJECTILE_EAST_BLOCKED
                                 | PROJECTILE_NORTH_EAST_BLOCKED | PROJECTILE_NORTH_BLOCKED)) != 0
-                            || (GetClipping(currentX + i - 1, currentY + i2, height)
+                            || (GetProjectileClipping(currentX + i - 1, currentY + i2, height)
                                 & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
                                    | PROJECTILE_EAST_BLOCKED)) != 0
-                            || (GetClipping(currentX + i, currentY + i2 - 1, height)
+                            || (GetProjectileClipping(currentX + i, currentY + i2 - 1, height)
                                 & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
                                    | PROJECTILE_NORTH_BLOCKED)) != 0)
                         {
@@ -906,13 +906,13 @@ public class Region
                     }
                     else if (diffX > 0 && diffY > 0)
                     {
-                        if ((GetClipping(currentX + i + 1, currentY + i2 + 1, height) & (UNLOADED_TILE
+                        if ((GetProjectileClipping(currentX + i + 1, currentY + i2 + 1, height) & (UNLOADED_TILE
                                 | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED | PROJECTILE_WEST_BLOCKED
                                 | PROJECTILE_SOUTH_WEST_BLOCKED | PROJECTILE_SOUTH_BLOCKED)) != 0
-                            || (GetClipping(currentX + i + 1, currentY + i2, height)
+                            || (GetProjectileClipping(currentX + i + 1, currentY + i2, height)
                                 & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
                                    | PROJECTILE_WEST_BLOCKED)) != 0
-                            || (GetClipping(currentX + i, currentY + i2 + 1, height)
+                            || (GetProjectileClipping(currentX + i, currentY + i2 + 1, height)
                                 & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
                                    | PROJECTILE_SOUTH_BLOCKED)) != 0)
                         {
@@ -921,13 +921,13 @@ public class Region
                     }
                     else if (diffX < 0 && diffY > 0)
                     {
-                        if ((GetClipping(currentX + i - 1, currentY + i2 + 1, height) & (UNLOADED_TILE
+                        if ((GetProjectileClipping(currentX + i - 1, currentY + i2 + 1, height) & (UNLOADED_TILE
                                 | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED | PROJECTILE_SOUTH_BLOCKED
                                 | PROJECTILE_SOUTH_EAST_BLOCKED | PROJECTILE_EAST_BLOCKED)) != 0
-                            || (GetClipping(currentX + i - 1, currentY + i2, height)
+                            || (GetProjectileClipping(currentX + i - 1, currentY + i2, height)
                                 & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
                                    | PROJECTILE_EAST_BLOCKED)) != 0
-                            || (GetClipping(currentX + i, currentY + i2 + 1, height)
+                            || (GetProjectileClipping(currentX + i, currentY + i2 + 1, height)
                                 & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
                                    | PROJECTILE_SOUTH_BLOCKED)) != 0)
                         {
@@ -936,13 +936,13 @@ public class Region
                     }
                     else if (diffX > 0 && diffY < 0)
                     {
-                        if ((GetClipping(currentX + i + 1, currentY + i2 - 1, height) & (UNLOADED_TILE
+                        if ((GetProjectileClipping(currentX + i + 1, currentY + i2 - 1, height) & (UNLOADED_TILE
                                 | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED | PROJECTILE_WEST_BLOCKED
                                 | PROJECTILE_NORTH_BLOCKED | PROJECTILE_NORTH_WEST_BLOCKED)) != 0
-                            || (GetClipping(currentX + i + 1, currentY + i2, height)
+                            || (GetProjectileClipping(currentX + i + 1, currentY + i2, height)
                                 & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
                                    | PROJECTILE_WEST_BLOCKED)) != 0
-                            || (GetClipping(currentX + i, currentY + i2 - 1, height)
+                            || (GetProjectileClipping(currentX + i, currentY + i2 - 1, height)
                                 & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
                                    | PROJECTILE_NORTH_BLOCKED)) != 0)
                         {
@@ -951,7 +951,7 @@ public class Region
                     }
                     else if (diffX > 0 && diffY == 0)
                     {
-                        if ((GetClipping(currentX + i + 1, currentY + i2, height)
+                        if ((GetProjectileClipping(currentX + i + 1, currentY + i2, height)
                              & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
                                 | PROJECTILE_WEST_BLOCKED)) != 0)
                         {
@@ -960,7 +960,7 @@ public class Region
                     }
                     else if (diffX < 0 && diffY == 0)
                     {
-                        if ((GetClipping(currentX + i - 1, currentY + i2, height)
+                        if ((GetProjectileClipping(currentX + i - 1, currentY + i2, height)
                              & (UNLOADED_TILE | /* BLOCKED_TILE | */UNKNOWN | PROJECTILE_TILE_BLOCKED
                                 | PROJECTILE_EAST_BLOCKED)) != 0)
                         {
@@ -969,7 +969,7 @@ public class Region
                     }
                     else if (diffX == 0 && diffY > 0)
                     {
-                        if ((GetClipping(currentX + i, currentY + i2 + 1, height) & (UNLOADED_TILE
+                        if ((GetProjectileClipping(currentX + i, currentY + i2 + 1, height) & (UNLOADED_TILE
                                 | /*
                                    * BLOCKED_TILE |
                                    */UNKNOWN | PROJECTILE_TILE_BLOCKED | PROJECTILE_SOUTH_BLOCKED)) != 0)
@@ -979,7 +979,7 @@ public class Region
                     }
                     else if (diffX == 0 && diffY < 0)
                     {
-                        if ((GetClipping(currentX + i, currentY + i2 - 1, height) & (UNLOADED_TILE
+                        if ((GetProjectileClipping(currentX + i, currentY + i2 - 1, height) & (UNLOADED_TILE
                                 | /*
                                    * BLOCKED_TILE |
                                    */UNKNOWN | PROJECTILE_TILE_BLOCKED | PROJECTILE_NORTH_BLOCKED)) != 0)

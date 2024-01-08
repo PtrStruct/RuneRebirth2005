@@ -1,0 +1,10 @@
+High Level Overview
+
+Combat
+ - Fix Projectile Clipping Check
+ - Magic
+
+NPC
+ - Retreat of out of range
+ - Drops
+ - Fix rat animations (server breaks when trying to attack a rat in Lumbridge)
