@@ -75,7 +75,7 @@ public static class PlayerManager
         player.PacketSender.SendSidebarInterface(13, 6299);
 
         player.PlayerInventory.AddItem(1277);
-        player.PlayerInventory.AddItem(851);
+        player.PlayerInventory.AddItem(841);
 
         for (int i = 0; i < player.PlayerInventory.Inventory.Length; i++)
         {

@@ -37,7 +37,7 @@ public class PlayerCombat : CombatBase
                             HitType = 1,
                             Attacker = Character,
                             Target = Target,
-                            Delay = 2
+                            Delay = 4
                         }, true);
                         AttackTimer = Character.AttackSpeed;
                         
@@ -52,8 +52,8 @@ public class PlayerCombat : CombatBase
                             var offX = (nY - pY) * -1;
                             var offY = (nX - pX) * -1;
 
-                            _character.PacketSender.CreateProjectile(nX, nY, offX, offY, 50, 85, 10,
-                                43, 31, -(Target.Index) - 1, 65);
+                            _character.PacketSender.CreateProjectile(nX, nY, offX, offY, 50, 60, 10,
+                                43, 31, -(Target.Index) - 1, 40);
                         }
                         
                     }
