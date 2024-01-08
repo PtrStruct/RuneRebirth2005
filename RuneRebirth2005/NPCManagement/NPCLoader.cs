@@ -28,7 +28,7 @@ public class NPCLoader
                     Size = def.Size,
                     Name = def.Name,
                     ModelId = def.Id,
-                    Stationary = def.Walk == 1,
+                    Stationary = def.Walk != 1,
                     CombatLevel = def.Combat,
                     FallAnimation = def.DeathAnim,
                     AttackSpeed = def.AttackSpeed,

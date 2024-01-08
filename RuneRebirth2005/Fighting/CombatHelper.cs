@@ -15,31 +15,6 @@ public class CombatHelper
             return false;
         }
 
-        /* Only do this check if we're not in multi */
-        if (IsAttacked(attacker) && attacker.Combat.Attacker != target)
-        {
-            if (attacker is Player player)
-            {
-                player.PacketSender.SendMessage("You are already under attack!");
-                return false;
-            }
-
-            /* Reset combat */
-            attacker.Combat.Reset();
-        }
-
-        if (IsAttacked(target) && target.Combat.Attacker != attacker)
-        {
-            if (attacker is Player player)
-            {
-                player.PacketSender.SendMessage("They are already under attack!");
-                return false;
-            }
-
-            /* Reset combat */
-            attacker.Combat.Reset();
-        }
-
         if (attacker is Player pl)
         {
             if (pl.UsingBow)
