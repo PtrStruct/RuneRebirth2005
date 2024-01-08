@@ -55,6 +55,7 @@ public class Player : Character
     public override int AttackSpeed { get; set; } = 5;
 
     public bool UsingBow { get; set; }
+    public Projectile.AmmunitionData Projectile { get; set; }
     
     public override void SetInteractionEntity(IEntity entity)
     {

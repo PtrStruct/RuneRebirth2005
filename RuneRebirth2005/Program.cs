@@ -54,6 +54,8 @@ try
 catch (Exception ex)
 {
     Log.Fatal(ex, "Application start-up failed");
+    Log.Fatal(ex.Message, "Application start-up failed");
+    Log.Fatal(ex.StackTrace, "Application start-up failed");
 }
 finally
 {

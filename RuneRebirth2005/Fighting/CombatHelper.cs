@@ -40,6 +40,38 @@ public class CombatHelper
             attacker.Combat.Reset();
         }
 
+        if (attacker is Player pl)
+        {
+            if (pl.UsingBow)
+            {
+                switch (pl.Equipment.GetItem(EquipmentSlot.Ammo).ItemId)
+                {
+                    case 882:
+                        pl.Projectile = Projectile.BRONZE_ARROW;
+                        break;
+                    case 884:
+                        pl.Projectile = Projectile.IRON_ARROW;
+                        break;
+                    case 886:
+                        pl.Projectile = Projectile.STEEL_ARROW;
+                        break;
+                    case 888:
+                        pl.Projectile = Projectile.MITHRIL_ARROW;
+                        break;
+                    case 890:
+                        pl.Projectile = Projectile.ADAMANT_ARROW;
+                        break;
+                    case 892:
+                        pl.Projectile = Projectile.RUNE_ARROW;
+                        break;
+                    default:
+                        pl.PacketSender.SendMessage("You don't have any arrows.");
+                        attacker.Combat.Reset();
+                        return false;
+                }
+            }
+        }
+
         return true;
     }
 

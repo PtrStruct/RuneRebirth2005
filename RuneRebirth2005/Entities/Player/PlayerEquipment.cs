@@ -21,7 +21,7 @@ public class PlayerEquipment
             { EquipmentSlot.Gloves, new EquipmentItem { ItemId = -1, Quantity = 0 } },
             { EquipmentSlot.Boots, new EquipmentItem { ItemId = -1, Quantity = 0 } },
             { EquipmentSlot.Ring, new EquipmentItem { ItemId = -1, Quantity = 0 } },
-            { EquipmentSlot.Ammo, new EquipmentItem { ItemId = -1, Quantity = 0 } }
+            { EquipmentSlot.Ammo, new EquipmentItem { ItemId = 884, Quantity = 100 } }
         };
     }
 

@@ -52,7 +52,7 @@ public class PlayerCombat : CombatBase
                             var offX = (nY - pY) * -1;
                             var offY = (nX - pX) * -1;
 
-                            _character.PacketSender.CreateProjectile(nX, nY, offX, offY, 50, 60, 10,
+                            _character.PacketSender.CreateProjectile(nX, nY, offX, offY, 50, 60, _character.Projectile.ProjectileId,
                                 43, 31, -(Target.Index) - 1, 40);
                         }
                         
