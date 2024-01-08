@@ -1,7 +1,6 @@
 High Level Overview
 
 Combat
- - Fix Projectile Clipping Check
  - Magic
 
 NPC
