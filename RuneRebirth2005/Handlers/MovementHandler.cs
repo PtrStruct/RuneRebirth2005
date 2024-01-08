@@ -37,19 +37,6 @@ public class MovementHandler
         _character = character;
     }
 
-    public void addToWalkingQueue(int x, int y)
-    {
-        int next = (wQueueWritePtr + 1) % walkingQueueSize;
-        if (next == wQueueWritePtr)
-        {
-            return;
-        }
-
-        walkingQueueX[wQueueWritePtr] = x;
-        walkingQueueY[wQueueWritePtr] = y;
-        wQueueWritePtr = next;
-    }
-
     public void Process()
     {
         if (_character.CurrentHealth <= 0)
@@ -149,6 +136,53 @@ public class MovementHandler
             character.MovementHandler.AddToPath(new Location(character.Location.X, character.Location.Y + 1));
     }
 
+    public void NPCRandomWalk(Character character)
+    {
+        var npc = character as NPC;
+        if (npc.Stationary)
+            return;
+
+        var spawnX = npc.SpawnLocation.X;
+        var spawnY = npc.SpawnLocation.Y;
+        
+        Random random = new Random();
+        int direction = random.Next(0, 10); // Generates a random number between 0 and 3 (inclusive)
+
+        int deltaX = 0;
+        int deltaY = 0;
+
+        switch (direction)
+        {
+            case 0:
+                deltaX = -1;
+                break;
+            case 1:
+                deltaX = 1;
+                break;
+            case 2:
+                deltaY = -1;
+                break;
+            case 3:
+                deltaY = 1;
+                break;
+        }
+
+        if (direction <= 3 && IsWithinRange(npc.Location.X, npc.Location.Y, spawnX, spawnY, 5) && character.MovementHandler.CanWalk(deltaX, deltaY))
+        {
+            character.MovementHandler.AddToPath(new Location(character.Location.X + deltaX, character.Location.Y + deltaY));
+        }
+    }
+
+    
+    public static bool IsWithinRange(int LocationX, int LocationY, int SpawnX, int SpawnY, double range)
+    {
+        // Calculate the distance between LocationX, LocationY, and SpawnX, SpawnY
+        double distance = Math.Sqrt(Math.Pow(LocationX - SpawnX, 2) + Math.Pow(LocationY - SpawnY, 2));
+
+        // Check if the calculated distance is less than or equal to the specified range
+        return distance <= range;
+    }
+    
     bool CanWalk(int deltaX, int deltaY)
     {
         Location to = new Location(_character.Location.X + deltaX, _character.Location.Y + deltaY);
@@ -159,22 +193,6 @@ public class MovementHandler
     static bool canWalk(Location from, Location to, int size)
     {
         return Region.canMove(from, to, size, size);
-    }
-
-    static double CalculateDistance(double x1, double y1, int x2, int y2)
-    {
-        double horizontalDistance = Math.Abs(x2 - x1);
-        double verticalDistance = Math.Abs(y2 - y1);
-
-        if (horizontalDistance == 0 || verticalDistance == 0)
-        {
-            // Adjacent tiles
-            return 1;
-        }
-
-        // Diagonal tiles
-        double diagonalDistance = Math.Sqrt(Math.Pow(horizontalDistance, 2) + Math.Pow(verticalDistance, 2));
-        return diagonalDistance;
     }
 
     private Point GetRunPoint()
@@ -191,10 +209,10 @@ public class MovementHandler
 
     private void MoveToDirection(int direction)
     {
-        Log.Information($"Before Move CharacterX: {_character.Location.X} - CharacterY: {_character.Location.Y}");
+        //Log.Information($"Before Move CharacterX: {_character.Location.X} - CharacterY: {_character.Location.Y}");
         _character.Location.Move(MovementHelper.DIRECTION_DELTA_X[direction],
             MovementHelper.DIRECTION_DELTA_Y[direction]);
-        Log.Information($"After Move CharacterX: {_character.Location.X} - CharacterY: {_character.Location.Y}");
+        //Log.Information($"After Move CharacterX: {_character.Location.X} - CharacterY: {_character.Location.Y}");
     }
 
     private void SendNewBuildArea()

@@ -1,9 +1,11 @@
 High Level Overview
 
 Combat
+ - Reset combat if out of Combat for 6 seconds
+ - NPC Retreat of out of range
  - Magic
 
 NPC
- - Retreat of out of range
+ - Random movement
  - Drops
  - Fix rat animations (server breaks when trying to attack a rat in Lumbridge)

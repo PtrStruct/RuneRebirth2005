@@ -47,7 +47,7 @@ public class Region
             _clips[height] = new int[64][];
             for (var i = 0; i < 64; i++) _clips[height][i] = new int[64];
         }
-        
+
         _clips[height][x - regionAbsX][y - regionAbsY] |= shift;
     }
 
@@ -66,11 +66,28 @@ public class Region
 
     private int GetClip(int x, int y, int height)
     {
-        var regionAbsX = (Id >> 8) * 64;
-        var regionAbsY = (Id & 0xff) * 64;
-        if (_clips[height] == null) return 0;
+        int zx;
+        int zy;
+        try
+        {
+            var regionAbsX = (Id >> 8) * 64;
+            var regionAbsY = (Id & 0xff) * 64;
+            if (_clips[height] == null) return 0;
+            zx = x - regionAbsX;
+            zy = y - regionAbsY;
 
-        return _clips[height][x - regionAbsX][y - regionAbsY];
+            if (zx >= 0 && zx <= 64 && zy >= 0 && zy <= 64)
+            {
+                return _clips[height][x - regionAbsX][y - regionAbsY];
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return -1;
     }
 
     private int GetProjectileClip(int x, int y, int height)
@@ -498,10 +515,12 @@ public class Region
         {
             if (ObjectDefinition.Lookup(objectId).IsSolid)
             {
-                AddClippingForVariableObject(x, y, height, type, direction, ObjectDefinition.Lookup(objectId).IsClipped);
+                AddClippingForVariableObject(x, y, height, type, direction,
+                    ObjectDefinition.Lookup(objectId).IsClipped);
 
                 if (ObjectDefinition.Lookup(objectId).IsImpenetrable)
-                    AddProjectileClippingForVariableObject(x, y, height, type, direction, ObjectDefinition.Lookup(objectId).IsClipped);
+                    AddProjectileClippingForVariableObject(x, y, height, type, direction,
+                        ObjectDefinition.Lookup(objectId).IsClipped);
             }
         }
 
@@ -1095,15 +1114,16 @@ public class Region
 
         if (isSet)
         {
-            if (((type - 0x0002000) & 0x1280108) == 0 || 
-                ((type - 0x0002000) & 0x1280108) == 256 || 
-                ((type - 0x0002000) & 0x1280108) == 2 || 
-                ((type - 0x0002000) & 0x1280108) == 32 || 
-                ((type - 0x0002000) & 0x1280108) == 8 || 
+            if (((type - 0x0002000) & 0x1280108) == 0 ||
+                ((type - 0x0002000) & 0x1280108) == 256 ||
+                ((type - 0x0002000) & 0x1280108) == 2 ||
+                ((type - 0x0002000) & 0x1280108) == 32 ||
+                ((type - 0x0002000) & 0x1280108) == 8 ||
                 GetClipping(x - 1, y, z) == 0)
             {
                 return true;
             }
+
             return false;
         }
         else
@@ -1129,15 +1149,15 @@ public class Region
 
         if (isSet)
         {
-            if (((GetClipping(x + 1, y, z) - 0x0002000) & 0x1280180) == 0 || 
+            if (((GetClipping(x + 1, y, z) - 0x0002000) & 0x1280180) == 0 ||
                 ((GetClipping(x + 1, y, z) - 0x0002000) & 0x1280180) == 128 ||
-                ((GetClipping(x + 1, y, z) - 0x0002000) & 0x1280180) == 256 || 
+                ((GetClipping(x + 1, y, z) - 0x0002000) & 0x1280180) == 256 ||
                 ((GetClipping(x + 1, y, z) - 0x0002000) & 0x1280180) == 32 ||
                 GetClipping(x + 1, y, z) == 0)
             {
                 return true;
             }
-        
+
             return false;
         }
         else
@@ -1168,7 +1188,7 @@ public class Region
             {
                 return true;
             }
-        
+
             return false;
         }
         else
@@ -1183,7 +1203,7 @@ public class Region
             }
         }
     }
-    
+
     public static bool BlockedRangeNorth(int x, int y, int z)
     {
         int clip = GetClipping(x, y + 1, z);
@@ -1194,14 +1214,15 @@ public class Region
 
         if (isSet)
         {
-            if (((GetClipping(x, y + 1, z) - 0x0002000) & 0x1280120) == 0 || 
-                ((GetClipping(x, y + 1, z) - 0x0002000) & 0x1280120) == 288 || 
-                ((GetClipping(x, y + 1, z) - 0x0002000) & 0x1280120) == 256 || 
-                ((GetClipping(x, y + 1, z) - 0x0002000) & 0x1280120) == 32 || 
+            if (((GetClipping(x, y + 1, z) - 0x0002000) & 0x1280120) == 0 ||
+                ((GetClipping(x, y + 1, z) - 0x0002000) & 0x1280120) == 288 ||
+                ((GetClipping(x, y + 1, z) - 0x0002000) & 0x1280120) == 256 ||
+                ((GetClipping(x, y + 1, z) - 0x0002000) & 0x1280120) == 32 ||
                 GetClipping(x, y + 1, z) == 0)
             {
                 return true;
             }
+
             return false;
         }
         else
@@ -1216,7 +1237,7 @@ public class Region
             }
         }
     }
-    
+
     public static bool BlockedRangeSouthWest(int x, int y, int z)
     {
         int type = Region.GetClipping(x - 1, y - 1, z);
@@ -1224,10 +1245,10 @@ public class Region
 
         if (isSet)
         {
-            if (((type - 0x0002000) & 0x128010e) == 0 || 
+            if (((type - 0x0002000) & 0x128010e) == 0 ||
                 ((type - 0x0002000) & 0x128010e) == 8 ||
-                ((type - 0x0002000) & 0x128010e) == 256 || 
-                ((type - 0x0002000) & 0x128010e) == 2 || 
+                ((type - 0x0002000) & 0x128010e) == 256 ||
+                ((type - 0x0002000) & 0x128010e) == 2 ||
                 ((type - 0x0002000) & 0x128010e) == 32 ||
                 GetClipping(x - 1, y - 1, z) == 0)
             {
@@ -1248,7 +1269,7 @@ public class Region
             }
         }
     }
-    
+
     public static bool BlockedRangeSouthEast(int x, int y, int z)
     {
         int type = Region.GetClipping(x + 1, y - 1, z);
@@ -1256,16 +1277,16 @@ public class Region
 
         if (isSet)
         {
-            if (((type - 0x0002000) & 0x1280183) == 0 || 
-                ((type - 0x0002000) & 0x1280183) == 256 || 
-                ((type - 0x0002000) & 0x1280183) == 128 || 
-                ((type - 0x0002000) & 0x1280183) == 2 || 
-                ((type - 0x0002000) & 0x1280183) == 32 || 
+            if (((type - 0x0002000) & 0x1280183) == 0 ||
+                ((type - 0x0002000) & 0x1280183) == 256 ||
+                ((type - 0x0002000) & 0x1280183) == 128 ||
+                ((type - 0x0002000) & 0x1280183) == 2 ||
+                ((type - 0x0002000) & 0x1280183) == 32 ||
                 GetClipping(x + 1, y - 1, z) == 0)
             {
                 return true;
             }
-        
+
             return false;
         }
         else
@@ -1280,7 +1301,7 @@ public class Region
             }
         }
     }
-    
+
     public static bool BlockedRangeNorthWest(int x, int y, int z)
     {
         int type = Region.GetClipping(x - 1, y + 1, z);
@@ -1288,16 +1309,16 @@ public class Region
 
         if (isSet)
         {
-            if (((type - 0x0002000) & 0x1280138) == 0 || 
+            if (((type - 0x0002000) & 0x1280138) == 0 ||
                 ((type - 0x0002000) & 0x1280138) == 8 ||
-                ((type - 0x0002000) & 0x1280138) == 256 || 
-                ((type - 0x0002000) & 0x1280138) == 2 || 
-                ((type - 0x0002000) & 0x1280138) == 32 || 
+                ((type - 0x0002000) & 0x1280138) == 256 ||
+                ((type - 0x0002000) & 0x1280138) == 2 ||
+                ((type - 0x0002000) & 0x1280138) == 32 ||
                 GetClipping(x - 1, y + 1, z) == 0)
             {
                 return true;
             }
-        
+
             return false;
         }
         else
@@ -1312,7 +1333,7 @@ public class Region
             }
         }
     }
-    
+
     public static bool BlockedRangeNorthEast(int x, int y, int z)
     {
         int type = Region.GetClipping(x + 1, y + 1, z);
@@ -1320,16 +1341,16 @@ public class Region
 
         if (isSet)
         {
-            if (((type - 0x0002000) & 0x12801e0) == 0 || 
-                ((type - 0x0002000) & 0x12801e0) == 256 || 
-                ((type - 0x0002000) & 0x12801e0) == 128 || 
-                ((type - 0x0002000) & 0x12801e0) == 2 || 
-                ((type - 0x0002000) & 0x12801e0) == 32 || 
+            if (((type - 0x0002000) & 0x12801e0) == 0 ||
+                ((type - 0x0002000) & 0x12801e0) == 256 ||
+                ((type - 0x0002000) & 0x12801e0) == 128 ||
+                ((type - 0x0002000) & 0x12801e0) == 2 ||
+                ((type - 0x0002000) & 0x12801e0) == 32 ||
                 GetClipping(x + 1, y + 1, z) == 0)
             {
                 return true;
             }
-        
+
             return false;
         }
         else
@@ -1344,5 +1365,4 @@ public class Region
             }
         }
     }
-
 }

@@ -129,6 +129,7 @@ public class ServerEngine
             var npc = Server.NPCs[i];
             if (npc == null) continue;
             // npc.MovementHandler.AddToPath(new Location(npc.Location.X + 1, npc.Location.Y));
+            npc.MovementHandler.NPCRandomWalk(npc);
             npc.MovementHandler.Process();
         }
 
